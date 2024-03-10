@@ -13,4 +13,6 @@
 
 # Europa Library
 
+Web application library that allows to catalog and download e-books.
+
 (Work in progress)
