@@ -1,9 +1,12 @@
 spring:
+  batch:
+    jdbc:
+      initialize-schema: always
   mvc:
     dispatch-options-request: true
   datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5436/europealibrary
+    driverClassName: org.sqlite.JDBC
+    url: jdbc:sqlite:europealibrary.db
     username: admin
     password: password
     testOnBorrow: true
@@ -20,7 +23,7 @@ spring:
         generate_statistics: true
         highlight_sql: true
     show-sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
   liquibase:
     change-log: classpath:/database/db.changelog.xml
     enabled: true
@@ -32,4 +35,9 @@ server:
 com:
   andreidodu:
     europa-library:
-      e-books-directory: "/home/test"
+      e-books-directory: "/home"
+
+db1:
+  url: jdbc:postgresql://localhost:5436/europealibrary
+  username: admin
+  password: password

@@ -1,11 +1,12 @@
+spring.batch.jdbc.initialize-schema: always
 spring:
   mvc:
     dispatch-options-request: true
   datasource:
-    driverClassName: org.sqlite.JDBC
-    url: jdbc:sqlite:europealibrary.db
-    username: admin
-    password: password
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5436/db
+    username: postgres
+    password: postgres
     testOnBorrow: true
     timeBetweenEvictionRunsMillis: 60000
     validationQuery: SELECT 1
@@ -20,16 +21,25 @@ spring:
         generate_statistics: true
         highlight_sql: true
     show-sql: true
-    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     change-log: classpath:/database/db.changelog.xml
     enabled: true
   servlet:
     multipart:
       enabled: false
+
 server:
   port: 8081
 com:
   andreidodu:
     europa-library:
-      e-books-directory: "/home/test"
+      e-books-directory: "/home/andrei/Documents"
+    task:
+      cron:
+        expression: "* */30 * * * ?"
+
+batchdb:
+  url: jdbc:postgresql://localhost:5436/db
+  username: postgres
+  password: postgres
