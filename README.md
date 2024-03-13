@@ -12,7 +12,7 @@
 
 # Europea Library
 
-Web application library that allows to catalog and download e-books.
+A library web application that allows to catalog and download e-books.
 
 (Work in progress)
 
@@ -23,11 +23,11 @@ Web application library that allows to catalog and download e-books.
 - Spring JPA (Spring Boot 3.3.0)
 - Liquibase (4.21)
 
-## Log changes
+## Changes log
 
 - 2024-03-13 - Job and files/directories DB schema
     - completed implementation of the db schema for storing files and directories information
-    - completed implementation of the job that indexes the directory file and stores them on DB hierarchically
+    - completed implementation of the job that indexes the directory files and stores them on DB hierarchically
         - added an endpoint that allows to run the job
         - the job starts every X minutes (configurable)
         - the job consists of 3 steps:
