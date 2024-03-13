@@ -32,14 +32,13 @@ import java.util.Map;
 public class JobConfiguration {
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     private Integer batchSize;
-    final private DataSource dataSource;
+
     final private EntityManagerFactory emFactory;
 
     @Bean
     public Job indexerJob(JobRepository jobRepository, Step indexDirectoriesAndFilesStep, Step deleteDbFilesStep, Step finalizeJobStep) {
         return new JobBuilder("indexerJob", jobRepository)
                 .incrementer(new SampleIncrementer())
-                //.preventRestart()
                 .start(indexDirectoriesAndFilesStep)
                 .next(deleteDbFilesStep)
                 .next(finalizeJobStep)

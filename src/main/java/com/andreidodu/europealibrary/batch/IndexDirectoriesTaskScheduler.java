@@ -19,15 +19,20 @@ import java.util.Date;
 @Component
 @RequiredArgsConstructor
 public class IndexDirectoriesTaskScheduler {
+    public static final String JOB_PARAMETER_DATE_KEY = "date";
     private final JobLauncher jobLauncher;
     private final Job job;
 
     @Scheduled(cron = "${com.andreidodu.task.cron.expression}")
     public void runIndexDirectoriesTaskScheduler() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         try {
-            jobLauncher.run(job, new JobParametersBuilder().addDate("date", new Date(System.currentTimeMillis())).toJobParameters());
+            jobLauncher.run(job, generateJobParameters());
         } catch (JobExecutionAlreadyRunningException e) {
             log.warn("Job is already running");
         }
+    }
+
+    private static JobParameters generateJobParameters() {
+        return new JobParametersBuilder().addDate(JOB_PARAMETER_DATE_KEY, new Date(System.currentTimeMillis())).toJobParameters();
     }
 }
