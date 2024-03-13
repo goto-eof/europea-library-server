@@ -1,5 +1,9 @@
-spring.batch.jdbc.initialize-schema: always
 spring:
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
   mvc:
     dispatch-options-request: true
   datasource:
@@ -20,6 +24,9 @@ spring:
         default_schema: public
         generate_statistics: true
         highlight_sql: true
+        order_inserts: true
+        jdbc:
+          batch_size: 100
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
@@ -35,9 +42,10 @@ com:
   andreidodu:
     europa-library:
       e-books-directory: "/home/andrei/Documents"
+      # e-books-directory: "/home/andrei/Desktop/ciao"
     task:
       cron:
-        expression: "* */30 * * * ?"
+        expression: "* */59 * * * ?"
 
 batchdb:
   url: jdbc:postgresql://localhost:5436/db

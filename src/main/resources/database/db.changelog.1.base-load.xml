@@ -4,5 +4,49 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
+    <changeSet id="2024-03-13-001" author="Andrei Dodu">
+        <createTable tableName="${tablePrefix}file_system_item">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_file_system_item"/>
+            </column>
+            <column name="name" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_path" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="size" type="bigint"/>
+            <column name="file_create_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_update_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_directory" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="BIGINT">
+                <constraints nullable="true" foreignKeyName="fk_fs_item_parent"
+                             references="${tablePrefix}file_system_item(id)"/>
+            </column>
+            <column name="job_step" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_status" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Andrei Dodu" id="2024-03-13-002">
+        <addUniqueConstraint
+                columnNames="base_path, name, job_step"
+                constraintName="unq_base_path_name"
+                tableName="${tablePrefix}file_system_item"
+                validate="true"/>
+    </changeSet>
 
 </databaseChangeLog>
