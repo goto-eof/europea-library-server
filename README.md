@@ -15,3 +15,10 @@
 Web application library that allows to catalog and download e-books.
 
 (Work in progress)
+
+
+## Technologies
+- Java (JDK 21)
+- Spring Batch
+- Spring JPA
+- Liquibase
