@@ -21,6 +21,7 @@ A library web application that allows to catalog and download e-books.
 - Java (JDK 21)
 - Spring Batch (Spring Boot 3.3.0)
 - Spring JPA (Spring Boot 3.3.0)
+- Hibernate
 - Liquibase (4.21)
 - PostgreSQL
 
