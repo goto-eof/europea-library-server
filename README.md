@@ -24,6 +24,7 @@ A library web application that allows to catalog and download e-books.
 - Hibernate
 - Liquibase (4.21)
 - PostgreSQL
+- Docker
 
 ## Changes log
 
