@@ -42,7 +42,7 @@ public class FileSystemItem extends ModelCommon {
     private FileSystemItem parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY,
-            cascade = {CascadeType.ALL}, orphanRemoval = true)
+            cascade = {CascadeType.REMOVE}, orphanRemoval = true)
     private List<FileSystemItem> childrenList;
 
     @Column(name = "job_step", nullable = false)

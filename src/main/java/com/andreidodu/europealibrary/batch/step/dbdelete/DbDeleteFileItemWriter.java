@@ -17,11 +17,13 @@ public class DbDeleteFileItemWriter implements ItemWriter<FileSystemItem> {
     final private FileSystemItemRepository fileSystemItemRepository;
 
     @Override
-    public void write(Chunk<? extends FileSystemItem> chunk) throws Exception {
-        chunk.getItems().forEach(item -> {
-            fileSystemItemRepository.delete(item);
-            log.info("record deleted: " + item);
+    public void write(Chunk<? extends FileSystemItem> chunk) {
+        chunk.getItems().forEach(model -> {
+            if (this.fileSystemItemRepository.existsById(model.getId())) {
+                this.fileSystemItemRepository.delete(model);
+            }
         });
+        log.info("records deleted: " + chunk);
         fileSystemItemRepository.flush();
     }
 }

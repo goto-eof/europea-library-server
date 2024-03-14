@@ -25,10 +25,7 @@
             <column name="is_directory" type="boolean">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_id" type="BIGINT">
-                <constraints nullable="true" foreignKeyName="fk_fs_item_parent"
-                             references="${tablePrefix}file_system_item(id)"/>
-            </column>
+            <column name="parent_id" type="BIGINT"/>
             <column name="job_step" type="int">
                 <constraints nullable="false"/>
             </column>
@@ -39,6 +36,14 @@
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="version" type="INT"/>
         </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="parent_id"
+                                 baseTableName="${tablePrefix}file_system_item"
+                                 constraintName="fk_fs_item_parent"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="${tablePrefix}file_system_item"
+                                 validate="true"/>
     </changeSet>
 
     <changeSet author="Andrei Dodu" id="2024-03-13-002">
