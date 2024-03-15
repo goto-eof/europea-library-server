@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.model;
 
+import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @Table(name = "el_book_info", uniqueConstraints = {@UniqueConstraint(columnNames = {"file_meta_info_id", "authors", "publisher"})})
 @EntityListeners(AuditingEntityListener.class)
-public class BookInfo {
+public class BookInfo extends ModelCommon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

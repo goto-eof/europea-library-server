@@ -2,7 +2,7 @@ package com.andreidodu.europealibrary.batch.step.file;
 
 import com.andreidodu.europealibrary.batch.JobStepEnum;
 import com.andreidodu.europealibrary.dto.FileDTO;
-import com.andreidodu.europealibrary.mapper.FileSystemMapper;
+import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import jakarta.transaction.Transactional;
@@ -21,7 +21,7 @@ import java.util.Optional;
 @Transactional
 public class FileItemWriter implements ItemWriter<FileDTO> {
     private final FileSystemItemRepository fileSystemItemRepository;
-    private final FileSystemMapper fileSystemMapper;
+    private final FileSystemItemMapper fileSystemItemMapper;
 
     @Override
     public void write(Chunk<? extends FileDTO> chunk) {
@@ -40,7 +40,7 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
     }
 
     private FileSystemItem buildFileSystemItem(FileDTO fileSystemItemDTO) {
-        FileSystemItem model = this.fileSystemMapper.toModel(fileSystemItemDTO);
+        FileSystemItem model = this.fileSystemItemMapper.toModel(fileSystemItemDTO);
         model.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         this.getParentFileSystemItem(calculateParentBasePath(fileSystemItemDTO.getBasePath()), calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
                 .ifPresent(model::setParent);

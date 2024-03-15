@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.model;
 
+import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class Tag extends ModelCommon {
     private Long id;
 
     @Column(name = "name", length = 100)
-    private String imageUrl;
+    private String name;
 
     @ManyToMany(mappedBy = "tagList")
     private List<FileMetaInfo> fileMetaInfoList;

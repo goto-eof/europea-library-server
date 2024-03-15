@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.model;
+package com.andreidodu.europealibrary.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;

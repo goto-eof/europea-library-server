@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 @Slf4j
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public abstract class FileMapper {
     public FileDTO toDTO(File file) {
         try {
