@@ -20,7 +20,6 @@ public class DbFileItemWriter implements ItemWriter<FileSystemItem> {
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
         chunk.getItems().forEach(item -> {
-            //this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(item.getBasePath(), item.getName(), JobStepEnum.READY.getStepNumber())
             item.setJobStep(JobStepEnum.READY.getStepNumber());
             fileSystemItemRepository.save(item);
             log.info("changed to ready: " + item);

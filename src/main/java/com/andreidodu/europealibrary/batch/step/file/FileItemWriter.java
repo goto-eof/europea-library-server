@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.batch.step.file;
 
 import com.andreidodu.europealibrary.batch.JobStepEnum;
 import com.andreidodu.europealibrary.dto.FileDTO;
+import com.andreidodu.europealibrary.mapper.FileSystemMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @Transactional
 public class FileItemWriter implements ItemWriter<FileDTO> {
     private final FileSystemItemRepository fileSystemItemRepository;
+    private final FileSystemMapper fileSystemMapper;
 
     @Override
     public void write(Chunk<? extends FileDTO> chunk) {
@@ -27,7 +29,6 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
             Optional<FileSystemItem> fileSystemItemOptional = getParentFileSystemItem(fileSystemItemDTO.getBasePath(), fileSystemItemDTO.getName(), JobStepEnum.INSERTED.getStepNumber());
             if (fileSystemItemOptional.isEmpty()) {
                 createAndSaveFileSystemItem(fileSystemItemDTO);
-                // fileSystemItemRepository.flush();
                 log.info("INSERT: " + fileSystemItemDTO);
             }
         });
@@ -39,17 +40,11 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
     }
 
     private FileSystemItem buildFileSystemItem(FileDTO fileSystemItemDTO) {
-        FileSystemItem fileSystemItem = new FileSystemItem();
-        fileSystemItem.setFileCreateDate(fileSystemItemDTO.getFileCreateDate());
-        fileSystemItem.setFileUpdateDate(fileSystemItemDTO.getFileUpdateDate());
-        fileSystemItem.setIsDirectory(fileSystemItemDTO.getIsDirectory());
-        fileSystemItem.setName(fileSystemItemDTO.getName());
-        fileSystemItem.setBasePath(fileSystemItemDTO.getBasePath());
-        fileSystemItem.setSize(fileSystemItemDTO.getSize());
-        fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
+        FileSystemItem model = this.fileSystemMapper.toModel(fileSystemItemDTO);
+        model.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         this.getParentFileSystemItem(calculateParentBasePath(fileSystemItemDTO.getBasePath()), calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
-                .ifPresent(fileSystemItem::setParent);
-        return fileSystemItem;
+                .ifPresent(model::setParent);
+        return model;
     }
 
     private String calculateParentName(String basePath) {
