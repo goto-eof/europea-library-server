@@ -10,21 +10,26 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class JobRunnerServiceImpl implements JobRunnerService {
-    final private JobLauncher jobLauncher;
-    final private Job job;
+    @Autowired
+    private JobLauncher jobLauncher;
+
+    @Autowired
+    @Qualifier("jobIndexer")
+    private Job job;
 
     @Override
     @Async
     public void runJobAsync() throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-        try {   /*new JobParametersBuilder().addDate("date", new Date(System.currentTimeMillis())).toJobParameters()*/
+        try {
             jobLauncher.run(job, new JobParameters());
         } catch (JobExecutionAlreadyRunningException e) {
             log.warn("Job is already running: {}", e.getMessage());

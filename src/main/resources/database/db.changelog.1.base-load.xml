@@ -5,6 +5,23 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
     <changeSet id="2024-03-13-001" author="Andrei Dodu">
+        <createTable tableName="${tablePrefix}file_meta_info">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_file_meta_info"/>
+            </column>
+            <column name="title" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(4000)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+
         <createTable tableName="${tablePrefix}file_system_item">
             <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_file_system_item"/>
@@ -29,9 +46,12 @@
             <column name="job_step" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="job_status" type="int">
-                <constraints nullable="true"/>
+            <column name="file_meta_info_id" type="bigint">
+                <constraints nullable="true"
+                             foreignKeyName="fk_file_meta_info"
+                             references="${tablePrefix}file_meta_info(id)"/>
             </column>
+            <column name="job_status" type="int"/>
             <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="version" type="INT"/>
@@ -43,14 +63,77 @@
                                  referencedColumnNames="id"
                                  referencedTableName="${tablePrefix}file_system_item"
                                  validate="true"/>
-    </changeSet>
 
-    <changeSet author="Andrei Dodu" id="2024-03-13-002">
+
         <addUniqueConstraint
                 columnNames="base_path, name, job_step"
                 constraintName="unq_base_path_name"
                 tableName="${tablePrefix}file_system_item"
                 validate="true"/>
+
+        <createTable tableName="${tablePrefix}book_info">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_book_info"/>
+            </column>
+            <column name="file_meta_info_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_book_file_meta_info"
+                             references="${tablePrefix}file_meta_info(id)"/>
+            </column>
+            <column name="image_url" type="VARCHAR(500)"/>
+            <column name="authors" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="note" type="VARCHAR(2000)"/>
+            <column name="sbn" type="VARCHAR(9)"/>
+            <column name="isbn" type="VARCHAR(13)"/>
+            <column name="publisher" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="year" type="int"/>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+        <addUniqueConstraint
+                columnNames="file_meta_info_id, authors, publisher"
+                constraintName="unq_fil_meta_auth_pub"
+                tableName="${tablePrefix}book_info"
+                validate="true"/>
+
+        <createTable tableName="${tablePrefix}tag">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tag"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+        <createTable tableName="${tablePrefix}file_meta_info_tag">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tag_file_meta_info"/>
+            </column>
+            <column name="file_meta_info_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="fk_file_meta_info"
+                             references="${tablePrefix}file_meta_info(id)"/>
+            </column>
+            <column name="tag_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="fk_tag"
+                             references="${tablePrefix}tag(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="file_meta_info_id, tag_id"
+                constraintName="unq_fil_met_inf_tag_id"
+                tableName="${tablePrefix}file_meta_info_tag"
+                validate="true"/>
+
     </changeSet>
 
 </databaseChangeLog>

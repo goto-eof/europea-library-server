@@ -10,6 +10,5 @@
     <property name="autoIncrement" value="true" dbms="mssql,mysql,postgresql"/>
 
     <include file="db.changelog.1.base-load.xml" relativeToChangelogFile="true"/>
-    <include file="db.changelog.2.base-load.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

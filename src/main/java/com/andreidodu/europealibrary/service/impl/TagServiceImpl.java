@@ -9,4 +9,5 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
+
 }

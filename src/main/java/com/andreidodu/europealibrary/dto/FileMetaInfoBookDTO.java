@@ -16,6 +16,5 @@ public class FileMetaInfoBookDTO extends FileMetaInfoDTO {
     private String isbn;
     private String publisher;
     private Integer year;
-    private List<TagDTO> tagList;
-    private List<FileSystemItemDTO> fileSystemItemList;
+    private List<Long> fileSystemItemIdList;
 }

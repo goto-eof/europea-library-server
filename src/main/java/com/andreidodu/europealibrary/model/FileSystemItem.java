@@ -1,9 +1,12 @@
 package com.andreidodu.europealibrary.model;
 
+import com.andreidodu.europealibrary.mapper.FileMetaInfoMapper;
 import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -52,12 +55,8 @@ public class FileSystemItem extends ModelCommon {
     @Column(name = "job_status")
     private Integer jobStatus;
 
-    @ManyToMany(cascade = {CascadeType.REMOVE})
-    @JoinTable(
-            uniqueConstraints = {@UniqueConstraint(columnNames = {"file_system_item_id", "file_meta_info_id"})},
-            name = "el_file_meta_info_file_system_item",
-            joinColumns = {@JoinColumn(name = "file_system_item_id")},
-            inverseJoinColumns = {@JoinColumn(name = "file_meta_info_id")}
-    )
-    private List<FileMetaInfo> fileMetaInfoList;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.JOIN)
+    @JoinColumn(name = "file_meta_info_id", nullable = true)
+    private FileMetaInfo fileMetaInfo;
 }

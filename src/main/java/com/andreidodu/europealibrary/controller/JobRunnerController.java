@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/job")
+@RequestMapping("/api/v1/job")
 @RequiredArgsConstructor
 public class JobRunnerController {
     final private JobRunnerService jobRunnerService;
 
-    @RequestMapping("/run")
+    @RequestMapping("/indexer/run")
     public ResponseEntity<JobStatusDTO> handle() throws Exception {
         jobRunnerService.runJobAsync();
         return ResponseEntity.ok(buildJobStartedResponse());

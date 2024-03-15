@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -12,6 +13,7 @@ import javax.sql.DataSource;
 import java.util.Objects;
 
 @Configuration
+@EnableJpaAuditing
 @EnableJpaRepositories(basePackages = {"com.andreidodu.europealibrary.repository"})
 // @EntityScan(basePackages = {"com.andreidodu.europalibrary.model"})
 @RequiredArgsConstructor

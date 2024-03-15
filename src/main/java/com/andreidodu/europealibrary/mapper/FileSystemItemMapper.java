@@ -14,6 +14,13 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public abstract class FileSystemItemMapper {
 
+
+    @Mapping(ignore = true, target = "id")
+    @Mapping(ignore = true, target = "parent")
+    @Mapping(ignore = true, target = "childrenList")
+    @Mapping(ignore = true, target = "jobStep")
+    @Mapping(ignore = true, target = "jobStatus")
+    @Mapping(ignore = true, target = "fileMetaInfo")
     public abstract FileSystemItem toModel(FileDTO dto);
 
     public abstract FileSystemItemDTO toDTO(FileSystemItem model);

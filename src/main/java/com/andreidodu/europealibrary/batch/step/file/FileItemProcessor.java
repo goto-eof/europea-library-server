@@ -1,40 +1,31 @@
 package com.andreidodu.europealibrary.batch.step.file;
 
 import com.andreidodu.europealibrary.dto.FileDTO;
+import com.andreidodu.europealibrary.mapper.FileMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
+@Slf4j
 @Component
 public class FileItemProcessor implements ItemProcessor<File, FileDTO> {
+    @Autowired
+    private FileMapper fileMapper;
+
     @Override
     public FileDTO process(final File file) {
-        System.out.println("File processed: " + file.getAbsoluteFile());
+        log.info("File processed: {}", file.getAbsoluteFile());
         try {
-            BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-            FileTime fileCreationTime = attr.creationTime();
-            FileTime fileUpdateTime = attr.lastModifiedTime();
-            FileDTO fileDTO = new FileDTO();
-            LocalDateTime creationDateTime = Instant.ofEpochMilli(fileCreationTime.toMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-            LocalDateTime updateDateTime = Instant.ofEpochMilli(fileUpdateTime.toMillis()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-            fileDTO.setFileCreateDate(creationDateTime);
-            fileDTO.setFileUpdateDate(updateDateTime);
-            fileDTO.setSize(attr.size());
-            fileDTO.setName(file.getName());
-            fileDTO.setIsDirectory(file.isDirectory());
-            fileDTO.setBasePath(file.getParentFile().getAbsolutePath());
-            return fileDTO;
+            return fileMapper.toDTO(file);
         } catch (IOException e) {
+            log.error("Failed to process file: {}", file.toString());
             throw new RuntimeException(e);
         }
     }
+
 
 }

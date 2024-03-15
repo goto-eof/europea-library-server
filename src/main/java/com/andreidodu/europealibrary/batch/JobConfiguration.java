@@ -35,7 +35,7 @@ public class JobConfiguration {
 
     final private EntityManagerFactory emFactory;
 
-    @Bean
+    @Bean("jobIndexer")
     public Job indexerJob(JobRepository jobRepository, Step indexDirectoriesAndFilesStep, Step deleteDbFilesStep, Step finalizeJobStep) {
         return new JobBuilder("indexerJob", jobRepository)
                 .incrementer(new SampleIncrementer())
