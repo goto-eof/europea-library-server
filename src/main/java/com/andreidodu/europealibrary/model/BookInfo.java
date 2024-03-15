@@ -35,7 +35,7 @@ public class BookInfo {
 
     private Integer year;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
     private FileMetaInfo fileMetaInfo;
 }
