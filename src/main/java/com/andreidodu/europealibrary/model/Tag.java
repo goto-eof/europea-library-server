@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @Table(name = "el_tag")
 @EntityListeners(AuditingEntityListener.class)
-public class Tag {
+public class Tag extends ModelCommon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

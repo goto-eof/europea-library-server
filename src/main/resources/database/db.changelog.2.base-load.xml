@@ -81,10 +81,12 @@
             <column name="tag_id" type="bigint">
                 <constraints nullable="false" foreignKeyName="fk_tag" references="${tablePrefix}tag(id)"/>
             </column>
-            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
-            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
-            <column name="version" type="INT"/>
         </createTable>
+        <addUniqueConstraint
+                columnNames="file_meta_info_id, tag_id"
+                constraintName="unq_fil_met_inf_tag_id"
+                tableName="${tablePrefix}file_meta_info_tag"
+                validate="true"/>
     </changeSet>
 
     <changeSet id="2024-03-15-004" author="Andrei Dodu">
@@ -100,10 +102,12 @@
                 <constraints nullable="false" foreignKeyName="fk_file_system_item"
                              references="${tablePrefix}file_system_item(id)"/>
             </column>
-            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
-            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
-            <column name="version" type="INT"/>
         </createTable>
+        <addUniqueConstraint
+                columnNames="file_meta_info_id, file_system_item_id"
+                constraintName="unq_fil_met_inf_fil_sys_id"
+                tableName="${tablePrefix}file_meta_info_file_system_item"
+                validate="true"/>
     </changeSet>
 
 </databaseChangeLog>
