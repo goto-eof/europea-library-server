@@ -15,6 +15,21 @@
             <column name="description" type="VARCHAR(4000)">
                 <constraints nullable="false"/>
             </column>
+
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+
+        <createTable tableName="${tablePrefix}book_metainfo">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_book_metainfo"/>
+            </column>
+            <column name="file_metainfo_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_book_file_metainfo"
+                             references="${tablePrefix}file_metainfo(id)"/>
+            </column>
             <column name="image_url" type="VARCHAR(500)"/>
             <column name="authors" type="VARCHAR(500)">
                 <constraints nullable="false"/>
@@ -32,9 +47,9 @@
         </createTable>
 
         <addUniqueConstraint
-                columnNames="title, authors, publisher"
-                constraintName="unq_title_auth_pub"
-                tableName="${tablePrefix}file_metainfo"
+                columnNames="file_metainfo_id, authors, publisher"
+                constraintName="unq_fil_meta_auth_pub"
+                tableName="${tablePrefix}book_metainfo"
                 validate="true"/>
 
     </changeSet>
