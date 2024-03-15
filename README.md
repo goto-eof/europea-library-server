@@ -28,6 +28,7 @@ A library web application that allows to catalog and download e-books.
 
 ## Changes log
 
+- 2023-03-15 - finished implementation regarding the file meta-info schema.
 - 2024-03-13 - Job and files/directories DB schema
     - completed implementation of the db schema for storing files and directories information
     - completed implementation of the job that indexes the directory files and stores them on DB hierarchically
