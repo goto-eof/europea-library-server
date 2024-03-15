@@ -27,7 +27,7 @@ public class FileMetaInfo extends ModelCommon {
     private BookInfo bookInfo;
 
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(
             name = "el_file_meta_info_tag",
             joinColumns = {@JoinColumn(name = "file_meta_info_id")},

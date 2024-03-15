@@ -51,7 +51,7 @@ public class FileSystemItem extends ModelCommon {
     @Column(name = "job_status")
     private Integer jobStatus;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(
             name = "el_file_meta_info_file_system_item",
             joinColumns = {@JoinColumn(name = "file_system_item_id")},
