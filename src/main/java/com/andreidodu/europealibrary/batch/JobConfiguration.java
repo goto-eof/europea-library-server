@@ -82,7 +82,7 @@ public class JobConfiguration {
     public JpaCursorItemReader<FileSystemItem> dbDeleteFileItemReader() {
         JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<FileSystemItem>());
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
-        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where jobStep =: step");
+        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where jobStep = :step");
         Map<String, Object> parameterValues = new HashMap<>();
         parameterValues.put("step", JobStepEnum.READY.getStepNumber());
         jpaCursorItemReader.setParameterValues(parameterValues);
@@ -94,7 +94,7 @@ public class JobConfiguration {
     public JpaCursorItemReader<FileSystemItem> dbFileItemReader() {
         JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<FileSystemItem>());
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
-        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where jobStep =: step");
+        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where jobStep = :step");
         Map<String, Object> parameterValues = new HashMap<>();
         parameterValues.put("step", JobStepEnum.INSERTED.getStepNumber());
         jpaCursorItemReader.setParameterValues(parameterValues);

@@ -25,12 +25,12 @@ public class FileItemReader implements ItemStreamReader<File> {
 
     @PostConstruct
     public void postConstruct() {
-        System.out.println(ebookDirectory);
+        log.info("ebooks directory: " + ebookDirectory);
         directories.add(Path.of(ebookDirectory));
     }
 
     @Override
-    public File read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public File read() {
         if (iterator.hasNext()) {
             Path path = this.iterator.next();
             File file = path.toFile();

@@ -31,7 +31,6 @@ public class FileItemProcessor implements ItemProcessor<File, FileDTO> {
             fileDTO.setName(file.getName());
             fileDTO.setIsDirectory(file.isDirectory());
             fileDTO.setBasePath(file.getParentFile().getAbsolutePath());
-
             return fileDTO;
         } catch (IOException e) {
             throw new RuntimeException(e);

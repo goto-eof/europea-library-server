@@ -41,11 +41,11 @@ server:
 com:
   andreidodu:
     europa-library:
-      # e-books-directory: "/home/andrei/Documents"
       e-books-directory: "/home/andrei/Desktop/ciao"
+      # e-books-directory: "/home/andrei/Desktop/ciao"
     task:
       cron:
-        expression: "0 0 */2 * * ?"
+        expression: "* * */2 * * ?"
 
 batchdb:
   url: jdbc:postgresql://localhost:5436/db

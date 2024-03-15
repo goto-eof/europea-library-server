@@ -40,7 +40,6 @@
         <addForeignKeyConstraint baseColumnNames="parent_id"
                                  baseTableName="${tablePrefix}file_system_item"
                                  constraintName="fk_fs_item_parent"
-                                 onDelete="CASCADE"
                                  referencedColumnNames="id"
                                  referencedTableName="${tablePrefix}file_system_item"
                                  validate="true"/>

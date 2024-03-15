@@ -13,7 +13,7 @@ public class DbDeleteFileItemProcessor implements ItemProcessor<FileSystemItem, 
 
 
     @Override
-    public FileSystemItem process(FileSystemItem item) throws Exception {
+    public FileSystemItem process(FileSystemItem item) {
         return item;
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Transactional
 public class DbFileItemProcessor implements ItemProcessor<FileSystemItem, FileSystemItem> {
     @Override
-    public FileSystemItem process(FileSystemItem item) throws Exception {
+    public FileSystemItem process(FileSystemItem item) {
         return item;
     }
 }

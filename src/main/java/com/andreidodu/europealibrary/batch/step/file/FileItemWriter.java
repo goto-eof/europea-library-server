@@ -27,13 +27,18 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
             Optional<FileSystemItem> fileSystemItemOptional = getParentFileSystemItem(fileSystemItemDTO.getBasePath(), fileSystemItemDTO.getName(), JobStepEnum.INSERTED.getStepNumber());
             if (fileSystemItemOptional.isEmpty()) {
                 createAndSaveFileSystemItem(fileSystemItemDTO);
+                // fileSystemItemRepository.flush();
                 log.info("INSERT: " + fileSystemItemDTO);
             }
         });
-        fileSystemItemRepository.flush();
     }
 
-    private FileSystemItem createAndSaveFileSystemItem(FileDTO fileSystemItemDTO) {
+    private void createAndSaveFileSystemItem(FileDTO fileSystemItemDTO) {
+        FileSystemItem fileSystemItem = buildFileSystemItem(fileSystemItemDTO);
+        fileSystemItemRepository.save(fileSystemItem);
+    }
+
+    private FileSystemItem buildFileSystemItem(FileDTO fileSystemItemDTO) {
         FileSystemItem fileSystemItem = new FileSystemItem();
         fileSystemItem.setFileCreateDate(fileSystemItemDTO.getFileCreateDate());
         fileSystemItem.setFileUpdateDate(fileSystemItemDTO.getFileUpdateDate());
@@ -44,7 +49,7 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         this.getParentFileSystemItem(calculateParentBasePath(fileSystemItemDTO.getBasePath()), calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
                 .ifPresent(fileSystemItem::setParent);
-        return fileSystemItemRepository.save(fileSystemItem);
+        return fileSystemItem;
     }
 
     private String calculateParentName(String basePath) {
@@ -55,7 +60,7 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         return new File(basePath).getParentFile().getAbsolutePath();
     }
 
-    private Optional<FileSystemItem> getParentFileSystemItem(String basePAth, String name, int jobStep) {
-        return this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(basePAth, name, jobStep);
+    private Optional<FileSystemItem> getParentFileSystemItem(String basePath, String name, int jobStep) {
+        return this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(basePath, name, jobStep);
     }
 }
