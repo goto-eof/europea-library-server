@@ -26,6 +26,9 @@ A library web application that allows to catalog and download e-books.
 - PostgreSQL
 - Docker
 
+## DB schema
+![db_schema](images/db_schema.png)
+
 ## Changes log
 
 - 2023-03-15 - finished implementation regarding the file meta-info schema.
