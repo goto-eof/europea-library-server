@@ -53,6 +53,7 @@ public class FileSystemItem extends ModelCommon {
 
     @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"file_system_item_id", "file_meta_info_id"})},
             name = "el_file_meta_info_file_system_item",
             joinColumns = {@JoinColumn(name = "file_system_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "file_meta_info_id")}

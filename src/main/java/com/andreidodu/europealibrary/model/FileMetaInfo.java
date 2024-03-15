@@ -29,6 +29,7 @@ public class FileMetaInfo extends ModelCommon {
 
     @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"file_meta_info_id", "tag_id"})},
             name = "el_file_meta_info_tag",
             joinColumns = {@JoinColumn(name = "file_meta_info_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")}
