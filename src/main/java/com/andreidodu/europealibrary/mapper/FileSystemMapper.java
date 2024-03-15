@@ -10,10 +10,12 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public abstract class FileSystemMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "parent", ignore = true)
-    @Mapping(target = "childrenList", ignore = true)
-    @Mapping(target = "jobStep", ignore = true)
-    @Mapping(target = "jobStatus", ignore = true)
+//    @Mapping(target = "id", ignore = true)
+//    @Mapping(target = "parent", ignore = true)
+//    @Mapping(target = "childrenList", ignore = true)
+//    @Mapping(target = "jobStep", ignore = true)
+//    @Mapping(target = "jobStatus", ignore = true)
+//    @Mapping(target = "fileMetaInfoList", ignore = true)
+//    @Mapping(target = "version", ignore = true)
     public abstract FileSystemItem toModel(FileDTO dto);
 }

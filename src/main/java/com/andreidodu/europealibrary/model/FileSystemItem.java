@@ -50,4 +50,12 @@ public class FileSystemItem extends ModelCommon {
 
     @Column(name = "job_status")
     private Integer jobStatus;
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "el_file_meta_info_file_system_item",
+            joinColumns = {@JoinColumn(name = "file_system_item_id")},
+            inverseJoinColumns = {@JoinColumn(name = "file_meta_info_id")}
+    )
+    private List<FileMetaInfo> fileMetaInfoList;
 }
