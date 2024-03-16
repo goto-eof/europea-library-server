@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.mapper;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import jdk.jfr.Name;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,17 +27,23 @@ public abstract class FileSystemItemMapper {
 
     @Mapping(ignore = true, target = "childrenList")
     @Mapping(ignore = true, target = "parent")
-    public abstract FileSystemItemDTO toDTOWithoutChildren(FileSystemItem model);
+    public abstract FileSystemItemDTO toDTOWithoutChildrenAndParent(FileSystemItem model);
+
+    @Named(value = "parentToDTO")
+    @Mapping(ignore = true, target = "childrenList")
+    @Mapping(target = "parent", source = "parent", qualifiedByName = "parentToDTO")
+    public abstract FileSystemItemDTO toDTOParent(FileSystemItem model);
 
     public FileSystemItemDTO toDTO(FileSystemItem model) {
-        FileSystemItemDTO dto = this.toDTOWithoutChildren(model);
-        dto.setChildrenList(toDTOWithoutChildren(model.getChildrenList()));
-        dto.setParent(this.toDTOWithoutChildren(model.getParent()));
+        FileSystemItemDTO dto = this.toDTOWithoutChildrenAndParent(model);
+        dto.setChildrenList(toDTOWithoutChildrenAndParent(model.getChildrenList()));
+        dto.setParent(this.toDTOParent(model.getParent()));
+
         return dto;
     }
 
 
-    public  List<FileSystemItemDTO> toDTOWithoutChildren(List<FileSystemItem> fileSystemItemList){
-        return fileSystemItemList.stream().map(this::toDTOWithoutChildren).toList();
+    public List<FileSystemItemDTO> toDTOWithoutChildrenAndParent(List<FileSystemItem> fileSystemItemList) {
+        return fileSystemItemList.stream().map(this::toDTOWithoutChildrenAndParent).toList();
     }
 }
