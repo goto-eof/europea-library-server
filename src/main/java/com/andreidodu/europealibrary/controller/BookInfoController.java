@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 public class BookInfoController {
     final private BookInfoService bookInfoService;
 
+    @GetMapping("/fileSystemItemId/{fileSystemItemId}")
+    public ResponseEntity<FileMetaInfoBookDTO> retrieveByFileSystemItemId(@PathVariable Long fileSystemItemId) throws Exception {
+        FileMetaInfoBookDTO dto = this.bookInfoService.retrieveByFileSystemItemId(fileSystemItemId);
+        return ResponseEntity.ok(dto);
+    }
+
     @GetMapping("/id/{id}")
     public ResponseEntity<FileMetaInfoBookDTO> retrieve(@PathVariable Long id) throws Exception {
         FileMetaInfoBookDTO dto = this.bookInfoService.retrieveById(id);

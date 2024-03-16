@@ -7,6 +7,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TagDTO extends CommonDTO {
-    private Long id;
     private String name;
 }

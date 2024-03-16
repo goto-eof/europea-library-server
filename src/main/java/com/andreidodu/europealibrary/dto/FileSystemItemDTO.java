@@ -14,7 +14,6 @@ import java.util.List;
 @Getter
 @Setter
 public class FileSystemItemDTO extends CommonDTO {
-    private Long id;
     private String name;
     private Long size;
     private String basePath;

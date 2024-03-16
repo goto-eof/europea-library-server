@@ -11,4 +11,6 @@ public interface BookInfoService {
     FileMetaInfoBookDTO updateBookInfo(Long id, FileMetaInfoBookDTO dto);
 
     OperationStatusDTO delete(Long id);
+
+    FileMetaInfoBookDTO retrieveByFileSystemItemId(Long fileSystemItemId);
 }

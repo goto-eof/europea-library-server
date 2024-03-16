@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonDTO {
-
+    private Long id;
     protected LocalDateTime createdDate;
     protected LocalDateTime lastModifiedDate;
 }

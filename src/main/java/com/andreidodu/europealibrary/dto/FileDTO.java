@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.dto;
 
+import com.andreidodu.europealibrary.dto.common.CommonDTO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,8 +10,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class FileDTO {
-    private Long id;
+public class FileDTO  extends CommonDTO {
+
     private String name;
     private Long size;
     private String basePath;

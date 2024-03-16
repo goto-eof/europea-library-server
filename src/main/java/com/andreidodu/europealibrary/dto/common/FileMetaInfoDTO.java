@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @Setter
 public class FileMetaInfoDTO extends CommonDTO {
-    protected Long id;
     protected String title;
     protected String description;
     private List<TagDTO> tagList;

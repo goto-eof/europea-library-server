@@ -72,6 +72,20 @@ public class BookInfoServiceImpl implements BookInfoService {
                 .orElse(new OperationStatusDTO(false, "not found"));
     }
 
+    @Override
+    public FileMetaInfoBookDTO retrieveByFileSystemItemId(Long fileSystemItemId) {
+        FileSystemItem fileSystemItem = checkFileSystemItemExistence(fileSystemItemId);
+        return this.fileMetaInfoBookMapper.toDTO(fileSystemItem.getFileMetaInfo());
+    }
+
+    private FileSystemItem checkFileSystemItemExistence(Long fileSystemItemId) {
+        Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findById(fileSystemItemId);
+        if (fileSystemItemOptional.isEmpty()) {
+            throw new ApplicationException("Entity not found");
+        }
+        return fileSystemItemOptional.get();
+    }
+
     private FileMetaInfo checkFileMetaInfoExistence(Long id) {
         Optional<FileMetaInfo> model = this.repository.findById(id);
         if (model.isEmpty()) {
