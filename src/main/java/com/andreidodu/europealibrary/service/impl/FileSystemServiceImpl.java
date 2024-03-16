@@ -49,12 +49,7 @@ public class FileSystemServiceImpl implements FileSystemService {
         if (fileSystemItemOptional.isEmpty()) {
             throw new ApplicationException("Entity not found");
         }
-        FileSystemItem fileSystemItem = fileSystemItemOptional.get();
-        fileSystemItem.getChildrenList()
-                .sort(Comparator.comparing(FileSystemItem::getIsDirectory)
-                        .reversed()
-                        .thenComparing(FileSystemItem::getName));
-        return fileSystemItemMapper.toDTO(fileSystemItem);
+        return this.manageCaseReadDirectoryIdProvided(fileSystemItemOptional.get().getId());
     }
 
     private FileSystemItem checkFileSystemItemExistence(Long id) {
