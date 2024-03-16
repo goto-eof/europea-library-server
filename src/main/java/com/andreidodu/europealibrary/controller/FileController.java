@@ -1,6 +1,8 @@
 package com.andreidodu.europealibrary.controller;
 
+import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
+import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import com.andreidodu.europealibrary.service.FileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FileController {
     final private FileSystemService fileSystemService;
+    final private CursoredFileSystemService cursoredFileSystemService;
 
     @GetMapping("/parentId/{id}")
     public ResponseEntity<FileSystemItemDTO> retrieveByParentDirectory(@PathVariable Long id) {
@@ -28,5 +31,18 @@ public class FileController {
         FileSystemItemDTO dto = fileSystemService.readDirectory();
         return ResponseEntity.ok(dto);
     }
+
+    @GetMapping
+    public ResponseEntity<FileSystemItemDTO> retrieveCursored(@RequestBody CursorRequestDTO cursorRequestDTO) {
+        FileSystemItemDTO dto = cursoredFileSystemService.readDirectory(cursorRequestDTO);
+        return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping
+    public ResponseEntity<FileSystemItemDTO> retrieveCursoredRoot(@RequestBody CursorRequestDTO cursorRequestDTO) {
+        FileSystemItemDTO dto = cursoredFileSystemService.readDirectory();
+        return ResponseEntity.ok(dto);
+    }
+
 
 }

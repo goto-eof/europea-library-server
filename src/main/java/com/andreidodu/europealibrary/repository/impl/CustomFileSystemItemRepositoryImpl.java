@@ -1,7 +1,35 @@
 package com.andreidodu.europealibrary.repository.impl;
 
+import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.model.QFileSystemItem;
 import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
+import java.util.List;
 
 public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemRepository {
+    @PersistenceContext
+    private EntityManager entityManager;
 
+
+    @Override
+    public List<FileSystemItem> retrieveChildrenByCursor(Long parentId, Long cursorId, int numberOfResults) {
+        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(fileSystemItem.parent.id.eq(parentId));
+        if (cursorId != null) {
+            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
+        }
+
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(fileSystemItem)
+                .from(fileSystemItem)
+                .where(booleanBuilder)
+                .limit(numberOfResults + 1)
+                .fetch();
+    }
 }

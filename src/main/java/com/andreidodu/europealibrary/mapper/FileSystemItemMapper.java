@@ -38,8 +38,11 @@ public abstract class FileSystemItemMapper {
         FileSystemItemDTO dto = this.toDTOWithoutChildrenAndParent(model);
         dto.setChildrenList(toDTOWithoutChildrenAndParent(model.getChildrenList()));
         dto.setParent(this.toDTOParent(model.getParent()));
-
         return dto;
+    }
+
+    public List<FileSystemItemDTO> toDTO(List<FileSystemItem> list) {
+        return list.stream().map(this::toDTOWithoutChildrenAndParent).toList();
     }
 
 
