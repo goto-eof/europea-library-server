@@ -11,6 +11,8 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
+
 @Slf4j
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {TagMapper.class})
 public abstract class FileMetaInfoBookMapper {
@@ -21,14 +23,18 @@ public abstract class FileMetaInfoBookMapper {
 
 
     public FileMetaInfoBookDTO toDTO(FileMetaInfo fileMetaInfo) {
-        FileMetaInfoBookDTO book = new FileMetaInfoBookDTO();
-        this.map(book, fileMetaInfo.getBookInfo());
-        this.fileMetaInfoMapper.map(book, fileMetaInfo);
-        book.setFileSystemItemIdList(fileMetaInfo.getFileSystemItemList()
-                .stream()
-                .map(FileSystemItem::getId)
-                .toList());
-        return book;
+        return Optional.ofNullable(fileMetaInfo)
+                .map(model -> {
+                    FileMetaInfoBookDTO book = new FileMetaInfoBookDTO();
+                    this.map(book, fileMetaInfo.getBookInfo());
+                    this.fileMetaInfoMapper.map(book, fileMetaInfo);
+                    book.setFileSystemItemIdList(fileMetaInfo.getFileSystemItemList()
+                            .stream()
+                            .map(FileSystemItem::getId)
+                            .toList());
+                    return book;
+                }).orElse(null);
+
     }
 
     @Mapping(ignore = true, target = "title")
