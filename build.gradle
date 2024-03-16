@@ -3,7 +3,11 @@ plugins {
     id 'org.springframework.boot' version '3.3.0-SNAPSHOT'
     id 'io.spring.dependency-management' version '1.1.4'
 }
-
+ext {
+    queryDslVersion = '5.1.0'
+    lombokVersion = '1.18.30'
+    jakartaPersistenceApi = '3.2.0-M2'
+}
 group = 'com.andreidodu'
 version = '0.0.1-SNAPSHOT'
 
@@ -24,12 +28,21 @@ repositories {
 }
 
 dependencies {
+
+    //compileOnly "com.querydsl:querydsl-sql:${queryDslVersion}"
+    //implementation "com.querydsl:querydsl-core:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api:${jakartaPersistenceApi}"
+
+
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    implementation "org.projectlombok:lombok:${lombokVersion}"
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor "org.projectlombok:lombok"
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -39,6 +52,14 @@ dependencies {
     implementation 'org.liquibase:liquibase-core:4.21.1'
 
     testImplementation 'org.springframework.batch:spring-batch-test:5.1.1'
+
+
+    testCompileOnly "com.querydsl:querydsl-sql:${queryDslVersion}"
+    testAnnotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:general")
+
+    testImplementation("org.projectlombok:lombok:${lombokVersion}")
+    testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+    testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
 }
 
 tasks.named('test') {

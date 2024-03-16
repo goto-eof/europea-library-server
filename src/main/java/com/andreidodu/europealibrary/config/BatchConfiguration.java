@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.config;
 
-import com.andreidodu.europealibrary.repository.impl.JobRepositoryCustom;
+import com.andreidodu.europealibrary.repository.impl.CustomJobRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +12,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Transactional
 @RequiredArgsConstructor
 public class BatchConfiguration {
-    final private JobRepositoryCustom jobRepositoryCustom;
+    final private CustomJobRepository customJobRepository;
 
     @PostConstruct
     private void resetJobStatus() {
-        jobRepositoryCustom.resetJobs();
+        customJobRepository.resetJobs();
     }
 }

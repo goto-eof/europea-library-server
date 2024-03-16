@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @RequiredArgsConstructor
-public class JobRepositoryCustom {
+public class CustomJobRepository {
 
     String RESET_JOB_STATUS_QUERY_1 = "UPDATE BATCH_JOB_EXECUTION SET STATUS = 'FAILED', END_TIME = NOW() WHERE END_TIME IS NULL";
     String RESET_JOB_STATUS_QUERY_2 = "UPDATE BATCH_STEP_EXECUTION SET STATUS = 'FAILED', END_TIME = NOW() WHERE END_TIME IS NULL";
