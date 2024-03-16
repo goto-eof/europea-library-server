@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Optional;
 
 @Slf4j
@@ -36,6 +37,7 @@ public class FileSystemServiceImpl implements FileSystemService {
 
     private FileSystemItemDTO manageCaseReadDirectoryIdProvided(Long id) {
         FileSystemItem fileSystemItem = checkFileSystemItemExistence(id);
+        fileSystemItem.getChildrenList().sort(Comparator.comparing(FileSystemItem::getIsDirectory).reversed().thenComparing(FileSystemItem::getName));
         return this.fileSystemItemMapper.toDTO(fileSystemItem);
     }
 
@@ -44,7 +46,9 @@ public class FileSystemServiceImpl implements FileSystemService {
         if (fileSystemItemOptional.isEmpty()) {
             throw new ApplicationException("Entity not found");
         }
-        return fileSystemItemMapper.toDTO(fileSystemItemOptional.get());
+        FileSystemItem fileSystemItem = fileSystemItemOptional.get();
+        fileSystemItem.getChildrenList().sort(Comparator.comparing(FileSystemItem::getIsDirectory).reversed().thenComparing(FileSystemItem::getName));
+        return fileSystemItemMapper.toDTO(fileSystemItem);
     }
 
     private FileSystemItem checkFileSystemItemExistence(Long id) {
