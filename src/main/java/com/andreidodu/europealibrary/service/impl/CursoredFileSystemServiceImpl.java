@@ -29,7 +29,7 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
 
     @Override
     public FileSystemItemDTO readDirectory(CursorRequestDTO cursorRequestDTO) {
-        return Optional.ofNullable(cursorRequestDTO.getNextCursor())
+        return Optional.ofNullable(cursorRequestDTO.getParentId())
                 .map(id -> this.manageCaseReadDirectoryIdProvided(cursorRequestDTO))
                 .orElse(manageCaseReadDirectoryNoIdProvided());
     }
