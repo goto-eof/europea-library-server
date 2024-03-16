@@ -6,6 +6,7 @@ import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
@@ -24,7 +25,18 @@ public abstract class FileSystemItemMapper {
     public abstract FileSystemItem toModel(FileDTO dto);
 
     @Mapping(ignore = true, target = "childrenList")
-    public abstract FileSystemItemDTO toDTO(FileSystemItem model);
+    @Mapping(ignore = true, target = "parent")
+    public abstract FileSystemItemDTO toDTOWithoutChildren(FileSystemItem model);
 
-    public abstract List<FileSystemItemDTO> toDTO(List<FileSystemItem> fileSystemItemList);
+    public FileSystemItemDTO toDTO(FileSystemItem model) {
+        FileSystemItemDTO dto = this.toDTOWithoutChildren(model);
+        dto.setChildrenList(toDTOWithoutChildren(model.getChildrenList()));
+        dto.setParent(this.toDTOWithoutChildren(model.getParent()));
+        return dto;
+    }
+
+
+    public  List<FileSystemItemDTO> toDTOWithoutChildren(List<FileSystemItem> fileSystemItemList){
+        return fileSystemItemList.stream().map(this::toDTOWithoutChildren).toList();
+    }
 }

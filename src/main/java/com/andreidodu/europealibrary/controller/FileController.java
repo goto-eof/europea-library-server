@@ -18,15 +18,15 @@ public class FileController {
     final private FileSystemService fileSystemService;
 
     @GetMapping("/parentId/{id}")
-    public ResponseEntity<List<FileSystemItemDTO>> retrieveByParentDirectory(@PathVariable Long id) {
-        List<FileSystemItemDTO> dtoList = fileSystemService.readDirectory(id);
-        return ResponseEntity.ok(dtoList);
+    public ResponseEntity<FileSystemItemDTO> retrieveByParentDirectory(@PathVariable Long id) {
+        FileSystemItemDTO dto = fileSystemService.readDirectory(id);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping
-    public ResponseEntity<List<FileSystemItemDTO>> retrieveRootDirectory() {
-        List<FileSystemItemDTO> dtoList = fileSystemService.readDirectory(null);
-        return ResponseEntity.ok(dtoList);
+    public ResponseEntity<FileSystemItemDTO> retrieveRootDirectory() {
+        FileSystemItemDTO dto = fileSystemService.readDirectory();
+        return ResponseEntity.ok(dto);
     }
 
 }

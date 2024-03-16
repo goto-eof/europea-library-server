@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -24,28 +23,28 @@ public class FileSystemServiceImpl implements FileSystemService {
     private final FileSystemItemMapper fileSystemItemMapper;
 
     @Override
-    public List<FileSystemItemDTO> readDirectory(Long id) {
+    public FileSystemItemDTO readDirectory(Long id) {
         return Optional.ofNullable(id)
                 .map(this::manageCaseReadDirectoryIdProvided)
                 .orElse(manageCaseReadDirectoryNoIdProvided());
     }
 
     @Override
-    public List<FileSystemItemDTO> readDirectory() {
+    public FileSystemItemDTO readDirectory() {
         return manageCaseReadDirectoryNoIdProvided();
     }
 
-    private List<FileSystemItemDTO> manageCaseReadDirectoryIdProvided(Long id) {
+    private FileSystemItemDTO manageCaseReadDirectoryIdProvided(Long id) {
         FileSystemItem fileSystemItem = checkFileSystemItemExistence(id);
-        return this.fileSystemItemMapper.toDTO(fileSystemItem.getChildrenList());
+        return this.fileSystemItemMapper.toDTO(fileSystemItem);
     }
 
-    private List<FileSystemItemDTO> manageCaseReadDirectoryNoIdProvided() {
+    private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
         Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber());
         if (fileSystemItemOptional.isEmpty()) {
             throw new ApplicationException("Entity not found");
         }
-        return fileSystemItemMapper.toDTO(fileSystemItemOptional.get().getChildrenList());
+        return fileSystemItemMapper.toDTO(fileSystemItemOptional.get());
     }
 
     private FileSystemItem checkFileSystemItemExistence(Long id) {
