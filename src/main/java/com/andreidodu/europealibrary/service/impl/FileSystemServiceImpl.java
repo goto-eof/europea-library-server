@@ -37,7 +37,10 @@ public class FileSystemServiceImpl implements FileSystemService {
 
     private FileSystemItemDTO manageCaseReadDirectoryIdProvided(Long id) {
         FileSystemItem fileSystemItem = checkFileSystemItemExistence(id);
-        fileSystemItem.getChildrenList().sort(Comparator.comparing(FileSystemItem::getIsDirectory).reversed().thenComparing(FileSystemItem::getName));
+        fileSystemItem.getChildrenList()
+                .sort(Comparator.comparing(FileSystemItem::getIsDirectory)
+                        .reversed()
+                        .thenComparing(FileSystemItem::getName));
         return this.fileSystemItemMapper.toDTO(fileSystemItem);
     }
 
@@ -47,7 +50,10 @@ public class FileSystemServiceImpl implements FileSystemService {
             throw new ApplicationException("Entity not found");
         }
         FileSystemItem fileSystemItem = fileSystemItemOptional.get();
-        fileSystemItem.getChildrenList().sort(Comparator.comparing(FileSystemItem::getIsDirectory).reversed().thenComparing(FileSystemItem::getName));
+        fileSystemItem.getChildrenList()
+                .sort(Comparator.comparing(FileSystemItem::getIsDirectory)
+                        .reversed()
+                        .thenComparing(FileSystemItem::getName));
         return fileSystemItemMapper.toDTO(fileSystemItem);
     }
 
