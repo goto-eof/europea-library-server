@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.repository.impl;
 
 import com.andreidodu.europealibrary.batch.JobStepEnum;
+import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.model.QFileSystemItem;
 import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
@@ -25,6 +26,10 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         if (cursorId != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
+        }
+
+        if (numberOfResults > ApplicationConst.MAX_ITEMS_RETRIEVEMENT) {
+            numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVEMENT;
         }
 
         return new JPAQuery<FileSystemItem>(entityManager)

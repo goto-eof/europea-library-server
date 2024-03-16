@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.batch.JobStepEnum;
+import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
@@ -53,7 +54,7 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
         FileSystemItem fileSystemItem = fileSystemItemOptional.get();
         CursorRequestDTO cursorRequestDTO = new CursorRequestDTO();
         cursorRequestDTO.setParentId(fileSystemItem.getId());
-        cursorRequestDTO.setLimit(10);
+        cursorRequestDTO.setLimit(ApplicationConst.MAX_ITEMS_RETRIEVEMENT);
         return manageCaseReadDirectoryIdProvided(cursorRequestDTO);
     }
 
