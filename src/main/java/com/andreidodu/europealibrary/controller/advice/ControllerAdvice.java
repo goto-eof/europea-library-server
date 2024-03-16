@@ -13,7 +13,7 @@ public class ControllerAdvice {
     @ExceptionHandler(value = {EntityNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpErrorDTO handleEntityNotFoundException(EntityNotFoundException e) {
-        return new HttpErrorDTO(404, e.getMessage());
+        return new HttpErrorDTO(HttpStatus.NOT_FOUND.value(), e.getMessage());
     }
 
 }
