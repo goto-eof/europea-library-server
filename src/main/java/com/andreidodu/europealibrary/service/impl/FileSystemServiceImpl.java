@@ -10,12 +10,14 @@ import com.andreidodu.europealibrary.service.FileSystemService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Transactional
+@Service
 @RequiredArgsConstructor
 public class FileSystemServiceImpl implements FileSystemService {
     private final FileSystemItemRepository fileSystemItemRepository;
@@ -26,6 +28,11 @@ public class FileSystemServiceImpl implements FileSystemService {
         return Optional.ofNullable(id)
                 .map(this::manageCaseReadDirectoryIdProvided)
                 .orElse(manageCaseReadDirectoryNoIdProvided());
+    }
+
+    @Override
+    public List<FileSystemItemDTO> readDirectory() {
+        return manageCaseReadDirectoryNoIdProvided();
     }
 
     private List<FileSystemItemDTO> manageCaseReadDirectoryIdProvided(Long id) {

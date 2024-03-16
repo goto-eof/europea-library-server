@@ -23,6 +23,7 @@ public abstract class FileSystemItemMapper {
     @Mapping(ignore = true, target = "fileMetaInfo")
     public abstract FileSystemItem toModel(FileDTO dto);
 
+    @Mapping(ignore = true, target = "childrenList")
     public abstract FileSystemItemDTO toDTO(FileSystemItem model);
 
     public abstract List<FileSystemItemDTO> toDTO(List<FileSystemItem> fileSystemItemList);
