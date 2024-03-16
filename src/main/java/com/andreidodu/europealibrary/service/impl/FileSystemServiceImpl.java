@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.batch.JobStepEnum;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
+import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
@@ -47,7 +48,7 @@ public class FileSystemServiceImpl implements FileSystemService {
     private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
         Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber());
         if (fileSystemItemOptional.isEmpty()) {
-            throw new ApplicationException("Entity not found");
+            throw new EntityNotFoundException("Entity not found");
         }
         return this.manageCaseReadDirectoryIdProvided(fileSystemItemOptional.get().getId());
     }
@@ -55,7 +56,7 @@ public class FileSystemServiceImpl implements FileSystemService {
     private FileSystemItem checkFileSystemItemExistence(Long id) {
         Optional<FileSystemItem> model = this.fileSystemItemRepository.findById(id);
         if (model.isEmpty()) {
-            throw new ApplicationException("Entity not found");
+            throw new EntityNotFoundException("Entity not found");
         }
         return model.get();
     }

@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
+import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
@@ -49,7 +50,7 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
     private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
         Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber());
         if (fileSystemItemOptional.isEmpty()) {
-            throw new ApplicationException("Entity not found");
+            throw new EntityNotFoundException("Entity not found");
         }
         FileSystemItem fileSystemItem = fileSystemItemOptional.get();
         CursorRequestDTO cursorRequestDTO = new CursorRequestDTO();
@@ -61,7 +62,7 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
     private FileSystemItem checkFileSystemItemExistence(Long id) {
         Optional<FileSystemItem> model = this.fileSystemItemRepository.findById(id);
         if (model.isEmpty()) {
-            throw new ApplicationException("Entity not found");
+            throw new EntityNotFoundException("Entity not found");
         }
         return model.get();
     }

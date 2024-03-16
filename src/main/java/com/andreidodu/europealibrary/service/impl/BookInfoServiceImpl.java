@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
+import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.FileMetaInfoBookMapper;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
@@ -81,7 +82,7 @@ public class BookInfoServiceImpl implements BookInfoService {
     private FileSystemItem checkFileSystemItemExistence(Long fileSystemItemId) {
         Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findById(fileSystemItemId);
         if (fileSystemItemOptional.isEmpty()) {
-            throw new ApplicationException("Entity not found");
+            throw new EntityNotFoundException("Entity not found");
         }
         return fileSystemItemOptional.get();
     }
