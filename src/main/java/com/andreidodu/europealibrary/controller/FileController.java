@@ -32,13 +32,13 @@ public class FileController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<FileSystemItemDTO> retrieveCursored(@RequestBody CursorRequestDTO cursorRequestDTO) {
         FileSystemItemDTO dto = cursoredFileSystemService.readDirectory(cursorRequestDTO);
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<FileSystemItemDTO> retrieveCursoredRoot(@RequestBody CursorRequestDTO cursorRequestDTO) {
         FileSystemItemDTO dto = cursoredFileSystemService.readDirectory();
         return ResponseEntity.ok(dto);
