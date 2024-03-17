@@ -36,6 +36,7 @@ public class FileItemReader implements ItemStreamReader<File> {
             File file = path.toFile();
             if (file.isDirectory()) {
                 Arrays.stream(Objects.requireNonNull(file.listFiles()))
+                        .sorted(sortByIsDirectoryAndName())
                         .map(File::toPath)
                         .forEach(pathItem -> {
                             iterator.add(pathItem);
@@ -46,6 +47,10 @@ public class FileItemReader implements ItemStreamReader<File> {
             return file;
         }
         return null;
+    }
+
+    private static Comparator<File> sortByIsDirectoryAndName() {
+        return Comparator.comparing(File::isDirectory).reversed().thenComparing(File::getName);
     }
 
     @Override
