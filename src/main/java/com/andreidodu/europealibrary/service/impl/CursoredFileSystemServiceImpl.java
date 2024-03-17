@@ -60,10 +60,7 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
     }
 
     private FileSystemItem checkFileSystemItemExistence(Long id) {
-        Optional<FileSystemItem> model = this.fileSystemItemRepository.findById(id);
-        if (model.isEmpty()) {
-            throw new EntityNotFoundException("Entity not found");
-        }
-        return model.get();
+        return this.fileSystemItemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
     }
 }
