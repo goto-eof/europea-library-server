@@ -48,11 +48,8 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
     }
 
     private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
-        Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber());
-        if (fileSystemItemOptional.isEmpty()) {
-            throw new EntityNotFoundException("Entity not found");
-        }
-        FileSystemItem fileSystemItem = fileSystemItemOptional.get();
+        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber())
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
         CursorRequestDTO cursorRequestDTO = new CursorRequestDTO();
         cursorRequestDTO.setParentId(fileSystemItem.getId());
         cursorRequestDTO.setLimit(ApplicationConst.MAX_ITEMS_RETRIEVEMENT);

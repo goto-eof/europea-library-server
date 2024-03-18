@@ -80,19 +80,13 @@ public class BookInfoServiceImpl implements BookInfoService {
     }
 
     private FileSystemItem checkFileSystemItemExistence(Long fileSystemItemId) {
-        Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findById(fileSystemItemId);
-        if (fileSystemItemOptional.isEmpty()) {
-            throw new EntityNotFoundException("Entity not found");
-        }
-        return fileSystemItemOptional.get();
+        return this.fileSystemItemRepository.findById(fileSystemItemId)
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
     }
 
     private FileMetaInfo checkFileMetaInfoExistence(Long id) {
-        Optional<FileMetaInfo> model = this.repository.findById(id);
-        if (model.isEmpty()) {
-            throw new ApplicationException("Entity not found");
-        }
-        return model.get();
+        return this.repository.findById(id)
+                .orElseThrow(() -> new ApplicationException("Entity not found"));
     }
 
 }

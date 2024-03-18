@@ -46,18 +46,13 @@ public class FileSystemServiceImpl implements FileSystemService {
     }
 
     private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
-        Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber());
-        if (fileSystemItemOptional.isEmpty()) {
-            throw new EntityNotFoundException("Entity not found");
-        }
-        return this.manageCaseReadDirectoryIdProvided(fileSystemItemOptional.get().getId());
+        return this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber())
+                .map(item -> this.manageCaseReadDirectoryIdProvided(item.getId()))
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
     }
 
     private FileSystemItem checkFileSystemItemExistence(Long id) {
-        Optional<FileSystemItem> model = this.fileSystemItemRepository.findById(id);
-        if (model.isEmpty()) {
-            throw new EntityNotFoundException("Entity not found");
-        }
-        return model.get();
+        return this.fileSystemItemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
     }
 }

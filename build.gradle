@@ -25,6 +25,7 @@ repositories {
     mavenCentral()
     maven { url 'https://repo.spring.io/milestone' }
     maven { url 'https://repo.spring.io/snapshot' }
+    maven { url 'https://github.com/psiegman/mvn-repo/raw/master/releases' }
 }
 
 dependencies {
@@ -50,6 +51,11 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.45.1.0'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.liquibase:liquibase-core:4.21.1'
+    implementation('nl.siegmann.epublib:epublib-core:3.1') {
+        exclude group: 'org.slf4j'
+        exclude group: 'xmlpull'
+    }
+
 
     testImplementation 'org.springframework.batch:spring-batch-test:5.1.1'
 
