@@ -19,7 +19,6 @@ public class FileItemProcessor implements ItemProcessor<File, FileDTO> {
     @Autowired
     private FileUtil fileUtil;
 
-
     @Override
     public FileDTO process(final File file) {
         log.info("File processed: {}", file.getAbsoluteFile());
@@ -34,6 +33,5 @@ public class FileItemProcessor implements ItemProcessor<File, FileDTO> {
             throw new RuntimeException(e);
         }
     }
-
 
 }
