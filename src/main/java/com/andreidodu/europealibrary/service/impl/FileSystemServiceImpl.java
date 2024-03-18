@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
+import com.andreidodu.europealibrary.exception.WorkInProgressException;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
@@ -47,7 +48,7 @@ public class FileSystemServiceImpl implements FileSystemService {
     private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
         return this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber())
                 .map(item -> this.manageCaseReadDirectoryIdProvided(item.getId()))
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+                .orElseThrow(() -> new WorkInProgressException("Job in progress. Please retry in few minutes"));
     }
 
     private FileSystemItem checkFileSystemItemExistence(Long id) {
