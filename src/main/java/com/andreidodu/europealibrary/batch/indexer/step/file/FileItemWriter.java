@@ -67,10 +67,10 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         if (buildMetaInfoFromEbook(model)) {
             return;
         }
-        buildMetaInfoFromDB();
+        buildMetaInfoFromWeb();
     }
 
-    private void buildMetaInfoFromDB() {
+    private void buildMetaInfoFromWeb() {
         // load metadata from internet
     }
 
