@@ -1,6 +1,5 @@
-package com.andreidodu.europealibrary.batch.step.dbupdate;
+package com.andreidodu.europealibrary.batch.indexer.step.dbdelete;
 
-import com.andreidodu.europealibrary.batch.JobStepEnum;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import jakarta.transaction.Transactional;
@@ -14,16 +13,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Transactional
 @RequiredArgsConstructor
-public class DbFileItemWriter implements ItemWriter<FileSystemItem> {
-    private final FileSystemItemRepository fileSystemItemRepository;
+public class DbDeleteFileItemWriter implements ItemWriter<FileSystemItem> {
+    final private FileSystemItemRepository fileSystemItemRepository;
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        chunk.getItems().forEach(item -> {
-            item.setJobStep(JobStepEnum.READY.getStepNumber());
-            fileSystemItemRepository.save(item);
-            log.info("changed to ready: " + item);
-        });
-        fileSystemItemRepository.flush();
+        this.fileSystemItemRepository.deleteAll(chunk.getItems());
+        log.info("deleted {} records", chunk.getItems().size());
     }
 }

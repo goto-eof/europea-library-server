@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch;
+package com.andreidodu.europealibrary.batch.indexer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class IndexDirectoriesTaskScheduler {
     private final Job job;
 
     @Scheduled(cron = "${com.andreidodu.task.cron.expression}")
-    public void runIndexDirectoriesTaskScheduler() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    public void runIndexDirectoriesTaskScheduler() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException {
         try {
             jobLauncher.run(job, generateJobParameters());
         } catch (JobExecutionAlreadyRunningException e) {

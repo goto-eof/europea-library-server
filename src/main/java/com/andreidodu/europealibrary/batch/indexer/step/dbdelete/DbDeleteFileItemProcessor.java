@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.step.dbdelete;
+package com.andreidodu.europealibrary.batch.indexer.step.dbdelete;
 
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import jakarta.transaction.Transactional;

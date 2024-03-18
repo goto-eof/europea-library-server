@@ -1,12 +1,13 @@
-package com.andreidodu.europealibrary.batch;
+package com.andreidodu.europealibrary.batch.indexer;
 
-import com.andreidodu.europealibrary.batch.step.dbdelete.DbDeleteFileItemProcessor;
-import com.andreidodu.europealibrary.batch.step.dbdelete.DbDeleteFileItemWriter;
-import com.andreidodu.europealibrary.batch.step.dbupdate.DbFileItemProcessor;
-import com.andreidodu.europealibrary.batch.step.dbupdate.DbFileItemWriter;
-import com.andreidodu.europealibrary.batch.step.file.FileItemProcessor;
-import com.andreidodu.europealibrary.batch.step.file.FileItemReader;
-import com.andreidodu.europealibrary.batch.step.file.FileItemWriter;
+import com.andreidodu.europealibrary.batch.SampleIncrementer;
+import com.andreidodu.europealibrary.batch.indexer.step.dbdelete.DbDeleteFileItemProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.dbdelete.DbDeleteFileItemWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.dbupdate.DbFileItemProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.dbupdate.DbFileItemWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemReader;
+import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemWriter;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import jakarta.persistence.EntityManagerFactory;
@@ -22,7 +23,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 
-import javax.sql.DataSource;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,6 @@ public class JobConfiguration {
     @Bean("jobIndexer")
     public Job indexerJob(JobRepository jobRepository, Step indexDirectoriesAndFilesStep, Step deleteDbFilesStep, Step finalizeJobStep) {
         return new JobBuilder("indexerJob", jobRepository)
-                .incrementer(new SampleIncrementer())
                 .start(indexDirectoriesAndFilesStep)
                 .next(deleteDbFilesStep)
                 .next(finalizeJobStep)

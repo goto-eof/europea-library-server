@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.step.dbupdate;
+package com.andreidodu.europealibrary.batch.indexer.step.dbupdate;
 
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import jakarta.transaction.Transactional;

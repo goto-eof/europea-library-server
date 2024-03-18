@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.step.file;
+package com.andreidodu.europealibrary.batch.indexer.step.file;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

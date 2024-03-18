@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.step.file;
+package com.andreidodu.europealibrary.batch.indexer.step.file;
 
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.mapper.FileMapper;
