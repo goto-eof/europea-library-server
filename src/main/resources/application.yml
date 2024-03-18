@@ -41,7 +41,7 @@ server:
 com:
   andreidodu:
     europa-library:
-      e-books-directory: "/home/andrei/Documents"
+      e-books-directory: "/home/andrei/Documents/backuped/multimedia/ebook"
       #e-books-directory: "/home/andrei/Desktop/ciao"
     task:
       cron:

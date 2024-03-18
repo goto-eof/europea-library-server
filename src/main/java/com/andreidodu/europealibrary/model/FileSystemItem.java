@@ -58,7 +58,7 @@ public class FileSystemItem extends ModelCommon {
     @Column(name = "job_status")
     private Integer jobStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "file_meta_info_id", nullable = true)
     private FileMetaInfo fileMetaInfo;

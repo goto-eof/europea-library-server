@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.util;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.epub.EpubReader;
 import org.apache.commons.io.FilenameUtils;
@@ -9,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class EpubUtil {
 
@@ -22,7 +24,8 @@ public class EpubUtil {
             EpubReader epubReader = new EpubReader();
             return Optional.of(epubReader.readEpub(new FileInputStream(filename)));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("failed to read epub: {}", filename);
         }
+        return Optional.empty();
     }
 }

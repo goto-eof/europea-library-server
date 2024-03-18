@@ -12,9 +12,7 @@
             <column name="title" type="VARCHAR(512)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="VARCHAR(4000)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="description" type="VARCHAR(4000)"/>
 
             <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>

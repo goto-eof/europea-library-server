@@ -33,11 +33,12 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
 
     @Override
     public void write(Chunk<? extends FileDTO> chunk) {
-        chunk.getItems().forEach(fileSystemItemDTO -> {
-            Optional<FileSystemItem> fileSystemItemOptional = getParentFileSystemItem(fileSystemItemDTO.getBasePath(), fileSystemItemDTO.getName(), JobStepEnum.INSERTED.getStepNumber());
+        chunk.getItems().forEach(fileDTO -> {
+            // if job was stopped prematurely, then i have already records in insert step
+            Optional<FileSystemItem> fileSystemItemOptional = getParentFileSystemItem(fileDTO.getBasePath(), fileDTO.getName(), JobStepEnum.INSERTED.getStepNumber());
             if (fileSystemItemOptional.isEmpty()) {
-                createAndSaveFileSystemItem(fileSystemItemDTO);
-                log.info("INSERT: " + fileSystemItemDTO);
+                createAndSaveFileSystemItem(fileDTO);
+                log.info("INSERT: " + fileDTO);
             }
         });
     }
@@ -75,7 +76,7 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
 
     private boolean loadMetaInfoFromDB(FileSystemItem model) {
         List<FileSystemItem> oldItems = this.fileSystemItemRepository.findBySha256AndJobStep(model.getSha256(), JobStepEnum.READY.getStepNumber());
-        if (!oldItems.isEmpty()) {
+        if (!oldItems.isEmpty() && oldItems.stream().anyMatch(oldItem -> oldItem.getFileMetaInfo() != null)) {
             model.setFileMetaInfo(oldItems.getFirst().getFileMetaInfo());
             return true;
         }
@@ -83,8 +84,11 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
     }
 
     private boolean buildMetaInfoFromEbook(FileSystemItem model) {
-        return epubUtil.retrieveBook(model.getBasePath() + "/" + model.getName())
+        String fullPath = model.getBasePath() + "/" + model.getName();
+        log.info("checking for meta-info for file {}...", fullPath);
+        return epubUtil.retrieveBook(fullPath)
                 .map(book -> {
+                    log.info("gathering information from ebook {}", fullPath);
                     FileMetaInfo fileMetaInfo = new FileMetaInfo();
                     List<FileSystemItem> list = new ArrayList<>();
                     list.add(model);
