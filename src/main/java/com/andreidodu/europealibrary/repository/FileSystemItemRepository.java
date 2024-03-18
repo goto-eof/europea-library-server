@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface FileSystemItemRepository extends TransactionalRepository<FileSystemItem, Long>, CustomFileSystemItemRepository {
@@ -11,4 +12,6 @@ public interface FileSystemItemRepository extends TransactionalRepository<FileSy
 
     @Query("select fsi from FileSystemItem fsi where id = (select min(id) from FileSystemItem) and jobStep=:jobStep")
     Optional<FileSystemItem> findByLowestId(Integer jobStep);
+
+    List<FileSystemItem> findBySha256AndJobStep(String sha256, int stepNumber);
 }

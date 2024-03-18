@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class FileDTO  extends CommonDTO {
+public class FileDTO extends CommonDTO {
 
     private String name;
     private Long size;
@@ -18,4 +18,5 @@ public class FileDTO  extends CommonDTO {
     private LocalDateTime fileCreateDate;
     private LocalDateTime fileUpdateDate;
     private Boolean isDirectory;
+    private String sha256;
 }

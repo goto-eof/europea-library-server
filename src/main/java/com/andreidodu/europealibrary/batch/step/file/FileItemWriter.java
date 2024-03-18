@@ -13,6 +13,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -42,9 +43,20 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
     private FileSystemItem buildFileSystemItem(FileDTO fileSystemItemDTO) {
         FileSystemItem model = this.fileSystemItemMapper.toModel(fileSystemItemDTO);
         model.setJobStep(JobStepEnum.INSERTED.getStepNumber());
+        associateMetaInfoEntity(model);
         this.getParentFileSystemItem(calculateParentBasePath(fileSystemItemDTO.getBasePath()), calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
                 .ifPresent(model::setParent);
         return model;
+    }
+
+    private void associateMetaInfoEntity(FileSystemItem model) {
+        if (model.getIsDirectory()) {
+            return;
+        }
+        List<FileSystemItem> oldItems = this.fileSystemItemRepository.findBySha256AndJobStep(model.getSha256(), JobStepEnum.READY.getStepNumber());
+        if (!oldItems.isEmpty()) {
+            model.setFileMetaInfo(oldItems.getFirst().getFileMetaInfo());
+        }
     }
 
     private String calculateParentName(String basePath) {

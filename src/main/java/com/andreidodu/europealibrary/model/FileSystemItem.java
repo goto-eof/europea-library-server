@@ -32,6 +32,9 @@ public class FileSystemItem extends ModelCommon {
     @Column(name = "base_path", nullable = false)
     private String basePath;
 
+    @Column(name = "sha256")
+    private String sha256;
+
     @Column(name = "file_create_date", nullable = false)
     private LocalDateTime fileCreateDate;
 

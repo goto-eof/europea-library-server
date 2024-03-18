@@ -20,11 +20,6 @@ public class DbDeleteFileItemWriter implements ItemWriter<FileSystemItem> {
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        chunk.getItems().forEach(item -> {
-            this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(item.getBasePath(), item.getName(), JobStepEnum.INSERTED.getStepNumber()).ifPresent(newItem -> {
-                newItem.setFileMetaInfo(item.getFileMetaInfo());
-            });
-        });
         this.fileSystemItemRepository.deleteAll(chunk.getItems());
         log.info("deleted {} records", chunk.getItems().size());
     }

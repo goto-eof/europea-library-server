@@ -32,6 +32,7 @@
             <column name="base_path" type="VARCHAR">
                 <constraints nullable="false"/>
             </column>
+            <column name="sha256" type="VARCHAR"/>
             <column name="size" type="bigint"/>
             <column name="file_create_date" type="DATETIME">
                 <constraints nullable="false"/>
