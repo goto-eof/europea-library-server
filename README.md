@@ -10,7 +10,7 @@
                                                                          SERVER
 ```
 
-# Europea Library (server - Work In Progress))
+# Europea Library (server - Work In Progress)
 
 A library web application that allows to catalog and download e-books. The front-end project can be
 found [here](https://github.com/goto-eof/europea-library-client).
