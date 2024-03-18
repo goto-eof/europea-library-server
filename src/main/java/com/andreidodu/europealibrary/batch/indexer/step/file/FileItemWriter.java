@@ -3,16 +3,22 @@ package com.andreidodu.europealibrary.batch.indexer.step.file;
 import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
+import com.andreidodu.europealibrary.model.BookInfo;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
+import com.andreidodu.europealibrary.util.EpubUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nl.siegmann.epublib.domain.Identifier;
+import nl.siegmann.epublib.domain.Metadata;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +29,7 @@ import java.util.Optional;
 public class FileItemWriter implements ItemWriter<FileDTO> {
     private final FileSystemItemRepository fileSystemItemRepository;
     private final FileSystemItemMapper fileSystemItemMapper;
+    private final EpubUtil epubUtil;
 
     @Override
     public void write(Chunk<? extends FileDTO> chunk) {
@@ -53,10 +60,61 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         if (model.getIsDirectory()) {
             return;
         }
+        if (loadMetaInfoFromDB(model)) {
+            return;
+        }
+        if (buildMetaInfoFromEbook(model)) {
+            return;
+        }
+        buildMetaInfoFromDB();
+    }
+
+    private void buildMetaInfoFromDB() {
+        // load metadata from internet
+    }
+
+    private boolean loadMetaInfoFromDB(FileSystemItem model) {
         List<FileSystemItem> oldItems = this.fileSystemItemRepository.findBySha256AndJobStep(model.getSha256(), JobStepEnum.READY.getStepNumber());
         if (!oldItems.isEmpty()) {
             model.setFileMetaInfo(oldItems.getFirst().getFileMetaInfo());
+            return true;
         }
+        return false;
+    }
+
+    private boolean buildMetaInfoFromEbook(FileSystemItem model) {
+        return epubUtil.retrieveBook(model.getBasePath() + "/" + model.getName())
+                .map(book -> {
+                    FileMetaInfo fileMetaInfo = new FileMetaInfo();
+                    List<FileSystemItem> list = new ArrayList<>();
+                    list.add(model);
+                    fileMetaInfo.setFileSystemItemList(list);
+                    Metadata metadata = book.getMetadata();
+                    fileMetaInfo.setTitle(metadata.getFirstTitle());
+                    fileMetaInfo.setDescription(this.getFirst(metadata.getDescriptions()));
+
+                    BookInfo bookInfo = new BookInfo();
+                    bookInfo.setFileMetaInfo(fileMetaInfo);
+                    bookInfo.setNote(metadata.getLanguage());
+                    bookInfo.setIsbn(getFirst(metadata.getIdentifiers().stream().map(Identifier::getValue).toList()));
+                    bookInfo.setAuthors(String.join(", ", metadata.getAuthors()
+                            .stream()
+                            .map(author -> author.getFirstname() + " " + author.getLastname())
+                            .toList()));
+                    bookInfo.setPublisher(String.join(", ", metadata.getPublishers()));
+
+                    fileMetaInfo.setBookInfo(bookInfo);
+                    model.setFileMetaInfo(fileMetaInfo);
+                    return true;
+                }).orElse(false);
+
+    }
+
+    private String getFirst(List<String> list) {
+        if (list != null && !list.isEmpty()) {
+            list.getFirst();
+        }
+        return null;
     }
 
     private String calculateParentName(String basePath) {

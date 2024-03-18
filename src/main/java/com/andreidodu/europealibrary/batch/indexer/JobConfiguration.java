@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.batch.indexer;
 
-import com.andreidodu.europealibrary.batch.SampleIncrementer;
 import com.andreidodu.europealibrary.batch.indexer.step.dbdelete.DbDeleteFileItemProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.dbdelete.DbDeleteFileItemWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.dbupdate.DbFileItemProcessor;
