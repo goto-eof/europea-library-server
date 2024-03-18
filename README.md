@@ -32,7 +32,7 @@ found [here](https://github.com/goto-eof/europea-library-client).
 
 ## Changes log
 
-- 2023-03-18 - indexer job now resores the relationship between file system item and meta info record.
+- 2023-03-18 - indexer job now restores the relationship between file system item and meta info record.
 - 2023-03-16 - finished CRUD implementation of Book info module and fixed the db schema.
 - 2023-03-15 - finished implementation regarding the file meta-info schema.
 - 2024-03-13 - Job and files/directories DB schema
