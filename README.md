@@ -44,7 +44,7 @@ found [here](https://github.com/goto-eof/europea-library-client).
         - the job starts every X minutes (configurable)
         - the job consists of 3 steps:
             - step 0 - directory/subdirectory indexer - retrieves information about directories and subdirectories and
-              stores them on DB (job step = INSERTED)
+              stores them on DB (job step = INSERTED). Extracts information from epub files and stores them into db.
             - step 1 - record remover - delete all obsolete files/directories records from DB
             - step 2 - record updater - update the step number of new files/directories (from INSERTED to READY)
 
