@@ -12,5 +12,5 @@ public interface OpenLibraryClient {
 
 
     @RequestMapping(method = RequestMethod.POST, value = "/account/login", produces = "application/json")
-    void getPostById(@PathVariable("postId") Long postId, @RequestBody OpenLibraryAuthenticationRequestDTO authenticationRequestDTO);
+    void authenticate(@PathVariable("postId") Long postId, @RequestBody OpenLibraryAuthenticationRequestDTO authenticationRequestDTO);
 }
