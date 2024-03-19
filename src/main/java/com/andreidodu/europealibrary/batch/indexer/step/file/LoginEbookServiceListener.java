@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -24,8 +25,16 @@ public class LoginEbookServiceListener implements StepExecutionListener {
     @Override
     public void beforeStep(final org.springframework.batch.core.StepExecution stepExecution) {
         log.info("Before Step Start Time{}", Instant.now());
-        String session = openLibraryClient.authenticate(new OpenLibraryAuthenticationRequestDTO(openLibraryConfiguration.getAccess(), openLibraryConfiguration.getSecret()));
-        stepExecution.getExecutionContext().put("session", session);
+        Optional.ofNullable(openLibraryConfiguration.getAccess())
+                .ifPresent(access -> {
+                    Optional.ofNullable(openLibraryConfiguration.getSecret())
+                            .ifPresent(secret -> {
+                                String session = openLibraryClient.authenticate(new OpenLibraryAuthenticationRequestDTO(access, secret));
+                                // TODO move key in constant
+                                stepExecution.getExecutionContext().put("session", session);
+                            });
+                });
+
     }
 
     @Override
