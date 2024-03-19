@@ -53,3 +53,8 @@ batchdb:
   password: postgres
 
 
+
+open-library:
+  authentication:
+    access: YOUR_ACCESS_KEY
+    secret: YOUR_ACCESS_SECRET
