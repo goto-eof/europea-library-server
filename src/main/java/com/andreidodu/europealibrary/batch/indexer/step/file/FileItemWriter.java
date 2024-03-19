@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.file;
 
 import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
+import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.BookInfo;
@@ -104,10 +105,20 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         List<FileSystemItem> list = new ArrayList<>();
         list.add(model);
         fileMetaInfo.setFileSystemItemList(list);
+
         Metadata metadata = book.getMetadata();
         fileMetaInfo.setTitle(metadata.getFirstTitle());
         fileMetaInfo.setDescription(this.getFirst(metadata.getDescriptions()));
 
+        BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
+
+        fileMetaInfo.setBookInfo(bookInfo);
+        model.setFileMetaInfo(fileMetaInfo);
+
+        return true;
+    }
+
+    private BookInfo buildBookInfo(Book book, FileMetaInfo fileMetaInfo, Metadata metadata) {
         BookInfo bookInfo = new BookInfo();
         bookInfo.setFileMetaInfo(fileMetaInfo);
         bookInfo.setNote(metadata.getLanguage());
@@ -116,11 +127,27 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
                 .stream()
                 .map(author -> author.getFirstname() + " " + author.getLastname())
                 .toList()));
+        BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.epubUtil.retrieveISBN(book);
+        setISBN(bookCodes, bookInfo);
+        setSBN(bookCodes, bookInfo);
         bookInfo.setPublisher(String.join(", ", metadata.getPublishers()));
+        return bookInfo;
+    }
 
-        fileMetaInfo.setBookInfo(bookInfo);
-        model.setFileMetaInfo(fileMetaInfo);
-        return true;
+    private static void setISBN(BookCodesDTO<Optional<String>, Optional<String>> bookCodes, BookInfo bookInfo) {
+        bookCodes.getIsbn()
+                .ifPresent(isbn -> {
+                    bookInfo.setIsbn(isbn);
+                    log.info("ISBN found: {}", isbn);
+                });
+    }
+
+    private static void setSBN(BookCodesDTO<Optional<String>, Optional<String>> bookCodes, BookInfo bookInfo) {
+        bookCodes.getSbn()
+                .ifPresent(sbn -> {
+                    bookInfo.setSbn(sbn);
+                    log.info("SBN found: {}", sbn);
+                });
     }
 
     private String getFirst(List<String> list) {
