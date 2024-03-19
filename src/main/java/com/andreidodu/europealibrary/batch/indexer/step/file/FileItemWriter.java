@@ -11,6 +11,7 @@ import com.andreidodu.europealibrary.util.EpubUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Identifier;
 import nl.siegmann.epublib.domain.Metadata;
 import org.springframework.batch.item.Chunk;
@@ -67,11 +68,12 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         if (buildMetaInfoFromEbook(model)) {
             return;
         }
-        buildMetaInfoFromWeb();
+        buildMetaInfoFromWeb(model);
     }
 
-    private void buildMetaInfoFromWeb() {
+    private void buildMetaInfoFromWeb(FileSystemItem model) {
         // load metadata from internet
+
     }
 
     private boolean loadMetaInfoFromDB(FileSystemItem model) {
@@ -88,30 +90,37 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         log.info("checking for meta-info for file {}...", fullPath);
         return epubUtil.retrieveBook(fullPath)
                 .map(book -> {
-                    log.info("gathering information from ebook {}", fullPath);
-                    FileMetaInfo fileMetaInfo = new FileMetaInfo();
-                    List<FileSystemItem> list = new ArrayList<>();
-                    list.add(model);
-                    fileMetaInfo.setFileSystemItemList(list);
-                    Metadata metadata = book.getMetadata();
-                    fileMetaInfo.setTitle(metadata.getFirstTitle());
-                    fileMetaInfo.setDescription(this.getFirst(metadata.getDescriptions()));
-
-                    BookInfo bookInfo = new BookInfo();
-                    bookInfo.setFileMetaInfo(fileMetaInfo);
-                    bookInfo.setNote(metadata.getLanguage());
-                    bookInfo.setIsbn(getFirst(metadata.getIdentifiers().stream().map(Identifier::getValue).toList()));
-                    bookInfo.setAuthors(String.join(", ", metadata.getAuthors()
-                            .stream()
-                            .map(author -> author.getFirstname() + " " + author.getLastname())
-                            .toList()));
-                    bookInfo.setPublisher(String.join(", ", metadata.getPublishers()));
-
-                    fileMetaInfo.setBookInfo(bookInfo);
-                    model.setFileMetaInfo(fileMetaInfo);
-                    return true;
+                    if (book.getMetadata().getFirstTitle().trim().isEmpty()) {
+                        return false;
+                    }
+                    return manageCaseBookTitleNotEmpty(model, book, fullPath);
                 }).orElse(false);
 
+    }
+
+    private boolean manageCaseBookTitleNotEmpty(FileSystemItem model, Book book, String fullPath) {
+        log.info("gathering information from ebook {}", fullPath);
+        FileMetaInfo fileMetaInfo = new FileMetaInfo();
+        List<FileSystemItem> list = new ArrayList<>();
+        list.add(model);
+        fileMetaInfo.setFileSystemItemList(list);
+        Metadata metadata = book.getMetadata();
+        fileMetaInfo.setTitle(metadata.getFirstTitle());
+        fileMetaInfo.setDescription(this.getFirst(metadata.getDescriptions()));
+
+        BookInfo bookInfo = new BookInfo();
+        bookInfo.setFileMetaInfo(fileMetaInfo);
+        bookInfo.setNote(metadata.getLanguage());
+        bookInfo.setIsbn(getFirst(metadata.getIdentifiers().stream().map(Identifier::getValue).toList()));
+        bookInfo.setAuthors(String.join(", ", metadata.getAuthors()
+                .stream()
+                .map(author -> author.getFirstname() + " " + author.getLastname())
+                .toList()));
+        bookInfo.setPublisher(String.join(", ", metadata.getPublishers()));
+
+        fileMetaInfo.setBookInfo(bookInfo);
+        model.setFileMetaInfo(fileMetaInfo);
+        return true;
     }
 
     private String getFirst(List<String> list) {
