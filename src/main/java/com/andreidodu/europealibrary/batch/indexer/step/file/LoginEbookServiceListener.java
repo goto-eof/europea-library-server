@@ -26,14 +26,14 @@ public class LoginEbookServiceListener implements StepExecutionListener {
     public void beforeStep(final org.springframework.batch.core.StepExecution stepExecution) {
         log.info("Before Step Start Time{}", Instant.now());
         Optional.ofNullable(openLibraryConfiguration.getAccess())
-                .ifPresent(access -> {
+                .ifPresentOrElse(access -> {
                     Optional.ofNullable(openLibraryConfiguration.getSecret())
-                            .ifPresent(secret -> {
+                            .ifPresentOrElse(secret -> {
                                 String session = openLibraryClient.authenticate(new OpenLibraryAuthenticationRequestDTO(access, secret));
                                 // TODO move key in constant
                                 stepExecution.getExecutionContext().put("session", session);
-                            });
-                });
+                            }, () -> log.warn("No secret key provided for openlibrary.org"));
+                }, () -> log.warn("No access key provided for openlibrary.org"));
 
     }
 
