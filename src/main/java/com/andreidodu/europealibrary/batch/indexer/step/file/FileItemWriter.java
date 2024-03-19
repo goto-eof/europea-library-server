@@ -9,6 +9,7 @@ import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
+import com.andreidodu.europealibrary.util.FileUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
     private final FileSystemItemRepository fileSystemItemRepository;
     private final FileSystemItemMapper fileSystemItemMapper;
     private final EpubUtil epubUtil;
+    private final FileUtil fileUtil;
 
     @Override
     public void write(Chunk<? extends FileDTO> chunk) {
@@ -54,7 +56,7 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         FileSystemItem model = this.fileSystemItemMapper.toModel(fileSystemItemDTO);
         model.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         associateMetaInfoEntity(model);
-        this.getParentFileSystemItem(calculateParentBasePath(fileSystemItemDTO.getBasePath()), calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
+        this.getParentFileSystemItem(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
                 .ifPresent(model::setParent);
         return model;
     }
@@ -157,13 +159,6 @@ public class FileItemWriter implements ItemWriter<FileDTO> {
         return null;
     }
 
-    private String calculateParentName(String basePath) {
-        return new File(basePath).getName();
-    }
-
-    private String calculateParentBasePath(String basePath) {
-        return new File(basePath).getParentFile().getAbsolutePath();
-    }
 
     private Optional<FileSystemItem> getParentFileSystemItem(String basePath, String name, int jobStep) {
         return this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(basePath, name, jobStep);

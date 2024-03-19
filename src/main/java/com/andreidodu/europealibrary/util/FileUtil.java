@@ -17,6 +17,14 @@ public class FileUtil {
         } catch (IOException e) {
             return null;
         }
-
     }
+
+    public String calculateParentName(String basePath) {
+        return new File(basePath).getName();
+    }
+
+    public String calculateParentBasePath(String basePath) {
+        return new File(basePath).getParentFile().getAbsolutePath();
+    }
+
 }
