@@ -28,8 +28,8 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
 
-        if (numberOfResults > ApplicationConst.MAX_ITEMS_RETRIEVEMENT) {
-            numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVEMENT;
+        if (numberOfResults > ApplicationConst.MAX_ITEMS_RETRIEVE) {
+            numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVE;
         }
 
         return new JPAQuery<FileSystemItem>(entityManager)

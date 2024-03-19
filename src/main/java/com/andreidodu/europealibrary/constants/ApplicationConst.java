@@ -1,5 +1,5 @@
 package com.andreidodu.europealibrary.constants;
 
 public interface ApplicationConst {
-    int MAX_ITEMS_RETRIEVEMENT = 10;
+    int MAX_ITEMS_RETRIEVE = 10;
 }

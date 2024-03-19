@@ -50,7 +50,7 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
         CursorRequestDTO cursorRequestDTO = new CursorRequestDTO();
         cursorRequestDTO.setParentId(fileSystemItem.getId());
-        cursorRequestDTO.setLimit(ApplicationConst.MAX_ITEMS_RETRIEVEMENT);
+        cursorRequestDTO.setLimit(ApplicationConst.MAX_ITEMS_RETRIEVE);
         return manageCaseReadDirectoryIdProvided(cursorRequestDTO);
     }
 
