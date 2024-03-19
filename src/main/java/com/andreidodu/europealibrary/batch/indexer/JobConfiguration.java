@@ -7,6 +7,7 @@ import com.andreidodu.europealibrary.batch.indexer.step.dbupdate.DbFileItemWrite
 import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemReader;
 import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.file.LoginEbookServiceListener;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import jakarta.persistence.EntityManagerFactory;
@@ -33,6 +34,7 @@ public class JobConfiguration {
     private Integer batchSize;
 
     final private EntityManagerFactory emFactory;
+    final private LoginEbookServiceListener loginEbookServiceListener;
 
     @Bean("jobIndexer")
     public Job indexerJob(JobRepository jobRepository, Step indexDirectoriesAndFilesStep, Step deleteDbFilesStep, Step finalizeJobStep) {
@@ -51,6 +53,7 @@ public class JobConfiguration {
                 .allowStartIfComplete(true)
                 .processor(processor)
                 .writer(writer)
+                .listener(loginEbookServiceListener)
                 .build();
     }
 

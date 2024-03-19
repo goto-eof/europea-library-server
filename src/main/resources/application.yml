@@ -51,3 +51,5 @@ batchdb:
   url: jdbc:postgresql://localhost:5436/db
   username: postgres
   password: postgres
+
+
