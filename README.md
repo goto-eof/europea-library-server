@@ -20,6 +20,7 @@ found [here](https://github.com/goto-eof/europea-library-client).
 - Java (JDK 21)
 - Spring Batch (Spring Boot 3.3.0)
 - Spring JPA (Spring Boot 3.3.0)
+- Feign
 - Querydsl
 - Hibernate
 - Liquibase (4.21)
