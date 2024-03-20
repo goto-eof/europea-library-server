@@ -19,20 +19,12 @@ found [here](https://github.com/goto-eof/europea-library-client).
 
 ## Technologies
 
-- Java (JDK 21)
-- Spring Boot 3.3.0
-- Spring Batch
-- Spring JPA
-- Feign
-- Querydsl
-- Hibernate
-- Liquibase (4.21)
-- PostgreSQL
-- Docker
+Java (JDK 21) • Spring Boot • Spring Batch • Spring JPA • Feign • Queryds • Hibernate • Liquibase • PostgreSQL
+• Docker
 
 ## External services
 
-- Google Books API
+Google Books API
 
 ## DB schema
 
