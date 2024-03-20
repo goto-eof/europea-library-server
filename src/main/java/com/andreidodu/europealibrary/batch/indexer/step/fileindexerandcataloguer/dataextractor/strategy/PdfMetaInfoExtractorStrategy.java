@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
 
             fileMetaInfo.setBookInfo(bookInfo);
 
+            log.info("PDF metadata extracted: {}", fileMetaInfo);
             return Optional.of(fileMetaInfo);
         } catch (IOException e) {
             log.error("Unable to parse PDF");
@@ -66,7 +68,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
         Optional.ofNullable(pdDocument.getDocumentInformation().getCreationDate())
-                .ifPresent(date -> bookInfo.setPublishedDate(date.toString()));
+                .ifPresent(date -> bookInfo.setPublishedDate(new SimpleDateFormat("yyyy-MM-dd").format(date)));
         return bookInfo;
     }
 
