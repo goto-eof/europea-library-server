@@ -20,7 +20,7 @@ found [here](https://github.com/goto-eof/europea-library-client).
 ## Technologies
 
 Java (JDK 21) • Spring Boot • Spring Batch • Spring JPA • Feign • Queryds • Hibernate • Liquibase • PostgreSQL
-• Docker
+• Docker • epublib • pdfbox
 
 ## External services
 
