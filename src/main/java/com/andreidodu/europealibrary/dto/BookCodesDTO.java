@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class BookCodesDTO<A, B> {
-    private A sbn;
-    private B isbn;
+    private A isbn10;
+    private B isbn13;
 }

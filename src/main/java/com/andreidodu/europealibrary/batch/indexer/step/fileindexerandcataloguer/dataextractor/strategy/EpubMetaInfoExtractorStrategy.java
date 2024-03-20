@@ -21,6 +21,7 @@ import java.util.Optional;
 public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "epub-meta-info-extractor-strategy";
     private final EpubUtil epubUtil;
+    private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
 
 
     @Override
@@ -61,36 +62,15 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
                 .ifPresent(language ->
                         bookInfo.setLanguage(language.substring(0, Math.min(language.length(), 10))));
         bookInfo.setNumberOfPages(book.getContents().size());
-        bookInfo.setIsbn13(getFirst(metadata.getIdentifiers()
-                .stream()
-                .map(Identifier::getValue)
-                .toList()));
         bookInfo.setAuthors(String.join(", ", metadata.getAuthors()
                 .stream()
                 .map(author -> author.getFirstname() + " " + author.getLastname())
                 .toList()));
         BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.epubUtil.retrieveISBN(book);
-        setISBN13(bookCodes, bookInfo);
-        setISBN10(bookCodes, bookInfo);
+        dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
+        dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
         bookInfo.setPublisher(String.join(", ", metadata.getPublishers()));
         return bookInfo;
-    }
-
-
-    private static void setISBN13(BookCodesDTO<Optional<String>, Optional<String>> bookCodes, BookInfo bookInfo) {
-        bookCodes.getIsbn()
-                .ifPresent(isbn -> {
-                    bookInfo.setIsbn13(isbn);
-                    log.info("ISBN-13 found: {}", isbn);
-                });
-    }
-
-    private static void setISBN10(BookCodesDTO<Optional<String>, Optional<String>> bookCodes, BookInfo bookInfo) {
-        bookCodes.getSbn()
-                .ifPresent(sbn -> {
-                    bookInfo.setIsbn10(sbn);
-                    log.info("ISBN-10 found: {}", sbn);
-                });
     }
 
     private String getFirst(List<String> list) {
@@ -99,6 +79,4 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         }
         return null;
     }
-
-
 }

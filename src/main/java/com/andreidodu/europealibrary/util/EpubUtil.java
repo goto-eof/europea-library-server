@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubReader;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -47,7 +46,7 @@ public class EpubUtil {
                 searchAndStoreISBN(result, contentString);
                 searchAndStoreSBN(result, contentString);
 
-                if (result.getIsbn().isPresent() && result.getSbn().isPresent()) {
+                if (result.getIsbn13().isPresent() && result.getIsbn10().isPresent()) {
                     return result;
                 }
                 if (i++ > 5) {
@@ -61,14 +60,14 @@ public class EpubUtil {
     }
 
     private void searchAndStoreSBN(BookCodesDTO<Optional<String>, Optional<String>> result, String contentString) {
-        if (result.getSbn().isEmpty()) {
-            result.setSbn(this.regularExpressionUtil.extractSBN(contentString));
+        if (result.getIsbn10().isEmpty()) {
+            result.setIsbn10(this.regularExpressionUtil.extractISBN10(contentString));
         }
     }
 
     private void searchAndStoreISBN(BookCodesDTO<Optional<String>, Optional<String>> result, String contentString) {
-        if (result.getIsbn().isEmpty()) {
-            result.setIsbn(this.regularExpressionUtil.extractISBN(contentString));
+        if (result.getIsbn13().isEmpty()) {
+            result.setIsbn13(this.regularExpressionUtil.extractISBN13(contentString));
         }
     }
 
