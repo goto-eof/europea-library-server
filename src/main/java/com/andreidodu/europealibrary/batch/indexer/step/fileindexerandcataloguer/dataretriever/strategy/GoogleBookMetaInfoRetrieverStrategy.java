@@ -94,16 +94,19 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private GoogleBookResponseDTO retrieveGoogleBook(FileSystemItem fileSystemItem) {
         GoogleBookResponseDTO googleBookResponse;
         try {
-            if (hasISBN13(fileSystemItem)) {
-                googleBookResponse = this.googleBooksClient.retrieveMetaInfo(calculateQueryISBN13(fileSystemItem), MAX_RESULTS, googleBooksApiKey);
-            } else {
-                googleBookResponse = this.googleBooksClient.retrieveMetaInfo(calculateQueryTitleAuthorPublisher(fileSystemItem), MAX_RESULTS, googleBooksApiKey);
-            }
+            googleBookResponse = retrieveBookInfoFromGoogleBooks(fileSystemItem);
         } catch (RuntimeException e) {
             log.error("Error while trying to contact google books api: {}", e.getMessage());
             return null;
         }
         return googleBookResponse;
+    }
+
+    private GoogleBookResponseDTO retrieveBookInfoFromGoogleBooks(FileSystemItem fileSystemItem) {
+        if (hasISBN13(fileSystemItem)) {
+            return this.googleBooksClient.retrieveMetaInfo(calculateQueryISBN13(fileSystemItem), MAX_RESULTS, googleBooksApiKey);
+        }
+        return this.googleBooksClient.retrieveMetaInfo(calculateQueryTitleAuthorPublisher(fileSystemItem), MAX_RESULTS, googleBooksApiKey);
     }
 
     private static String calculateQueryISBN13(FileSystemItem fileSystemItem) {
