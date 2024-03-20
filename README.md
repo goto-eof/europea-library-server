@@ -33,7 +33,7 @@ Google Books API
 ## Changes log
 
 - 2023-03-20
-    - added PDF extractor strategy 
+    - added PDF meta-data extractor strategy in addition to the EPUB meta-data extractor.
     - refactor of the indexer and cataloguer job (for the first step I moved the business logic in the
       processor as should be done)
     - added the language, num_pages, average_rating and number of raters columns
