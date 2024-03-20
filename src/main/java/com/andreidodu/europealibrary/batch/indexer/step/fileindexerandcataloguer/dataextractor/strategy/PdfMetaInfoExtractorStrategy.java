@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.strategy;
 
+import ch.qos.logback.classic.util.CopyOnInheritThreadLocal;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.BookInfo;
@@ -43,6 +44,17 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
             File file = new File(filename);
             PDDocument pdf = Loader.loadPDF(file);
             PDDocumentInformation documentInformation = pdf.getDocumentInformation();
+
+            if (documentInformation.getTitle() == null) {
+                return Optional.empty();
+            }
+            // publisher
+            if (documentInformation.getCreator() == null) {
+                return Optional.empty();
+            }
+            if (documentInformation.getAuthor() == null) {
+                return Optional.empty();
+            }
 
             FileMetaInfo fileMetaInfo = new FileMetaInfo();
             fileMetaInfo.setTitle(documentInformation.getTitle());

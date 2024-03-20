@@ -44,10 +44,9 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         log.info("gathering information from ebook {}", fullPath);
         FileMetaInfo fileMetaInfo = new FileMetaInfo();
 
-
         Metadata metadata = book.getMetadata();
         fileMetaInfo.setTitle(metadata.getFirstTitle());
-        fileMetaInfo.setDescription(this.getFirst(metadata.getDescriptions()));
+        fileMetaInfo.setDescription(getFirst(metadata.getDescriptions()));
 
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
 
