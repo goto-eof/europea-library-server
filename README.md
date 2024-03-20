@@ -63,3 +63,4 @@ Google Books API
 - Currently, I do not add new changesets to liquibase (the base schema is still in definition status), so that sometimes
   it is necessary to drop all tables and restart the application.
 - developed and tested on Linux.
+- if you have any suggestions or noticed a bug please contact me [here](https://andre-i.eu/#contactme)
