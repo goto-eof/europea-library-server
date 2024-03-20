@@ -32,6 +32,7 @@
             </column>
             <column name="sha256" type="VARCHAR"/>
             <column name="size" type="bigint"/>
+            <column name="extension" type="VARCHAR(30)"/>
             <column name="file_create_date" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
@@ -82,13 +83,17 @@
             <column name="authors" type="VARCHAR(500)">
                 <constraints nullable="false"/>
             </column>
+            <column name="language" type="VARCHAR(10)"/>
             <column name="note" type="VARCHAR(2000)"/>
-            <column name="sbn" type="VARCHAR(9)"/>
-            <column name="isbn" type="VARCHAR(13)"/>
+            <column name="num_pages" type="int"/>
+            <column name="average_rating" type="double"/>
+            <column name="ratings_count" type="bigint"/>
+            <column name="isbn10" type="VARCHAR(10)"/>
+            <column name="isbn13" type="VARCHAR(13)"/>
             <column name="publisher" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="year" type="int"/>
+            <column name="published_date" type="VARCHAR(50)"/>
             <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="version" type="INT"/>

@@ -24,7 +24,7 @@ public class IndexDirectoriesTaskScheduler {
     private final Job job;
 
     @Scheduled(cron = "${com.andreidodu.task.cron.expression}")
-    public void runIndexDirectoriesTaskScheduler() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException {
+    public void runIndexAndCatalogueTaskScheduler() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException {
         try {
             jobLauncher.run(job, generateJobParameters());
         } catch (JobExecutionAlreadyRunningException e) {

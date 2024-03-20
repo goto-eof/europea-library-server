@@ -23,7 +23,7 @@ public class JobRunnerServiceImpl implements JobRunnerService {
     private JobLauncher jobLauncher;
 
     @Autowired
-    @Qualifier("jobIndexer")
+    @Qualifier("indexerJob")
     private Job job;
 
     @Override

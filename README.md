@@ -12,14 +12,17 @@
 
 # Europea Library (server - Work In Progress)
 
-A library web application that allows to catalog and download e-books. The front-end project can be
+A library web application that allows to index, gather information about books and search for ebooks. The front-end
+project
+can be
 found [here](https://github.com/goto-eof/europea-library-client).
 
 ## Technologies
 
 - Java (JDK 21)
-- Spring Batch (Spring Boot 3.3.0)
-- Spring JPA (Spring Boot 3.3.0)
+- Spring Boot 3.3.0
+- Spring Batch
+- Spring JPA
 - Feign
 - Querydsl
 - Hibernate
@@ -27,12 +30,23 @@ found [here](https://github.com/goto-eof/europea-library-client).
 - PostgreSQL
 - Docker
 
+## External services
+
+- Google Books API
+
 ## DB schema
 
 ![db_schema](images/db_schema.png)
 
 ## Changes log
 
+- 2023-03-20
+    - refactor of the indexer and cataloguer job (for the first step I moved the business logic in the
+      processor as should be done)
+    - added the language, num_pages, average_rating and number of raters columns
+    - changed column names sbn and isbn to isbn10 and isbn13
+    - integration with Google Books API -> now Europea Library downloads book's information from web
+    - removed openlibrary.org client (obsolete)
 - 2023-03-19 - added Feign (login to openlibrary.org) and implemented .epub meta-data extractor.
 - 2023-03-18 - indexer job now restores the relationship between file system item and meta info record.
 - 2023-03-16 - finished CRUD implementation of Book info module and fixed the db schema.
@@ -50,4 +64,9 @@ found [here](https://github.com/goto-eof/europea-library-client).
 
 ## More
 
+- Europea Library uses Google Books API. This API has daily limits: 1,000 requests/day. To get the API key go
+  to [Google Console](https://console.cloud.google.com/apis/credentials?hl=it) and create an API key. Remember also to
+  enable Google Books API.
+- Currently, I do not add new changesets to liquibase (the base schema is still in definition status), so that sometimes
+  it is necessary to drop all tables and restart the application.
 - developed and tested on Linux.

@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.dbupdate;
+package com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater;
 
 import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
 import com.andreidodu.europealibrary.model.FileSystemItem;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Transactional
 @RequiredArgsConstructor
-public class DbFileItemWriter implements ItemWriter<FileSystemItem> {
+public class DbStepUpdaterWriter implements ItemWriter<FileSystemItem> {
     private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
@@ -24,6 +24,6 @@ public class DbFileItemWriter implements ItemWriter<FileSystemItem> {
             fileSystemItemRepository.save(item);
             log.info("changed to ready: " + item);
         });
-        fileSystemItemRepository.flush();
+        //fileSystemItemRepository.flush();
     }
 }

@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.file;
+package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import java.util.*;
 @Slf4j
 @Component
 @StepScope
-public class FileItemReader implements ItemStreamReader<File> {
+public class FileIndexerReader implements ItemStreamReader<File> {
 
     @Value("${com.andreidodu.europa-library.e-books-directory}")
     private String ebookDirectory;
@@ -50,7 +50,10 @@ public class FileItemReader implements ItemStreamReader<File> {
     }
 
     private static Comparator<File> sortByIsDirectoryAndName() {
-        return Comparator.comparing(File::isDirectory).reversed().thenComparing(File::getName);
+        return Comparator
+                .comparing(File::isDirectory)
+                .reversed()
+                .thenComparing(File::getName);
     }
 
     @Override

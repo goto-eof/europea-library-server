@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class RegularExpressionUtil {
 
     private final static String PATTERN_ISBN_STRING = "(?!(([a-z ]+)|(<[a-zA-Z=\" ]+>))((ISBN|isbn)[a-zA-Z0-9]*[:]?[\s]?))(?<=\s)([0-9]{13})(?![0-9]$)+(?=(</[a-zA-Z]*>))";
-    private final static String PATTERN_SBN_STRING = "(?!(([a-z ]+)|(<[a-zA-Z=\" ]+>))(((?!I)SBN|(?!i)sbn)[a-zA-Z0-9]*[:]?[\s]?))(?<=\s)([0-9]{9})(?![0-9]$)+(?=(</[a-zA-Z]*>))";
+    private final static String PATTERN_SBN_STRING = "(?!(([a-z ]+)|(<[a-zA-Z=\" ]+>))((ISBN|(?!i)sbn)[a-zA-Z0-9]*[:]?[\s]?))(?<=\s)([0-9]{10})(?![0-9]$)+(?=(</[a-zA-Z]*>))";
     private static final Pattern ISBN_PATTERN_COMPILED = Pattern.compile(PATTERN_ISBN_STRING);
     private static final Pattern SBN_PATTERN_COMPILED = Pattern.compile(PATTERN_SBN_STRING);
 

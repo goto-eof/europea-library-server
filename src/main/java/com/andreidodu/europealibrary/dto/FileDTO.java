@@ -18,5 +18,6 @@ public class FileDTO extends CommonDTO {
     private LocalDateTime fileCreateDate;
     private LocalDateTime fileUpdateDate;
     private Boolean isDirectory;
+    private String extension;
     private String sha256;
 }

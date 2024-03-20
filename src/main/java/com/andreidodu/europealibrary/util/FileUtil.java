@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -25,6 +26,10 @@ public class FileUtil {
 
     public String calculateParentBasePath(String basePath) {
         return new File(basePath).getParentFile().getAbsolutePath();
+    }
+
+    public String getExtension(String filename) {
+        return FilenameUtils.getExtension(filename);
     }
 
 }

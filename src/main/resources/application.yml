@@ -41,6 +41,8 @@ server:
 com:
   andreidodu:
     europa-library:
+      force-load-meta-info-from-web: false
+      override-meta-info: false
       e-books-directory: "/home/andrei/Documents/backuped/multimedia/ebook"
       #e-books-directory: "/home/andrei/Desktop/ciao"
     task:
@@ -52,9 +54,7 @@ batchdb:
   username: postgres
   password: postgres
 
-
-# openlibrary.org
-open-library:
-  authentication:
-    access: YOUR_ACCESS_KEY
-    secret: YOUR_ACCESS_SECRET
+google:
+  books:
+    query-url: https://www.googleapis.com/books/v1/volumes
+    api_key: ABCDEFGHI

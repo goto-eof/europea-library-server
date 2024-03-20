@@ -9,6 +9,7 @@ import nl.siegmann.epublib.epub.EpubReader;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Optional;
@@ -20,9 +21,10 @@ public class EpubUtil {
 
     public static final String EPUB_FILE_EXTENSION = "epub";
     private final RegularExpressionUtil regularExpressionUtil;
+    private final FileUtil fileUtil;
 
     public Optional<Book> retrieveBook(String filename) {
-        if (!EPUB_FILE_EXTENSION.equals(FilenameUtils.getExtension(filename))) {
+        if (!EPUB_FILE_EXTENSION.equals(fileUtil.getExtension(filename))) {
             return Optional.empty();
         }
         try {
@@ -68,5 +70,9 @@ public class EpubUtil {
         if (result.getIsbn().isEmpty()) {
             result.setIsbn(this.regularExpressionUtil.extractISBN(contentString));
         }
+    }
+
+    public boolean isEpub(String fullPath) {
+        return !(new File(fullPath).isDirectory()) && EPUB_FILE_EXTENSION.equals(this.fileUtil.getExtension(fullPath));
     }
 }

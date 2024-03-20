@@ -25,18 +25,40 @@ public class BookInfo extends ModelCommon {
     @Column(length = 2000)
     private String note;
 
-    @Column(length = 9)
-    private String sbn;
+    @Column(length = 10)
+    private String isbn10;
 
     @Column(length = 13)
-    private String isbn;
+    private String isbn13;
 
     @Column(length = 100)
     private String publisher;
 
-    private Integer year;
+    @Column(length = 10)
+    private String language;
+
+    @Column(name = "num_pages")
+    private Integer numberOfPages;
+
+    @Column(name = "published_date", length = 50)
+    private String publishedDate;
+
+    @Column(name = "average_rating")
+    private Double averageRating;
+
+    @Column(name = "ratings_count")
+    private Long ratingsCount;
 
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
     private FileMetaInfo fileMetaInfo;
+
+    @Override
+    public String toString() {
+        return "BookInfo{" +
+                "authors='" + authors + '\'' +
+                ", isbn13='" + isbn13 + '\'' +
+                ", publisher='" + publisher + '\'' +
+                '}';
+    }
 }

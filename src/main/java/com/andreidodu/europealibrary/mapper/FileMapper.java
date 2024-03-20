@@ -2,9 +2,11 @@ package com.andreidodu.europealibrary.mapper;
 
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
+import com.andreidodu.europealibrary.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +21,9 @@ import java.time.ZoneId;
 @Slf4j
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public abstract class FileMapper {
+    @Autowired
+    private FileUtil fileUtil;
+
     public FileDTO toDTO(File file) throws IOException {
         BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         FileTime fileCreationTime = attr.creationTime();
@@ -32,6 +37,9 @@ public abstract class FileMapper {
         fileDTO.setName(file.getName());
         fileDTO.setIsDirectory(file.isDirectory());
         fileDTO.setBasePath(file.getParentFile().getAbsolutePath());
+        if (file.isFile()) {
+            fileDTO.setSha256(this.fileUtil.fileToSha256(file));
+        }
         return fileDTO;
     }
 }

@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.dbdelete;
+package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer;
 
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Transactional
 @RequiredArgsConstructor
-public class DbDeleteFileItemWriter implements ItemWriter<FileSystemItem> {
-    final private FileSystemItemRepository fileSystemItemRepository;
+@Transactional
+public class FileIndexerWriter implements ItemWriter<FileSystemItem> {
+    private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        this.fileSystemItemRepository.deleteAll(chunk.getItems());
-        log.info("deleted {} records", chunk.getItems().size());
+        this.fileSystemItemRepository.saveAll(chunk.getItems());
     }
+
 }

@@ -42,4 +42,12 @@ public class FileMetaInfo extends ModelCommon {
     @OneToMany(mappedBy = "fileMetaInfo")
     @Fetch(FetchMode.JOIN)
     private List<FileSystemItem> fileSystemItemList;
+
+    @Override
+    public String toString() {
+        return "FileMetaInfo{" +
+                "title='" + title + '\'' +
+                ", bookInfo=" + bookInfo +
+                '}';
+    }
 }

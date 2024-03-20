@@ -12,9 +12,13 @@ public class FileMetaInfoBookDTO extends FileMetaInfoDTO {
     private String imageUrl;
     private String authors;
     private String note;
-    private String sbn;
-    private String isbn;
+    private String isbn10;
+    private String isbn13;
+    private Integer numberOfPages;
+    private String language;
     private String publisher;
-    private Integer year;
+    private String publishedDate;
+    private Double averageRating;
+    private Long ratingsCount;
     private List<Long> fileSystemItemIdList;
 }

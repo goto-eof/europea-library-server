@@ -1,14 +1,15 @@
 package com.andreidodu.europealibrary.batch.indexer;
 
-import com.andreidodu.europealibrary.batch.indexer.step.dbdelete.DbDeleteFileItemProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.dbdelete.DbDeleteFileItemWriter;
-import com.andreidodu.europealibrary.batch.indexer.step.dbupdate.DbFileItemProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.dbupdate.DbFileItemWriter;
-import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemReader;
-import com.andreidodu.europealibrary.batch.indexer.step.file.FileItemWriter;
-import com.andreidodu.europealibrary.batch.indexer.step.file.LoginEbookServiceListener;
-import com.andreidodu.europealibrary.dto.FileDTO;
+import com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter.DbFMIObsoleteDeleterProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter.DbFMIObsoleteDeleterWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater.DbStepUpdaterProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater.DbStepUpdaterWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerReader;
+import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerWriter;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
@@ -34,53 +35,63 @@ public class JobConfiguration {
     private Integer batchSize;
 
     final private EntityManagerFactory emFactory;
-    final private LoginEbookServiceListener loginEbookServiceListener;
 
-    @Bean("jobIndexer")
-    public Job indexerJob(JobRepository jobRepository, Step indexDirectoriesAndFilesStep, Step deleteDbFilesStep, Step finalizeJobStep) {
+    @Bean("indexerJob")
+    public Job indexerJob(JobRepository jobRepository, Step fileIndexerAndCataloguerStep, Step dbFSIObsoleteDeleterStep, Step dbFMIObsoleteDeleterStep, Step dbJobStepUpdaterStep) {
         return new JobBuilder("indexerJob", jobRepository)
-                .start(indexDirectoriesAndFilesStep)
-                .next(deleteDbFilesStep)
-                .next(finalizeJobStep)
+                .start(fileIndexerAndCataloguerStep)
+                .next(dbFSIObsoleteDeleterStep)
+                .next(dbFMIObsoleteDeleterStep)
+                .next(dbJobStepUpdaterStep)
                 .build();
     }
 
-    @Bean
-    public Step indexDirectoriesAndFilesStep(JobRepository jobRepository, FileItemProcessor processor, FileItemReader fileItemReader, FileItemWriter writer, HibernateTransactionManager transactionManager) {
+    @Bean("fileIndexerAndCataloguerStep")
+    public Step fileIndexerAndCataloguerStep(JobRepository jobRepository, FileIndexerProcessor processor, FileIndexerReader fileIndexerReader, FileIndexerWriter writer, HibernateTransactionManager transactionManager) {
         return new StepBuilder("indexDirectoriesAndFiles", jobRepository)
-                .<File, FileDTO>chunk(batchSize, transactionManager)
-                .reader(fileItemReader)
+                .<File, FileSystemItem>chunk(batchSize, transactionManager)
+                .reader(fileIndexerReader)
                 .allowStartIfComplete(true)
                 .processor(processor)
                 .writer(writer)
-                .listener(loginEbookServiceListener)
                 .build();
     }
 
-    @Bean
-    public Step deleteDbFilesStep(JpaCursorItemReader<FileSystemItem> dbDeleteFileItemReader, JobRepository jobRepository, DbDeleteFileItemProcessor processor, DbDeleteFileItemWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    @Bean("dbFSIObsoleteDeleterStep")
+    public Step dbFSIObsoleteDeleterStep(JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("deleteDbFilesStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
-                .reader(dbDeleteFileItemReader)
+                .reader(dbFSIObsoleteDeleterReader)
                 .processor(processor)
                 .writer(fileItemWriter)
                 .build();
     }
 
-    @Bean
-    public Step finalizeJobStep(JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbFileItemReader, DbFileItemProcessor processor, DbFileItemWriter dbFileItemWriter, HibernateTransactionManager transactionManager) {
-        return new StepBuilder("finalizeJobStep", jobRepository)
-                .<FileSystemItem, FileSystemItem>chunk(batchSize, transactionManager)
+    @Bean("dbFMIObsoleteDeleterStep")
+    public Step dbFMIObsoleteDeleterStep(JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+        return new StepBuilder("deleteDbFilesStep", jobRepository)
+                .<FileMetaInfo, FileMetaInfo>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
-                .reader(dbFileItemReader)
+                .reader(dbFMIObsoleteDeleterReader)
                 .processor(processor)
-                .writer(dbFileItemWriter)
+                .writer(fileItemWriter)
                 .build();
     }
 
-    @Bean
-    public JpaCursorItemReader<FileSystemItem> dbDeleteFileItemReader() {
+    @Bean("dbJobStepUpdaterStep")
+    public Step dbJobStepUpdaterStep(JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
+        return new StepBuilder("finalizeJobStep", jobRepository)
+                .<FileSystemItem, FileSystemItem>chunk(batchSize, transactionManager)
+                .allowStartIfComplete(true)
+                .reader(dbStepUpdaterReader)
+                .processor(processor)
+                .writer(dbStepUpdaterWriter)
+                .build();
+    }
+
+    @Bean("dbFSIObsoleteDeleterReader")
+    public JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader() {
         JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<FileSystemItem>());
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
         jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where jobStep = :step");
@@ -91,8 +102,17 @@ public class JobConfiguration {
         return jpaCursorItemReader;
     }
 
-    @Bean
-    public JpaCursorItemReader<FileSystemItem> dbFileItemReader() {
+    @Bean("dbFMIObsoleteDeleterReader")
+    public JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader() {
+        JpaCursorItemReader<FileMetaInfo> jpaCursorItemReader = (new JpaCursorItemReader<FileMetaInfo>());
+        jpaCursorItemReader.setEntityManagerFactory(emFactory);
+        jpaCursorItemReader.setQueryString("SELECT p FROM FileMetaInfo p where p.fileSystemItemList IS EMPTY");
+        jpaCursorItemReader.setSaveState(true);
+        return jpaCursorItemReader;
+    }
+
+    @Bean("dbStepUpdaterReader")
+    public JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader() {
         JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<FileSystemItem>());
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
         jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where jobStep = :step");
