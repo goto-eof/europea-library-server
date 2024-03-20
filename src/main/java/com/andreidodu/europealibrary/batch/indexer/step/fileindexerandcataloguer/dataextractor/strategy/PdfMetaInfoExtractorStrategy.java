@@ -26,7 +26,8 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
-    final private static String STRATEGY_NAME = "epub-meta-info-extractor-strategy";
+    final private static String STRATEGY_NAME = "pdf-meta-info-extractor-strategy";
+    public static final String PUBLISHED_DATE_FORMAT = "yyyy-MM-dd";
     private final PdfUtil pdfUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
 
@@ -70,7 +71,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
         Optional.ofNullable(pdDocument.getDocumentInformation().getCreationDate())
                 .ifPresent(calendar -> {
-                    SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat format1 = new SimpleDateFormat(PUBLISHED_DATE_FORMAT);
                     bookInfo.setPublishedDate(format1.format(calendar.getTime()));
                 });
         return bookInfo;
