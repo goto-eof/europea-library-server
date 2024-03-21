@@ -65,6 +65,9 @@ public class FileSystemItem extends ModelCommon {
     @JoinColumn(name = "file_meta_info_id", nullable = true)
     private FileMetaInfo fileMetaInfo;
 
+    @Column(name = "record_status")
+    private Integer recordStatus;
+
     @Override
     public String toString() {
         return "FileSystemItem{" +

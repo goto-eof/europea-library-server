@@ -94,9 +94,9 @@ public class JobConfiguration {
     public JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader() {
         JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<FileSystemItem>());
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
-        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where jobStep = :step");
+        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where recordStatus = :recordStatus");
         Map<String, Object> parameterValues = new HashMap<>();
-        parameterValues.put("step", JobStepEnum.READY.getStepNumber());
+        parameterValues.put("recordStatus", RecordStatusEnum.ENABLED.getStatus());
         jpaCursorItemReader.setParameterValues(parameterValues);
         jpaCursorItemReader.setSaveState(true);
         return jpaCursorItemReader;
@@ -115,9 +115,9 @@ public class JobConfiguration {
     public JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader() {
         JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<FileSystemItem>());
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
-        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where jobStep = :step");
+        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where recordStatus = :recordStatus");
         Map<String, Object> parameterValues = new HashMap<>();
-        parameterValues.put("step", JobStepEnum.INSERTED.getStepNumber());
+        parameterValues.put("recordStatus", RecordStatusEnum.JUST_UPDATED.getStatus());
         jpaCursorItemReader.setParameterValues(parameterValues);
         jpaCursorItemReader.setSaveState(true);
         return jpaCursorItemReader;
