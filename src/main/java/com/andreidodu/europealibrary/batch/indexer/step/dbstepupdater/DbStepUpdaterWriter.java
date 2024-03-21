@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater;
 
 import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
+import com.andreidodu.europealibrary.batch.indexer.RecordStatusEnum;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import jakarta.transaction.Transactional;
@@ -21,9 +22,9 @@ public class DbStepUpdaterWriter implements ItemWriter<FileSystemItem> {
     public void write(Chunk<? extends FileSystemItem> chunk) {
         chunk.getItems().forEach(item -> {
             item.setJobStep(JobStepEnum.READY.getStepNumber());
+            item.setRecordStatus(RecordStatusEnum.ENABLED.getStatus());
             fileSystemItemRepository.save(item);
             log.info("changed to ready: " + item);
         });
-        //fileSystemItemRepository.flush();
     }
 }

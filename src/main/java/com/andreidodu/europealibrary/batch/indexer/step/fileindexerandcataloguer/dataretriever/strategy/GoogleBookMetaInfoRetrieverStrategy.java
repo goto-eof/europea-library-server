@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcatalogue
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
@@ -19,7 +20,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStrategy {
-
+    private static final String STRATEGY_NAME = "google-book-meta-info-retriever-strategy";
     public static final String IDENTIFIER_TYPE_ISBN_10 = "ISBN_10";
     public static final int MAX_RESULTS = 1;
     public static final String GOOGLE_QUERY_INTITLE = "intitle:";
@@ -32,9 +33,25 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final GoogleBooksClient googleBooksClient;
     private final StringUtil stringUtil;
 
+    @Value("${com.andreidodu.europa-library.force-load-meta-info-from-web}")
+    private boolean forceLoadMetaInfoFromWeb;
+
+    @Override
+    public String getStrategyName() {
+        return STRATEGY_NAME;
+    }
+
     @Override
     public boolean accept(FileSystemItem fileSystemItem) {
-        return hasISBNOrTitleAuthorsOrPublisher(fileSystemItem);
+        return (forceLoadMetaInfoFromWeb || wasNotAlreadyRetrievedFromWeb(fileSystemItem)) && hasISBNOrTitleAuthorsOrPublisher(fileSystemItem);
+    }
+
+    private boolean wasNotAlreadyRetrievedFromWeb(FileSystemItem fileSystemItem) {
+        if (fileSystemItem == null || fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
+            return false;
+        }
+        BookInfo bookInfo = fileSystemItem.getFileMetaInfo().getBookInfo();
+        return bookInfo.getIsInfoRetrievedFromWeb() == null || !bookInfo.getIsInfoRetrievedFromWeb();
     }
 
     private static boolean hasISBNOrTitleAuthorsOrPublisher(FileSystemItem fileSystemItem) {
@@ -56,15 +73,17 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
 
     @Override
     public void process(FileSystemItem fileSystemItem) {
+        log.info("applying strategy: {}", getStrategyName());
         log.info("retrieving book information from google books....");
         GoogleBookResponseDTO googleBookResponse = retrieveGoogleBook(fileSystemItem);
         if (isEmptyResponse(googleBookResponse)) {
             log.info("book information not found for {}", fileSystemItem);
+            fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(false);
             return;
         }
         log.info("book information retrieved: {}", googleBookResponse);
         updateModel(fileSystemItem, googleBookResponse);
-
+        fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(true);
     }
 
     private void updateModel(FileSystemItem fileSystemItem, GoogleBookResponseDTO googleBookResponse) {
@@ -97,7 +116,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             googleBookResponse = retrieveBookInfoFromGoogleBooks(fileSystemItem);
         } catch (RuntimeException e) {
             log.error("Error while trying to contact google books api: {}", e.getMessage());
-            return null;
+            throw new ApplicationException("Google Books API throw an error: " + e.getMessage(), e);
         }
         return googleBookResponse;
     }

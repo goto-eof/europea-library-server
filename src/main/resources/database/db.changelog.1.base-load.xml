@@ -52,6 +52,7 @@
                              references="${tablePrefix}file_meta_info(id)"/>
             </column>
             <column name="job_status" type="int"/>
+            <column name="record_status" type="int"/>
             <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="version" type="INT"/>
@@ -91,9 +92,12 @@
             <column name="isbn10" type="VARCHAR(10)"/>
             <column name="isbn13" type="VARCHAR(13)"/>
             <column name="publisher" type="varchar(100)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="published_date" type="VARCHAR(50)"/>
+            <column name="is_info_extracted_from_file" type="boolean"/>
+            <column name="is_info_retrieved_from_web" type="boolean"/>
+            <column name="record_status" type="int"/>
             <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="version" type="INT"/>

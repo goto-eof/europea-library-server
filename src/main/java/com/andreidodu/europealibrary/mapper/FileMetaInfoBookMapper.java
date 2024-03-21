@@ -51,6 +51,7 @@ public abstract class FileMetaInfoBookMapper {
 
     @Mapping(ignore = true, target = "fileMetaInfo")
     @Mapping(ignore = true, target = "id")
+    @Mapping(ignore = true, target = "recordStatus")
     public abstract void map(@MappingTarget BookInfo model, FileMetaInfoBookDTO source);
 
     public FileMetaInfo toModel(FileMetaInfoBookDTO dto) {
