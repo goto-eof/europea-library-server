@@ -8,7 +8,6 @@ import com.andreidodu.europealibrary.util.EpubUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.Identifier;
 import nl.siegmann.epublib.domain.Metadata;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +22,10 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
     private final EpubUtil epubUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
 
+    @Override
+    public String getStrategyName() {
+        return STRATEGY_NAME;
+    }
 
     @Override
     public boolean accept(String filename) {
@@ -31,6 +34,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
 
     @Override
     public Optional<FileMetaInfo> extract(String filename) {
+        log.info("applying strategy: {}", getStrategyName());
         return epubUtil.retrieveBook(filename)
                 .map(book -> {
                     if (book.getMetadata().getFirstTitle().trim().isEmpty()) {
@@ -51,6 +55,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
 
         fileMetaInfo.setBookInfo(bookInfo);
+        fileMetaInfo.getBookInfo().setIsInfoExtractedFromFile(true);
         return fileMetaInfo;
     }
 

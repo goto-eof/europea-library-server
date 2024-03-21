@@ -28,10 +28,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "pdf-meta-info-extractor-strategy";
-    public static final String PUBLISHED_DATE_FORMAT = "yyyy-MM-dd";
     private final PdfUtil pdfUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
 
+    @Override
+    public String getStrategyName() {
+        return STRATEGY_NAME;
+    }
 
     @Override
     public boolean accept(String filename) {
@@ -40,16 +43,13 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
 
     @Override
     public Optional<FileMetaInfo> extract(String filename) {
+        log.info("applying strategy: {}", getStrategyName());
         try {
             File file = new File(filename);
             PDDocument pdf = Loader.loadPDF(file);
             PDDocumentInformation documentInformation = pdf.getDocumentInformation();
 
             if (documentInformation.getTitle() == null) {
-                return Optional.empty();
-            }
-            // publisher
-            if (documentInformation.getCreator() == null) {
                 return Optional.empty();
             }
             if (documentInformation.getAuthor() == null) {
@@ -65,6 +65,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
             fileMetaInfo.setBookInfo(bookInfo);
 
             log.info("PDF metadata extracted: {}", fileMetaInfo);
+            fileMetaInfo.getBookInfo().setIsInfoExtractedFromFile(true);
             return Optional.of(fileMetaInfo);
         } catch (IOException e) {
             log.error("Unable to parse PDF");
@@ -77,15 +78,9 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         bookInfo.setLanguage(pdDocument.getDocumentCatalog().getLanguage());
         bookInfo.setNumberOfPages(pdDocument.getNumberOfPages());
         bookInfo.setAuthors(pdDocument.getDocumentInformation().getAuthor());
-        bookInfo.setPublisher(pdDocument.getDocumentInformation().getCreator());
         BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.pdfUtil.retrieveISBN(pdDocument);
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
-        Optional.ofNullable(pdDocument.getDocumentInformation().getCreationDate())
-                .ifPresent(calendar -> {
-                    SimpleDateFormat format1 = new SimpleDateFormat(PUBLISHED_DATE_FORMAT);
-                    bookInfo.setPublishedDate(format1.format(calendar.getTime()));
-                });
         return bookInfo;
     }
 
