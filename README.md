@@ -31,7 +31,7 @@ Google Books API
 ![db_schema](images/db_schema.png)
 
 ## Changes log
-
+- 2023-03-21 - Improved job performance.
 - 2023-03-20
     - added PDF meta-data extractor strategy in addition to the EPUB meta-data extractor.
     - refactor of the indexer and cataloguer job (for the first step I moved the business logic in the
