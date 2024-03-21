@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcatalogue
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
@@ -115,7 +116,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             googleBookResponse = retrieveBookInfoFromGoogleBooks(fileSystemItem);
         } catch (RuntimeException e) {
             log.error("Error while trying to contact google books api: {}", e.getMessage());
-            return null;
+            throw new ApplicationException("Google Books API throw an error: " + e.getMessage(), e);
         }
         return googleBookResponse;
     }

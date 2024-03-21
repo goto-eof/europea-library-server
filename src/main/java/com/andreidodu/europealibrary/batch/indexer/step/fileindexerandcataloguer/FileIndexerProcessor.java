@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.batch.indexer.RecordStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.dto.FileDTO;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.mapper.FileMapper;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
@@ -12,9 +13,12 @@ import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
 import com.andreidodu.europealibrary.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -42,10 +46,14 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private EpubUtil epubUtil;
     @Autowired
     private List<MetaInfoExtractorStrategy> metaInfoExtractorStrategyList;
-
+    private StepExecution stepExecution;
     @Autowired
     List<MetaInfoRetrieverStrategy> metaInfoRetrieverStrategyList;
 
+    @BeforeStep
+    public void setStepExecution(StepExecution stepExecution) {
+        this.stepExecution = stepExecution;
+    }
 
     @Override
     public FileSystemItem process(final File file) {
@@ -109,9 +117,19 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
                 .filter(strategy -> strategy.accept(fileSystemItem))
                 .findFirst()
                 .map(strategy -> {
-                    strategy.process(fileSystemItem);
-                    putThreadOnSleep();
-                    return true;
+                    if (stepExecution.getExecutionContext().get("do-not-call-google-books") != null && (boolean) stepExecution.getExecutionContext().get("do-not-call-google-books")) {
+                        return false;
+                    }
+                    try {
+                        strategy.process(fileSystemItem);
+                        putThreadOnSleep();
+                        return true;
+                    } catch (ApplicationException e) {
+                        if (e.getCause().getMessage().contains("\"code\": 429")) {
+                            this.stepExecution.getExecutionContext().put("do-not-call-google-books", true);
+                        }
+                        return false;
+                    }
                 })
                 .orElse(false);
     }
