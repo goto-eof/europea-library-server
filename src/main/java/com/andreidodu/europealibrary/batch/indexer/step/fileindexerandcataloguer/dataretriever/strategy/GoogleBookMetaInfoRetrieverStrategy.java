@@ -32,6 +32,9 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final GoogleBooksClient googleBooksClient;
     private final StringUtil stringUtil;
 
+    @Value("${com.andreidodu.europa-library.force-load-meta-info-from-web}")
+    private boolean forceLoadMetaInfoFromWeb;
+
     @Override
     public String getStrategyName() {
         return STRATEGY_NAME;
@@ -39,7 +42,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
 
     @Override
     public boolean accept(FileSystemItem fileSystemItem) {
-        return wasNotAlreadyRetrievedFromWeb(fileSystemItem) && hasISBNOrTitleAuthorsOrPublisher(fileSystemItem);
+        return (forceLoadMetaInfoFromWeb || wasNotAlreadyRetrievedFromWeb(fileSystemItem)) && hasISBNOrTitleAuthorsOrPublisher(fileSystemItem);
     }
 
     private boolean wasNotAlreadyRetrievedFromWeb(FileSystemItem fileSystemItem) {

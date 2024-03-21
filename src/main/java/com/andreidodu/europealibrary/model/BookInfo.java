@@ -55,6 +55,9 @@ public class BookInfo extends ModelCommon {
     @Column(name = "is_info_retrieved_from_web")
     private Boolean isInfoRetrievedFromWeb;
 
+    @Column(name = "record_status")
+    private Integer recordStatus;
+
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
     private FileMetaInfo fileMetaInfo;

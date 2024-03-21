@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
+import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.util.PdfUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
+public class PdfMetaInfoExtractorStrategy extends MetaInfoExtractorStrategyCommon implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "pdf-meta-info-extractor-strategy";
     private final PdfUtil pdfUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
@@ -37,12 +38,12 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     }
 
     @Override
-    public boolean accept(String filename) {
-        return pdfUtil.isPdf(filename);
+    public boolean accept(String filename, FileSystemItem fileSystemItem) {
+        return pdfUtil.isPdf(filename) && !wasAlreadyProcessed(fileSystemItem);
     }
 
     @Override
-    public Optional<FileMetaInfo> extract(String filename) {
+    public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
         log.info("applying strategy: {}", getStrategyName());
         try {
             File file = new File(filename);

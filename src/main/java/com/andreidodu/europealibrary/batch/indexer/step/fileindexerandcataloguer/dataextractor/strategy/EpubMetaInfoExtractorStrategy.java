@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
+import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.util.EpubUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
+public class EpubMetaInfoExtractorStrategy extends MetaInfoExtractorStrategyCommon implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "epub-meta-info-extractor-strategy";
     private final EpubUtil epubUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
@@ -28,12 +29,13 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
     }
 
     @Override
-    public boolean accept(String filename) {
-        return epubUtil.isEpub(filename);
+    public boolean accept(String filename, FileSystemItem fileSystemItem) {
+        return epubUtil.isEpub(filename) && !wasAlreadyProcessed(fileSystemItem);
     }
 
+
     @Override
-    public Optional<FileMetaInfo> extract(String filename) {
+    public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
         log.info("applying strategy: {}", getStrategyName());
         return epubUtil.retrieveBook(filename)
                 .map(book -> {

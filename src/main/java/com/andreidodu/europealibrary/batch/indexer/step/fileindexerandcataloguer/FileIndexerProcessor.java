@@ -1,9 +1,9 @@
 package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer;
 
 import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
+import com.andreidodu.europealibrary.batch.indexer.RecordStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
-import com.andreidodu.europealibrary.client.GoogleBooksClient;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.mapper.FileMapper;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
@@ -51,10 +51,22 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     public FileSystemItem process(final File file) {
         log.info("Processing file: {}", file.getAbsoluteFile());
         // if job was stopped prematurely, then I have already a record on DB
-        Optional<FileSystemItem> fileSystemItemOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.INSERTED.getStepNumber());
-        if (fileSystemItemOptional.isPresent()) {
+        Optional<FileSystemItem> fileSystemIteminInsertedOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.INSERTED.getStepNumber());
+        if (fileSystemIteminInsertedOptional.isPresent()) {
+            fileSystemIteminInsertedOptional.get().setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
             return null;
         }
+        // case when file is in the same directory
+        Optional<FileSystemItem> fileSystemItemInReadyOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.READY.getStepNumber());
+        if (fileSystemItemInReadyOptional.isPresent()) {
+            FileSystemItem fileSystemItem = fileSystemItemInReadyOptional.get();
+            fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
+            buildMetaInfoFromEbookIfNecessary(fileSystemItem);
+            buildMetaInfoFromWebIfNecessary(fileSystemItem);
+            fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
+            return fileSystemItem;
+        }
+        // case when fle is new
         return buildFileSystemItem(file);
     }
 
@@ -75,6 +87,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         associateMetaInfoEntity(model);
         this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
                 .ifPresent(model::setParent);
+        model.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         return model;
     }
 
@@ -85,18 +98,18 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         if (!overrideMetaInfo && loadMetaInfoFromDB(model)) {
             return;
         }
-        if (buildMetaInfoFromEbook(model) && !forceLoadMetaInfoFromWeb) {
+        if (buildMetaInfoFromEbookIfNecessary(model) && !forceLoadMetaInfoFromWeb) {
             return;
         }
-        buildMetaInfoFromWeb(model);
+        buildMetaInfoFromWebIfNecessary(model);
     }
 
-    private boolean buildMetaInfoFromWeb(FileSystemItem model) {
+    private boolean buildMetaInfoFromWebIfNecessary(FileSystemItem fileSystemItem) {
         return metaInfoRetrieverStrategyList.stream()
-                .filter(strategy -> strategy.accept(model))
+                .filter(strategy -> strategy.accept(fileSystemItem))
                 .findFirst()
                 .map(strategy -> {
-                    strategy.process(model);
+                    strategy.process(fileSystemItem);
                     putThreadOnSleep();
                     return true;
                 })
@@ -120,14 +133,14 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         return false;
     }
 
-    private boolean buildMetaInfoFromEbook(FileSystemItem model) {
+    private boolean buildMetaInfoFromEbookIfNecessary(FileSystemItem model) {
         String fullPath = model.getBasePath() + "/" + model.getName();
         log.info("checking for meta-info for file {}...", fullPath);
         return this.metaInfoExtractorStrategyList
                 .stream()
-                .filter(strategy -> strategy.accept(fullPath))
+                .filter(strategy -> strategy.accept(fullPath, model))
                 .findFirst()
-                .map(strategy -> strategy.extract(fullPath))
+                .map(strategy -> strategy.extract(fullPath, model))
                 .flatMap(item -> item)
                 .map(metaInfo -> {
                     model.setFileMetaInfo(metaInfo);

@@ -23,6 +23,7 @@ public abstract class FileSystemItemMapper {
     @Mapping(ignore = true, target = "jobStep")
     @Mapping(ignore = true, target = "jobStatus")
     @Mapping(ignore = true, target = "fileMetaInfo")
+    @Mapping(ignore = true, target = "recordStatus")
     public abstract FileSystemItem toModel(FileDTO dto);
 
     @Mapping(ignore = true, target = "childrenList")
