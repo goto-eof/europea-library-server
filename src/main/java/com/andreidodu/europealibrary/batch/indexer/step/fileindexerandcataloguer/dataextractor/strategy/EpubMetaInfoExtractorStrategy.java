@@ -109,16 +109,16 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
                     tags.stream()
                             .filter(tag -> !tag.trim().isEmpty())
                             .forEach(tag -> {
-                                Optional<Tag> tagOptional = this.tagRepository.findByNameIgnoreCase(tag);
+                                String resizedTag = tag.substring(0, Math.min(tag.length(), 100));
+                                Optional<Tag> tagOptional = this.tagRepository.findByNameIgnoreCase(resizedTag);
                                 tagOptional.ifPresentOrElse(tagEntity -> {
                                             if (!fileMetaInfo.getTagList().contains(tagEntity)) {
                                                 fileMetaInfo.getTagList().add(tagEntity);
                                             }
                                         },
                                         () -> {
-                                            String processedTag = tag.substring(0, Math.min(tag.length(), 100));
                                             Tag tagEntity = new Tag();
-                                            tagEntity.setName(processedTag);
+                                            tagEntity.setName(resizedTag);
                                             this.tagRepository.save(tagEntity);
                                             fileMetaInfo.getTagList().add(tagEntity);
                                         }
