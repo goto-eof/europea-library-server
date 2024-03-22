@@ -114,7 +114,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tag"/>
             </column>
             <column name="name" type="VARCHAR(100)">
-                <constraints nullable="false"/>
+                <constraints unique="true" nullable="false"/>
             </column>
             <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
@@ -143,5 +143,41 @@
                 validate="true"/>
 
     </changeSet>
+    <changeSet id="2024-03-22-001" author="Andrei Dodu">
+        <createTable tableName="${tablePrefix}category">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_category"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+        <createTable tableName="${tablePrefix}book_info_category">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_category_book_info"/>
+            </column>
+            <column name="book_info_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="fk_book_info"
+                             references="${tablePrefix}book_info(id)"/>
+            </column>
+            <column name="category_id" type="bigint">
+                <constraints nullable="false"
+                             foreignKeyName="fk_category"
+                             references="${tablePrefix}category(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="book_info_id, category_id"
+                constraintName="unq_book_info_id_category_id"
+                tableName="${tablePrefix}book_info_category"
+                validate="true"/>
+
+    </changeSet>
+
 
 </databaseChangeLog>

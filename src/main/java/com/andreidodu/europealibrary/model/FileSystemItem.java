@@ -60,7 +60,7 @@ public class FileSystemItem extends ModelCommon {
 
     private String extension;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "file_meta_info_id", nullable = true)
     private FileMetaInfo fileMetaInfo;
@@ -68,11 +68,23 @@ public class FileSystemItem extends ModelCommon {
     @Column(name = "record_status")
     private Integer recordStatus;
 
+
     @Override
     public String toString() {
         return "FileSystemItem{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", size=" + size +
+                ", basePath='" + basePath + '\'' +
+                ", sha256='" + sha256 + '\'' +
+                ", fileCreateDate=" + fileCreateDate +
+                ", fileUpdateDate=" + fileUpdateDate +
+                ", isDirectory=" + isDirectory +
+                ", jobStep=" + jobStep +
+                ", jobStatus=" + jobStatus +
+                ", extension='" + extension + '\'' +
                 ", fileMetaInfo=" + fileMetaInfo +
+                ", recordStatus=" + recordStatus +
                 '}';
     }
 }

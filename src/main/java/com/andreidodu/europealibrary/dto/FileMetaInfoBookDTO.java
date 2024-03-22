@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.dto;
 
 import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
+import com.andreidodu.europealibrary.model.Category;
 import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,4 +25,5 @@ public class FileMetaInfoBookDTO extends FileMetaInfoDTO {
     private Boolean isInfoExtractedFromFile;
     private Boolean isInfoRetrievedFromWeb;
     private List<Long> fileSystemItemIdList;
+    private List<CategoryDTO> categoryList;
 }

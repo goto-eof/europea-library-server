@@ -40,9 +40,12 @@ server:
   port: 8081
 com:
   andreidodu:
-    europa-library:
+    europea-library:
       force-load-meta-info-from-web: false
       override-meta-info: false
+      do-not-extract-metadata-from-file-extensions: pdf,txt
+      disable-epub-metadata-extractor: false
+      disable-pdf-metadata-extractor: false
       e-books-directory: "/home/andrei/Documents/backuped/multimedia/ebook"
       #e-books-directory: "/home/andrei/Desktop/ciao"
     task:

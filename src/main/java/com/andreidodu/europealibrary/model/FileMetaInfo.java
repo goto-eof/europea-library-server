@@ -26,11 +26,11 @@ public class FileMetaInfo extends ModelCommon {
     @Column(length = 4000)
     private String description;
 
-    @OneToOne(mappedBy = "fileMetaInfo", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToOne(mappedBy = "fileMetaInfo", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private BookInfo bookInfo;
 
 
-    @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinTable(
             uniqueConstraints = {@UniqueConstraint(columnNames = {"file_meta_info_id", "tag_id"})},
             name = "el_file_meta_info_tag",
@@ -48,6 +48,7 @@ public class FileMetaInfo extends ModelCommon {
         return "FileMetaInfo{" +
                 "title='" + title + '\'' +
                 ", bookInfo=" + bookInfo +
+                ", tagList=" + tagList +
                 '}';
     }
 }

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -58,16 +60,38 @@ public class BookInfo extends ModelCommon {
     @Column(name = "record_status")
     private Integer recordStatus;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne//(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
     private FileMetaInfo fileMetaInfo;
+
+    @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinTable(
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"book_info_id", "category_id"})},
+            name = "el_book_info_category",
+            joinColumns = {@JoinColumn(name = "book_info_id")},
+            inverseJoinColumns = {@JoinColumn(name = "category_id")}
+    )
+    private List<Category> categoryList;
 
     @Override
     public String toString() {
         return "BookInfo{" +
-                "authors='" + authors + '\'' +
+                "id=" + id +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", authors='" + authors + '\'' +
+                ", note='" + note + '\'' +
+                ", isbn10='" + isbn10 + '\'' +
                 ", isbn13='" + isbn13 + '\'' +
                 ", publisher='" + publisher + '\'' +
+                ", language='" + language + '\'' +
+                ", numberOfPages=" + numberOfPages +
+                ", publishedDate='" + publishedDate + '\'' +
+                ", averageRating=" + averageRating +
+                ", ratingsCount=" + ratingsCount +
+                ", isInfoExtractedFromFile=" + isInfoExtractedFromFile +
+                ", isInfoRetrievedFromWeb=" + isInfoRetrievedFromWeb +
+                ", recordStatus=" + recordStatus +
+                ", categoryList=" + categoryList +
                 '}';
     }
 }

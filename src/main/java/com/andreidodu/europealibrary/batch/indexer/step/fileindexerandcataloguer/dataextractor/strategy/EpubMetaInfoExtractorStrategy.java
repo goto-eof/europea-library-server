@@ -2,26 +2,36 @@ package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcatalogue
 
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
-import com.andreidodu.europealibrary.model.BookInfo;
-import com.andreidodu.europealibrary.model.FileMetaInfo;
-import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.exception.ApplicationException;
+import com.andreidodu.europealibrary.model.*;
+import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Component
+@Transactional
 @RequiredArgsConstructor
-public class EpubMetaInfoExtractorStrategy extends MetaInfoExtractorStrategyCommon implements MetaInfoExtractorStrategy {
+public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "epub-meta-info-extractor-strategy";
+
     private final EpubUtil epubUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
+    private final TagRepository tagRepository;
+    private final MetaInfoExtractorStrategyCommon metaInfoExtractorStrategyCommon;
+
+    @Value("${com.andreidodu.europea-library.disable-epub-metadata-extractor}")
+    private boolean disableEpubMetadataExtractor;
 
     @Override
     public String getStrategyName() {
@@ -30,27 +40,36 @@ public class EpubMetaInfoExtractorStrategy extends MetaInfoExtractorStrategyComm
 
     @Override
     public boolean accept(String filename, FileSystemItem fileSystemItem) {
-        return epubUtil.isEpub(filename) && !wasAlreadyProcessed(fileSystemItem);
+        return metaInfoExtractorStrategyCommon.isFileExtensionInWhiteList(epubUtil.getEpubFileExtension()) &&
+                !disableEpubMetadataExtractor &&
+                epubUtil.isEpub(filename) &&
+                metaInfoExtractorStrategyCommon.wasNotAlreadyProcessed(fileSystemItem);
     }
 
 
     @Override
     public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
         log.info("applying strategy: {}", getStrategyName());
-        return epubUtil.retrieveBook(filename)
-                .map(book -> {
-                    if (book.getMetadata().getFirstTitle().trim().isEmpty()) {
-                        return null;
-                    }
-                    return manageCaseBookTitleNotEmpty(book, filename);
-                });
+        FileMetaInfo fileMetaInfo = fileSystemItem.getFileMetaInfo();
+        try {
+            return epubUtil.retrieveBook(filename)
+                    .map(book -> {
+                        if (book.getMetadata().getFirstTitle().trim().isEmpty()) {
+                            return null;
+                        }
+                        return manageCaseBookTitleNotEmpty(book, filename, fileMetaInfo);
+                    });
+        } catch (Exception e) {
+            throw new ApplicationException(e);
+        }
     }
 
-    private FileMetaInfo manageCaseBookTitleNotEmpty(Book book, String fullPath) {
+    private FileMetaInfo manageCaseBookTitleNotEmpty(Book book, String fullPath, FileMetaInfo existingFileMetaInfo) {
         log.info("gathering information from ebook {}", fullPath);
-        FileMetaInfo fileMetaInfo = new FileMetaInfo();
+        FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
 
         Metadata metadata = book.getMetadata();
+
         fileMetaInfo.setTitle(metadata.getFirstTitle());
         fileMetaInfo.setDescription(getFirst(metadata.getDescriptions()));
 
@@ -62,7 +81,7 @@ public class EpubMetaInfoExtractorStrategy extends MetaInfoExtractorStrategyComm
     }
 
     private BookInfo buildBookInfo(Book book, FileMetaInfo fileMetaInfo, Metadata metadata) {
-        BookInfo bookInfo = new BookInfo();
+        BookInfo bookInfo = fileMetaInfo.getBookInfo() != null ? fileMetaInfo.getBookInfo() : new BookInfo();
         bookInfo.setFileMetaInfo(fileMetaInfo);
         Optional.ofNullable(metadata.getLanguage())
                 .ifPresent(language ->
@@ -72,11 +91,41 @@ public class EpubMetaInfoExtractorStrategy extends MetaInfoExtractorStrategyComm
                 .stream()
                 .map(author -> author.getFirstname() + " " + author.getLastname())
                 .toList()));
-        BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.epubUtil.retrieveISBN(book);
+        BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.epubUtil.extractISBN(book);
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
         bookInfo.setPublisher(String.join(", ", metadata.getPublishers()));
+        addTagsIfPresent(metadata, fileMetaInfo);
         return bookInfo;
+    }
+
+    private void addTagsIfPresent(Metadata metadata, FileMetaInfo fileMetaInfo) {
+        log.info("EPUB METADATA: {}", metadata.toString());
+        Optional.ofNullable(metadata.getSubjects())
+                .ifPresent(tags -> {
+                    if (fileMetaInfo.getTagList() == null) {
+                        fileMetaInfo.setTagList(new ArrayList<>());
+                    }
+                    tags.stream()
+                            .filter(tag -> !tag.trim().isEmpty())
+                            .forEach(tag -> {
+                                Optional<Tag> tagOptional = this.tagRepository.findByNameIgnoreCase(tag);
+                                tagOptional.ifPresentOrElse(tagEntity -> {
+                                            if (!fileMetaInfo.getTagList().contains(tagEntity)) {
+                                                fileMetaInfo.getTagList().add(tagEntity);
+                                            }
+                                        },
+                                        () -> {
+                                            String processedTag = tag.substring(0, Math.min(tag.length(), 100));
+                                            Tag tagEntity = new Tag();
+                                            tagEntity.setName(processedTag);
+                                            this.tagRepository.save(tagEntity);
+                                            fileMetaInfo.getTagList().add(tagEntity);
+                                        }
+                                );
+
+                            });
+                });
     }
 
     private String getFirst(List<String> list) {

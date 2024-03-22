@@ -17,7 +17,7 @@ import java.util.*;
 @StepScope
 public class FileIndexerReader implements ItemStreamReader<File> {
 
-    @Value("${com.andreidodu.europa-library.e-books-directory}")
+    @Value("${com.andreidodu.europea-library.e-books-directory}")
     private String ebookDirectory;
     ListIterator<Path> iterator;
     List<Path> directories = new ArrayList<>();

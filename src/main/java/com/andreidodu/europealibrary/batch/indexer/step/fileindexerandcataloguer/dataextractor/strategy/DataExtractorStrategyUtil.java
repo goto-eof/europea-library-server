@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcatalogue
 
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.BookInfo;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@Transactional
 public class DataExtractorStrategyUtil {
 
     public void setISBN13(BookCodesDTO<Optional<String>, Optional<String>> bookCodes, BookInfo bookInfo) {

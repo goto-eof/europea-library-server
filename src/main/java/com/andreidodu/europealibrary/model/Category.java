@@ -13,9 +13,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "el_tag")
+@Table(name = "el_category")
 @EntityListeners(AuditingEntityListener.class)
-public class Tag extends ModelCommon {
+public class Category extends ModelCommon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,13 +23,13 @@ public class Tag extends ModelCommon {
     @Column(name = "name", length = 100)
     private String name;
 
-    @ManyToMany(mappedBy = "tagList")
+    @ManyToMany(mappedBy = "categoryList")
     @Fetch(FetchMode.JOIN)
-    private List<FileMetaInfo> fileMetaInfoList;
+    private List<BookInfo> bookInfoList;
 
     @Override
     public String toString() {
-        return "Tag{" +
+        return "Category{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';

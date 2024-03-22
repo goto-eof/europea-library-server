@@ -16,6 +16,7 @@ public class GoogleBookResponseDTO {
 
     @Getter
     @Setter
+    @ToString
     public static class GoogleBookItemDTO {
 
         private String kind;
@@ -41,6 +42,7 @@ public class GoogleBookResponseDTO {
 
             @Getter
             @Setter
+            @ToString
             public static class IndustryIdentifierDTO {
                 private String type;
                 private String identifier;

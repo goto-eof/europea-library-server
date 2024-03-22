@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 @Slf4j
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {TagMapper.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {TagMapper.class, CategoryMapper.class})
 public abstract class FileMetaInfoBookMapper {
     @Autowired
     private FileMetaInfoMapper fileMetaInfoMapper;

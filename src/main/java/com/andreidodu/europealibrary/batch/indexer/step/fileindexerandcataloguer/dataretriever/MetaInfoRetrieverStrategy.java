@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever;
 
+import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.strategy.ApiStatusEnum;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 
 public interface MetaInfoRetrieverStrategy {
@@ -7,5 +8,5 @@ public interface MetaInfoRetrieverStrategy {
 
     boolean accept(FileSystemItem fileSystemItem);
 
-    void process(FileSystemItem fileSystemItem);
+    ApiStatusEnum process(FileSystemItem fileSystemItem);
 }

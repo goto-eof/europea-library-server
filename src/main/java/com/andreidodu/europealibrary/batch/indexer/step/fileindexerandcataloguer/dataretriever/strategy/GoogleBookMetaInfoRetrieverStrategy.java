@@ -5,19 +5,24 @@ import com.andreidodu.europealibrary.client.GoogleBooksClient;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
+import com.andreidodu.europealibrary.model.Category;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.repository.CategoryRepository;
 import com.andreidodu.europealibrary.util.StringUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStrategy {
     private static final String STRATEGY_NAME = "google-book-meta-info-retriever-strategy";
@@ -32,8 +37,9 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
 
     private final GoogleBooksClient googleBooksClient;
     private final StringUtil stringUtil;
+    private final CategoryRepository categoryRepository;
 
-    @Value("${com.andreidodu.europa-library.force-load-meta-info-from-web}")
+    @Value("${com.andreidodu.europea-library.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
 
     @Override
@@ -72,27 +78,36 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     }
 
     @Override
-    public void process(FileSystemItem fileSystemItem) {
+    public ApiStatusEnum process(FileSystemItem fileSystemItem) {
         log.info("applying strategy: {}", getStrategyName());
         log.info("retrieving book information from google books....");
-        GoogleBookResponseDTO googleBookResponse = retrieveGoogleBook(fileSystemItem);
+        GoogleBookResponseDTO googleBookResponse = null;
+        try {
+            googleBookResponse = retrieveGoogleBook(fileSystemItem);
+        } catch (Exception e) {
+            log.error("google books api throw an error: {}", e.getMessage());
+            return ApiStatusEnum.FATAL_ERROR;
+        }
         if (isEmptyResponse(googleBookResponse)) {
             log.info("book information not found for {}", fileSystemItem);
             fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(false);
-            return;
+            return ApiStatusEnum.SUCCESS;
         }
         log.info("book information retrieved: {}", googleBookResponse);
         updateModel(fileSystemItem, googleBookResponse);
         fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(true);
+        return ApiStatusEnum.SUCCESS;
     }
 
     private void updateModel(FileSystemItem fileSystemItem, GoogleBookResponseDTO googleBookResponse) {
         GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo = googleBookResponse.getItems().getFirst().getVolumeInfo();
         FileMetaInfo fileMetaInfo = fileSystemItem.getFileMetaInfo();
+        fileMetaInfo = fileMetaInfo == null ? new FileMetaInfo() : fileMetaInfo;
         Optional.ofNullable(volumeInfo.getTitle()).ifPresent(fileMetaInfo::setTitle);
         Optional.ofNullable(volumeInfo.getDescription()).ifPresent(fileMetaInfo::setDescription);
 
-        BookInfo bookInfo = fileMetaInfo.getBookInfo();
+        BookInfo oldBookInfo = fileMetaInfo.getBookInfo();
+        BookInfo bookInfo = oldBookInfo == null ? new BookInfo() : oldBookInfo;
         Optional.ofNullable(volumeInfo.getAuthors())
                 .ifPresent(authors -> bookInfo.setAuthors(String.join(",", authors)));
         Optional.ofNullable(volumeInfo.getLanguage()).ifPresent(bookInfo::setLanguage);
@@ -104,6 +119,33 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         Optional.ofNullable(volumeInfo.getImageLinks())
                 .flatMap(imageLinks -> Optional.ofNullable(imageLinks.getThumbnail()))
                 .ifPresent(bookInfo::setImageUrl);
+        addCategoriesIfNecessary(volumeInfo, bookInfo);
+
+    }
+
+    private void addCategoriesIfNecessary(GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo, BookInfo bookInfo) {
+        Optional.ofNullable(volumeInfo.getCategories())
+                .ifPresent(categories -> {
+                    if (bookInfo.getCategoryList() == null) {
+                        bookInfo.setCategoryList(new ArrayList<>());
+                    }
+                    categories.forEach(category -> {
+                        this.categoryRepository.findByNameIgnoreCase(category)
+                                .ifPresentOrElse(categoryEntity -> {
+                                            if (!bookInfo.getCategoryList().contains(categoryEntity)) {
+                                                bookInfo.getCategoryList().add(categoryEntity);
+                                            }
+                                        },
+                                        () -> {
+                                            Category categoryEntity = new Category();
+                                            categoryEntity.setName(category);
+                                            this.categoryRepository.save(categoryEntity);
+                                            bookInfo.getCategoryList().add(categoryEntity);
+                                        }
+                                );
+
+                    });
+                });
     }
 
     private static boolean isEmptyResponse(GoogleBookResponseDTO googleBookResponse) {

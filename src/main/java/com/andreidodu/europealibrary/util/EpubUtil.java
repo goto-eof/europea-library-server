@@ -35,7 +35,7 @@ public class EpubUtil {
         return Optional.empty();
     }
 
-    public BookCodesDTO<Optional<String>, Optional<String>> retrieveISBN(Book book) {
+    public BookCodesDTO<Optional<String>, Optional<String>> extractISBN(Book book) {
         BookCodesDTO<Optional<String>, Optional<String>> result = new BookCodesDTO<>(Optional.empty(), Optional.empty());
         // TODO can be optimized -> usually SBN/ISBN is on the first 3-4 pages of the ebook or last 4 pages
         int i = 0;
@@ -69,6 +69,11 @@ public class EpubUtil {
         if (result.getIsbn13().isEmpty()) {
             result.setIsbn13(this.regularExpressionUtil.extractISBN13(contentString));
         }
+    }
+
+
+    public String getEpubFileExtension() {
+        return EPUB_FILE_EXTENSION;
     }
 
     public boolean isEpub(String fullPath) {

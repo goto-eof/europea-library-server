@@ -31,4 +31,8 @@ public class PdfUtil {
         return result;
     }
 
+    public String getPdfFileExtension() {
+        return PDF_FILE_EXTENSION;
+    }
+
 }
