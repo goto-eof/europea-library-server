@@ -18,16 +18,11 @@ public class FileIndexerWriter implements ItemWriter<FileSystemItem> {
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        try {
-            if (chunk.getItems().isEmpty()) {
-                return;
-            }
-            log.info("Storing: {}", chunk.getItems().stream().findFirst().get());
-            this.fileSystemItemRepository.saveAll(chunk.getItems());
-        } catch (Exception e) {
-            throw new ApplicationException(e);
+        if (chunk.getItems().isEmpty()) {
+            return;
         }
-
+        log.info("Saving {} elements", chunk.getItems().size());
+        this.fileSystemItemRepository.saveAll(chunk.getItems());
     }
 
 }
