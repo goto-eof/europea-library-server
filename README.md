@@ -1,5 +1,5 @@
 ```
-★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
     ______                                     __    _ __                         
    / ____/_  ___________  ____  ___  ____ _   / /   (_) /_  _________ ________  __
   / __/ / / / / ___/ __ \/ __ \/ _ \/ __ `/  / /   / / __ \/ ___/ __ `/ ___/ / / /
@@ -8,7 +8,6 @@
                       /_/                                                /____/   
 
                                                                          SERVER
-★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 ```
 
 # Europea Library (server - Work In Progress)
@@ -46,7 +45,7 @@ Google Books API
 ![db_schema](images/db_schema.png)
 
 ## Changes log
-
+- 2024-03-23 - filter by file extensions (new properties: `skip-file-extensions` and `allow-file-extensions`)
 - 2024-03-22 - Added categories table, which is filled up by google books response. Now epub metadata extractor fills up
   also the tags table. Fixed hibernate exception bug when trying to store parent with child. Filling up the file
   extension column. Added option to avoid the extraction of metadata from a specified file
