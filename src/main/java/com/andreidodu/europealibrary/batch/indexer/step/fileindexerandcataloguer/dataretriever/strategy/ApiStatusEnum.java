@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum ApiStatusEnum {
-    SUCCESS(1), FATAL_ERROR(2), ERROR(3);
+    SUCCESS(1), SUCCESS_EMPTY_RESPONSE(2), FATAL_ERROR(3), ERROR(4);
     private final int code;
 
     ApiStatusEnum(int code) {

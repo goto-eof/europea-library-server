@@ -86,12 +86,13 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             googleBookResponse = retrieveGoogleBook(fileSystemItem);
         } catch (Exception e) {
             log.error("google books api throw an error: {}", e.getMessage());
+            fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(false);
             return ApiStatusEnum.FATAL_ERROR;
         }
         if (isEmptyResponse(googleBookResponse)) {
             log.info("book information not found for {}", fileSystemItem);
-            fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(false);
-            return ApiStatusEnum.SUCCESS;
+            fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(true);
+            return ApiStatusEnum.SUCCESS_EMPTY_RESPONSE;
         }
         log.info("book information retrieved: {}", googleBookResponse);
         updateModel(fileSystemItem, googleBookResponse);
