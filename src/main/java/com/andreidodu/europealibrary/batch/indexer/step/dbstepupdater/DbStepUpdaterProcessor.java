@@ -6,7 +6,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 @Component
-@Transactional
 public class DbStepUpdaterProcessor implements ItemProcessor<FileSystemItem, FileSystemItem> {
     @Override
     public FileSystemItem process(FileSystemItem item) {

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Transactional
 @RequiredArgsConstructor
 public class DbStepUpdaterWriter implements ItemWriter<FileSystemItem> {
     private final FileSystemItemRepository fileSystemItemRepository;

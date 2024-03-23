@@ -7,7 +7,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 @Component
-@Transactional
 @RequiredArgsConstructor
 public class DbFMIObsoleteDeleterProcessor implements ItemProcessor<FileMetaInfo, FileMetaInfo> {
 

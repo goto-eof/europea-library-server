@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Transactional
 @RequiredArgsConstructor
 public class DbFSIObsoleteDeleterWriter implements ItemWriter<FileSystemItem> {
     final private FileSystemItemRepository fileSystemItemRepository;

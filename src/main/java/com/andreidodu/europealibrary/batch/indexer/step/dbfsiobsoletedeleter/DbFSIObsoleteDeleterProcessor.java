@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 @Component
-@Transactional
 @RequiredArgsConstructor
 public class DbFSIObsoleteDeleterProcessor implements ItemProcessor<FileSystemItem, FileSystemItem> {
 
