@@ -29,7 +29,7 @@ public class FileUtil {
     }
 
     public String getExtension(String filename) {
-        return FilenameUtils.getExtension(filename);
+        return FilenameUtils.getExtension(filename).trim();
     }
 
 }

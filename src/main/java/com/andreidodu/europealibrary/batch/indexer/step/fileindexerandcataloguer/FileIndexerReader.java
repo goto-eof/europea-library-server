@@ -1,6 +1,8 @@
 package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer;
 
+import com.andreidodu.europealibrary.util.FileUtil;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.*;
@@ -15,10 +17,15 @@ import java.util.*;
 @Slf4j
 @Component
 @StepScope
+@RequiredArgsConstructor
 public class FileIndexerReader implements ItemStreamReader<File> {
 
     @Value("${com.andreidodu.europea-library.e-books-directory}")
     private String ebookDirectory;
+    @Value("${com.andreidodu.europea-library.skip-file-extensions}")
+    private List<String> fileExtensionsToIgnore;
+
+    private final FileUtil fileUtil;
     ListIterator<Path> iterator;
     List<Path> directories = new ArrayList<>();
 
@@ -36,6 +43,12 @@ public class FileIndexerReader implements ItemStreamReader<File> {
             File file = path.toFile();
             if (file.isDirectory()) {
                 Arrays.stream(Objects.requireNonNull(file.listFiles()))
+                        .peek(fileItem -> {
+                            if (fileItem.isFile() && fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase())) {
+                                log.info("ignoring file: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
+                            }
+                        })
+                        .filter(fileItem -> !fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
                         .sorted(sortByIsDirectoryAndName())
                         .map(File::toPath)
                         .forEach(pathItem -> {
@@ -43,7 +56,7 @@ public class FileIndexerReader implements ItemStreamReader<File> {
                             iterator.previous();
                         });
             }
-            log.info("found: " + file.getAbsolutePath() + " | " + file.getName());
+            log.info("found: " + file.getAbsolutePath() + "/" + file.getName());
             return file;
         }
         return null;
@@ -58,7 +71,6 @@ public class FileIndexerReader implements ItemStreamReader<File> {
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        DirectoryStream<Path> directoryStream = null;
         this.iterator = directories.listIterator();
     }
 

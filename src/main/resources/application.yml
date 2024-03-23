@@ -44,6 +44,7 @@ com:
       force-load-meta-info-from-web: false
       override-meta-info: false
       do-not-extract-metadata-from-file-extensions:
+      skip-file-extensions:
       disable-epub-metadata-extractor: false
       disable-pdf-metadata-extractor: false
       e-books-directory: "/home/andrei/Documents/backuped/multimedia/ebook"
