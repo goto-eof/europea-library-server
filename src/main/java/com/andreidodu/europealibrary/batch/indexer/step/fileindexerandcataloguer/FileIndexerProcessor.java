@@ -154,10 +154,10 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
                 .filter(strategy -> strategy.accept(fullPath, fileSystemItem))
                 .findFirst()
                 .map(strategy -> strategy.extract(fullPath, fileSystemItem))
-                .flatMap(item -> item)
-                .map(metaInfo -> {
-                    fileSystemItem.setFileMetaInfo(metaInfo);
-                    return metaInfo;
+                .flatMap(fileMetaInfo -> fileMetaInfo)
+                .map(fileMetaInfo -> {
+                    fileSystemItem.setFileMetaInfo(fileMetaInfo);
+                    return fileMetaInfo;
                 }).isPresent();
     }
 

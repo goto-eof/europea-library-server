@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.*;
+import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
 import jakarta.transaction.Transactional;
@@ -29,7 +30,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final TagRepository tagRepository;
     private final MetaInfoExtractorStrategyCommon metaInfoExtractorStrategyCommon;
-
+    private final FileMetaInfoRepository fileMetaInfoRepository;
     @Value("${com.andreidodu.europea-library.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
 
@@ -72,7 +73,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
 
         fileMetaInfo.setTitle(metadata.getFirstTitle());
         fileMetaInfo.setDescription(getFirst(metadata.getDescriptions()));
-
+        this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
 
         fileMetaInfo.setBookInfo(bookInfo);

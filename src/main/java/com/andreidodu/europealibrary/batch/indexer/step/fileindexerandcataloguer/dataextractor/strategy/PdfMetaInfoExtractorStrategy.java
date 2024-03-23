@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.PdfUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     private boolean disablePDFMetadataExtractor;
 
     private final MetaInfoExtractorStrategyCommon metaInfoExtractorStrategyCommon;
+    private final FileMetaInfoRepository fileMetaInfoRepository;
 
     @Override
     public String getStrategyName() {
@@ -58,20 +60,21 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
             if (documentInformation.getTitle() == null) {
                 return Optional.empty();
             }
+
             if (documentInformation.getAuthor() == null) {
                 return Optional.empty();
             }
 
-            FileMetaInfo fileMetaInfo = fileSystemItem.getFileMetaInfo() == null ? new FileMetaInfo() : fileSystemItem.getFileMetaInfo();
+            FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
+            FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
             fileMetaInfo.setTitle(documentInformation.getTitle());
-
+            this.fileMetaInfoRepository.save(fileMetaInfo);
             BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
+            fileMetaInfo.setBookInfo(bookInfo);
             bookInfo.setFileMetaInfo(fileMetaInfo);
 
-            fileMetaInfo.setBookInfo(bookInfo);
-
-            log.info("PDF metadata extracted: {}", fileMetaInfo);
-            fileMetaInfo.getBookInfo().setIsInfoExtractedFromFile(true);
+            log.info("PDF METADATA extracted: {}", fileMetaInfo);
+            bookInfo.setIsInfoExtractedFromFile(true);
             return Optional.of(fileMetaInfo);
         } catch (IOException e) {
             log.error("Unable to parse PDF");
