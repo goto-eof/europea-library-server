@@ -54,24 +54,32 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         // if job was stopped prematurely, then I have already a record on DB
         Optional<FileSystemItem> fileSystemIteminInsertedOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.INSERTED.getStepNumber());
         if (fileSystemIteminInsertedOptional.isPresent()) {
-            FileSystemItem fileSystemItem = fileSystemIteminInsertedOptional.get();
-            fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
-            buildMetaInfoFromEbookIfNecessary(fileSystemItem);
-            buildMetaInfoFromWebIfNecessary(fileSystemItem);
-            return fileSystemItem;
+            return recoverExistingRecord(fileSystemIteminInsertedOptional);
         }
         // case when file is in the same directory
         Optional<FileSystemItem> fileSystemItemInReadyOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.READY.getStepNumber());
         if (fileSystemItemInReadyOptional.isPresent()) {
-            FileSystemItem fileSystemItem = fileSystemItemInReadyOptional.get();
-            fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
-            buildMetaInfoFromEbookIfNecessary(fileSystemItem);
-            buildMetaInfoFromWebIfNecessary(fileSystemItem);
-            fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
-            return fileSystemItem;
+            return reprocessOldRecord(fileSystemItemInReadyOptional);
         }
         // case when file is new
         return buildFileSystemItemFromScratch(file);
+    }
+
+    private FileSystemItem reprocessOldRecord(Optional<FileSystemItem> fileSystemItemInReadyOptional) {
+        FileSystemItem fileSystemItem = fileSystemItemInReadyOptional.get();
+        fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
+        buildMetaInfoFromEbookIfNecessary(fileSystemItem);
+        buildMetaInfoFromWebIfNecessary(fileSystemItem);
+        fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
+        return fileSystemItem;
+    }
+
+    private FileSystemItem recoverExistingRecord(Optional<FileSystemItem> fileSystemIteminInsertedOptional) {
+        FileSystemItem fileSystemItem = fileSystemIteminInsertedOptional.get();
+        fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
+        buildMetaInfoFromEbookIfNecessary(fileSystemItem);
+        buildMetaInfoFromWebIfNecessary(fileSystemItem);
+        return fileSystemItem;
     }
 
     private FileSystemItem buildFileSystemItemFromScratch(File file) {
@@ -104,23 +112,21 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         buildMetaInfoFromWebIfNecessary(fileSystemItem);
     }
 
-    private boolean buildMetaInfoFromWebIfNecessary(FileSystemItem fileSystemItem) {
-        return metaInfoRetrieverStrategyList.stream()
+    private void buildMetaInfoFromWebIfNecessary(FileSystemItem fileSystemItem) {
+        metaInfoRetrieverStrategyList.stream()
                 .filter(strategy -> strategy.accept(fileSystemItem))
                 .findFirst()
-                .map(strategy -> {
+                .ifPresent(strategy -> {
                     if (doNotCallApiIsTrue()) {
-                        return false;
+                        return;
                     }
                     ApiStatusEnum result = strategy.process(fileSystemItem);
                     if (result == ApiStatusEnum.FATAL_ERROR) {
                         this.stepExecution.getExecutionContext().put(DO_NOT_CALL_WEB_API, true);
-                        return false;
+                        return;
                     }
                     putThreadOnSleep();
-                    return true;
-                })
-                .orElse(false);
+                });
     }
 
     private boolean doNotCallApiIsTrue() {
@@ -136,19 +142,16 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         }
     }
 
-    private boolean buildMetaInfoFromEbookIfNecessary(FileSystemItem fileSystemItem) {
+    private void buildMetaInfoFromEbookIfNecessary(FileSystemItem fileSystemItem) {
         String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
         log.info("checking for meta-info for file {}...", fullPath);
-        return this.metaInfoExtractorStrategyList
+        this.metaInfoExtractorStrategyList
                 .stream()
                 .filter(strategy -> strategy.accept(fullPath, fileSystemItem))
                 .findFirst()
                 .map(strategy -> strategy.extract(fullPath, fileSystemItem))
                 .flatMap(fileMetaInfo -> fileMetaInfo)
-                .map(fileMetaInfo -> {
-                    fileSystemItem.setFileMetaInfo(fileMetaInfo);
-                    return fileMetaInfo;
-                }).isPresent();
+                .ifPresent(fileSystemItem::setFileMetaInfo);
     }
 
 
