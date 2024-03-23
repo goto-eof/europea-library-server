@@ -54,18 +54,18 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         // if job was stopped prematurely, then I have already a record on DB
         Optional<FileSystemItem> fileSystemIteminInsertedOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.INSERTED.getStepNumber());
         if (fileSystemIteminInsertedOptional.isPresent()) {
-            return recoverExistingRecord(fileSystemIteminInsertedOptional);
+            return recoverExistingFileSystemItem(fileSystemIteminInsertedOptional);
         }
         // case when file is in the same directory
         Optional<FileSystemItem> fileSystemItemInReadyOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.READY.getStepNumber());
         if (fileSystemItemInReadyOptional.isPresent()) {
-            return reprocessOldRecord(fileSystemItemInReadyOptional);
+            return reprocessOldFileSystemItem(fileSystemItemInReadyOptional);
         }
         // case when file is new
         return buildFileSystemItemFromScratch(file);
     }
 
-    private FileSystemItem reprocessOldRecord(Optional<FileSystemItem> fileSystemItemInReadyOptional) {
+    private FileSystemItem reprocessOldFileSystemItem(Optional<FileSystemItem> fileSystemItemInReadyOptional) {
         FileSystemItem fileSystemItem = fileSystemItemInReadyOptional.get();
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         buildMetaInfoFromEbookIfNecessary(fileSystemItem);
@@ -74,7 +74,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         return fileSystemItem;
     }
 
-    private FileSystemItem recoverExistingRecord(Optional<FileSystemItem> fileSystemIteminInsertedOptional) {
+    private FileSystemItem recoverExistingFileSystemItem(Optional<FileSystemItem> fileSystemIteminInsertedOptional) {
         FileSystemItem fileSystemItem = fileSystemIteminInsertedOptional.get();
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         buildMetaInfoFromEbookIfNecessary(fileSystemItem);
