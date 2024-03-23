@@ -28,12 +28,11 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "pdf-meta-info-extractor-strategy";
 
     private final PdfUtil pdfUtil;
+    private final FileMetaInfoRepository fileMetaInfoRepository;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     @Value("${com.andreidodu.europea-library.disable-pdf-metadata-extractor}")
     private boolean disablePDFMetadataExtractor;
 
-    private final MetaInfoExtractorStrategyCommon metaInfoExtractorStrategyCommon;
-    private final FileMetaInfoRepository fileMetaInfoRepository;
 
     @Override
     public String getStrategyName() {
@@ -42,10 +41,10 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
 
     @Override
     public boolean accept(String filename, FileSystemItem fileSystemItem) {
-        return metaInfoExtractorStrategyCommon.isFileExtensionInWhiteList(pdfUtil.getPdfFileExtension()) &&
+        return dataExtractorStrategyUtil.isFileExtensionInWhiteList(pdfUtil.getPdfFileExtension()) &&
                 !disablePDFMetadataExtractor &&
                 pdfUtil.isPdf(filename) &&
-                metaInfoExtractorStrategyCommon.wasNotAlreadyProcessed(fileSystemItem);
+                dataExtractorStrategyUtil.wasNotAlreadyProcessed(fileSystemItem);
     }
 
 

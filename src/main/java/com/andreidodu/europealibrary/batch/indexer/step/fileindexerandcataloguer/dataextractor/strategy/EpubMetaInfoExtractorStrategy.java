@@ -29,7 +29,6 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
     private final EpubUtil epubUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final TagRepository tagRepository;
-    private final MetaInfoExtractorStrategyCommon metaInfoExtractorStrategyCommon;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     @Value("${com.andreidodu.europea-library.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
@@ -41,10 +40,10 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
 
     @Override
     public boolean accept(String filename, FileSystemItem fileSystemItem) {
-        return metaInfoExtractorStrategyCommon.isFileExtensionInWhiteList(epubUtil.getEpubFileExtension()) &&
+        return dataExtractorStrategyUtil.isFileExtensionInWhiteList(epubUtil.getEpubFileExtension()) &&
                 !disableEpubMetadataExtractor &&
                 epubUtil.isEpub(filename) &&
-                metaInfoExtractorStrategyCommon.wasNotAlreadyProcessed(fileSystemItem);
+                dataExtractorStrategyUtil.wasNotAlreadyProcessed(fileSystemItem);
     }
 
 
