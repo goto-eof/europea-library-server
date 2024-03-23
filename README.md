@@ -12,7 +12,7 @@
 
 # Europea Library (server - Work In Progress)
 
-A library web application that allows to index, retrieve information about books from file metadata/web and search for ebooks. The front-end
+A library web application that allows to index, retrieve information about books from file metadata/web (Google Books API) and search for ebooks. The front-end
 project
 can be
 found [here](https://github.com/goto-eof/europea-library-client).
