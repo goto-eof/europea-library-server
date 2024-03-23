@@ -30,6 +30,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem> {
+    public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
     @Value("${com.andreidodu.europea-library.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
     @Value("${com.andreidodu.europea-library.override-meta-info}")
@@ -81,7 +82,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
             fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
             return fileSystemItem;
         }
-        // case when fle is new
+        // case when file is new
         return buildFileSystemItemFromScratch(file);
     }
 
@@ -125,7 +126,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
                     }
                     ApiStatusEnum result = strategy.process(fileSystemItem);
                     if (result == ApiStatusEnum.FATAL_ERROR) {
-                        this.stepExecution.getExecutionContext().put("do-not-call-google-books", true);
+                        this.stepExecution.getExecutionContext().put(DO_NOT_CALL_WEB_API, true);
                         return false;
                     }
                     putThreadOnSleep();
@@ -135,7 +136,8 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     }
 
     private boolean isDoNotCallApi() {
-        return stepExecution.getExecutionContext().get("do-not-call-google-books") != null && (boolean) stepExecution.getExecutionContext().get("do-not-call-google-books");
+        Object doNotCallApi = stepExecution.getExecutionContext().get(DO_NOT_CALL_WEB_API);
+        return doNotCallApi != null && (boolean) doNotCallApi;
     }
 
     private static void putThreadOnSleep() {
