@@ -15,5 +15,5 @@ import java.util.List;
 @Getter
 @Setter
 public class FileSystemItemDTO extends CommonFileSystemItemDTO {
-    private List<FileSystemItemDTO> childrenList;
+
 }

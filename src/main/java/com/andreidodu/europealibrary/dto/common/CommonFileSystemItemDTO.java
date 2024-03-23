@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,4 +19,5 @@ public class CommonFileSystemItemDTO extends CommonDTO {
     private FileSystemItemDTO parent;
     private Integer jobStep;
     private Integer jobStatus;
+    private List<FileSystemItemDTO> childrenList;
 }

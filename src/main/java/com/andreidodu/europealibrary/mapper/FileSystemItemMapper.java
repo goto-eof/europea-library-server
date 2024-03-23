@@ -1,14 +1,12 @@
 package com.andreidodu.europealibrary.mapper;
 
+import com.andreidodu.europealibrary.dto.CursoredFileSystemItemDTO;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import jdk.jfr.Name;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 import java.util.List;
 
@@ -35,6 +33,7 @@ public abstract class FileSystemItemMapper {
     @Mapping(target = "parent", source = "parent", qualifiedByName = "parentToDTO")
     public abstract FileSystemItemDTO toDTOParent(FileSystemItem model);
 
+    @Named("toDTOWithChildAndParent")
     public FileSystemItemDTO toDTO(FileSystemItem model) {
         FileSystemItemDTO dto = this.toDTOWithoutChildrenAndParent(model);
         dto.setChildrenList(toDTOWithoutChildrenAndParent(model.getChildrenList()));
@@ -47,7 +46,18 @@ public abstract class FileSystemItemMapper {
     }
 
 
+    @Named("toDTOWithoutChildrenAndParent")
     public List<FileSystemItemDTO> toDTOWithoutChildrenAndParent(List<FileSystemItem> fileSystemItemList) {
         return fileSystemItemList.stream().map(this::toDTOWithoutChildrenAndParent).toList();
     }
+
+
+    @Named("toCursoredDTO")
+    @MapMapping(valueQualifiedByName = "toDTOWithChildAndParent")
+    @Mapping(ignore = true, target = "nextCursor")
+    public abstract CursoredFileSystemItemDTO toCursoredDTO(FileSystemItem model);
+
+    @Mapping(ignore = true, target = "nextCursor")
+    @MapMapping(valueQualifiedByName = "toCursoredDTO")
+    public abstract void map(@MappingTarget CursoredFileSystemItemDTO cursoredFileSystemItemDTO, FileSystemItem parent);
 }

@@ -37,6 +37,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
                 .from(fileSystemItem)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
+                .orderBy(fileSystemItem.id.asc())
                 .fetch();
     }
 }
