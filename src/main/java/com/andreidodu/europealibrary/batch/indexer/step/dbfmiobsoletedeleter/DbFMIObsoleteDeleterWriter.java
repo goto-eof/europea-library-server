@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter;
 
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;

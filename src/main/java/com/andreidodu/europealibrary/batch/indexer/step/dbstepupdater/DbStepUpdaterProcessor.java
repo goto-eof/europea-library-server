@@ -1,7 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater;
 
 import com.andreidodu.europealibrary.model.FileSystemItem;
-import jakarta.transaction.Transactional;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
