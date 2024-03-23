@@ -98,7 +98,10 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         associateMetaInfoEntity(fileSystemItem);
         this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
-                .ifPresent(fileSystemItem::setParent);
+                .ifPresentOrElse(fileSystemItem::setParent,
+                        () -> this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.READY.getStepNumber())
+                                .ifPresent(fileSystemItem::setParent)
+                );
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         fileSystemItem.setExtension(this.fileUtil.getExtension(fileSystemItemDTO.getName()));
         return fileSystemItem;

@@ -24,4 +24,9 @@ public class CursoredFileController {
         return ResponseEntity.ok(cursoredFileSystemService.readDirectory(cursorRequestDTO));
     }
 
+    @GetMapping
+    public ResponseEntity<CursoredFileSystemItemDTO> retrieveCursoredRoot() {
+        return ResponseEntity.ok(cursoredFileSystemService.readDirectory());
+    }
+
 }
