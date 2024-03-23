@@ -22,9 +22,10 @@ public class PdfUtil {
     }
 
     public BookCodesDTO<Optional<String>, Optional<String>> retrieveISBN(PDDocument pdDocument) throws IOException {
-
-        PDFTextStripper pdfTextStripper = new PDFTextStripper();
-        String text = pdfTextStripper.getText(pdDocument);
+        PDFTextStripper reader = new PDFTextStripper();
+        reader.setStartPage(1);
+        reader.setEndPage(5);
+        String text = reader.getText(pdDocument);
         BookCodesDTO<Optional<String>, Optional<String>> result = new BookCodesDTO<>(Optional.empty(), Optional.empty());
         result.setIsbn13(this.regularExpressionUtil.extractISBN13(text));
         result.setIsbn10(this.regularExpressionUtil.extractISBN10(text));
