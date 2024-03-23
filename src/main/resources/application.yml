@@ -43,11 +43,17 @@ com:
     europea-library:
       force-load-meta-info-from-web: false
       override-meta-info: false
+      # will be skipped by strategy
       do-not-extract-metadata-from-file-extensions:
+      # file will be skipped and not stored on db
       skip-file-extensions:
+      # file will be taken in consideration and stored on db
       allow-file-extensions:
+      # disables the strategy
       disable-epub-metadata-extractor: false
+      # disables the strategy
       disable-pdf-metadata-extractor: false
+      # the directory that contains all your e-book which need to be indexed
       e-books-directory: "/home/andrei/Documents/backuped/multimedia/ebook"
       #e-books-directory: "/home/andrei/Desktop/ciao"
     task:
