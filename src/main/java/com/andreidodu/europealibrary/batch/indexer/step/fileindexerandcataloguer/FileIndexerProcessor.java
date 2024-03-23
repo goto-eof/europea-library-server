@@ -121,7 +121,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
                 .filter(strategy -> strategy.accept(fileSystemItem))
                 .findFirst()
                 .map(strategy -> {
-                    if (isDoNotCallApi()) {
+                    if (doNotCallApiIsTrue()) {
                         return false;
                     }
                     ApiStatusEnum result = strategy.process(fileSystemItem);
@@ -135,9 +135,9 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
                 .orElse(false);
     }
 
-    private boolean isDoNotCallApi() {
-        Object doNotCallApi = stepExecution.getExecutionContext().get(DO_NOT_CALL_WEB_API);
-        return doNotCallApi != null && (boolean) doNotCallApi;
+    private boolean doNotCallApiIsTrue() {
+        Object doNotCallApiIdTrue = stepExecution.getExecutionContext().get(DO_NOT_CALL_WEB_API);
+        return doNotCallApiIdTrue != null && (boolean) doNotCallApiIdTrue;
     }
 
     private static void putThreadOnSleep() {
