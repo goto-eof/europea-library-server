@@ -12,13 +12,11 @@ import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
 import com.andreidodu.europealibrary.util.FileUtil;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -29,30 +27,20 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem> {
     public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
     @Value("${com.andreidodu.europea-library.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
     @Value("${com.andreidodu.europea-library.override-meta-info}")
     private boolean overrideMetaInfo;
-    @Autowired
-    private FileMapper fileMapper;
-    @Autowired
-    private FileUtil fileUtil;
-    @Autowired
-    private FileSystemItemMapper fileSystemItemMapper;
-    @Autowired
-    private FileSystemItemRepository fileSystemItemRepository;
-    @Autowired
-    private EpubUtil epubUtil;
-    @Autowired
-    private List<MetaInfoExtractorStrategy> metaInfoExtractorStrategyList;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-    @Autowired
-    List<MetaInfoRetrieverStrategy> metaInfoRetrieverStrategyList;
-
+    final private FileMapper fileMapper;
+    final private FileUtil fileUtil;
+    final private FileSystemItemMapper fileSystemItemMapper;
+    final private FileSystemItemRepository fileSystemItemRepository;
+    final private EpubUtil epubUtil;
+    final private List<MetaInfoExtractorStrategy> metaInfoExtractorStrategyList;
+    final private List<MetaInfoRetrieverStrategy> metaInfoRetrieverStrategyList;
     private StepExecution stepExecution;
 
     @BeforeStep

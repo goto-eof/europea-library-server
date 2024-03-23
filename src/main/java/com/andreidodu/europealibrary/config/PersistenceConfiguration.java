@@ -15,7 +15,6 @@ import java.util.Objects;
 @Configuration
 @EnableJpaAuditing
 @EnableJpaRepositories(basePackages = {"com.andreidodu.europealibrary.repository"})
-// @EntityScan(basePackages = {"com.andreidodu.europalibrary.model"})
 @RequiredArgsConstructor
 public class PersistenceConfiguration {
     private final BatchDbConfig batchDbConfig;

@@ -44,7 +44,6 @@ public abstract class FileMetaInfoBookMapper {
     public abstract void map(@MappingTarget FileMetaInfoBookDTO dto, BookInfo source);
 
     public void map(@MappingTarget FileMetaInfo model, FileMetaInfoBookDTO dto) {
-        // model.getTagList();
         this.fileMetaInfoMapper.map(model, dto);
         this.map(model.getBookInfo(), dto);
     }

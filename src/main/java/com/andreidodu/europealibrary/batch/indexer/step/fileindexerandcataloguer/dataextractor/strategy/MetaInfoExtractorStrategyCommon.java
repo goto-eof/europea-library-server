@@ -15,7 +15,8 @@ public class MetaInfoExtractorStrategyCommon {
         if (fileSystemItem == null || fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
             return true;
         }
-        return fileSystemItem.getFileMetaInfo().getBookInfo().getIsInfoExtractedFromFile() != null && fileSystemItem.getFileMetaInfo().getBookInfo().getIsInfoExtractedFromFile();
+        return fileSystemItem.getFileMetaInfo().getBookInfo().getIsInfoExtractedFromFile() != null &&
+                fileSystemItem.getFileMetaInfo().getBookInfo().getIsInfoExtractedFromFile();
     }
 
     public boolean isFileExtensionInWhiteList(String fileExtension) {

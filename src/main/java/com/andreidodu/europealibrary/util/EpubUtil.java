@@ -17,13 +17,12 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class EpubUtil {
-
     public static final String EPUB_FILE_EXTENSION = "epub";
     private final RegularExpressionUtil regularExpressionUtil;
     private final FileUtil fileUtil;
 
     public Optional<Book> retrieveBook(String filename) {
-        if (!EPUB_FILE_EXTENSION.equals(fileUtil.getExtension(filename))) {
+        if (!EPUB_FILE_EXTENSION.equalsIgnoreCase(fileUtil.getExtension(filename))) {
             return Optional.empty();
         }
         try {
@@ -37,7 +36,6 @@ public class EpubUtil {
 
     public BookCodesDTO<Optional<String>, Optional<String>> extractISBN(Book book) {
         BookCodesDTO<Optional<String>, Optional<String>> result = new BookCodesDTO<>(Optional.empty(), Optional.empty());
-        // TODO can be optimized -> usually SBN/ISBN is on the first 3-4 pages of the ebook or last 4 pages
         int i = 0;
         for (Resource content : book.getContents())
             try {
@@ -71,12 +69,11 @@ public class EpubUtil {
         }
     }
 
-
     public String getEpubFileExtension() {
         return EPUB_FILE_EXTENSION;
     }
 
     public boolean isEpub(String fullPath) {
-        return !(new File(fullPath).isDirectory()) && EPUB_FILE_EXTENSION.equals(this.fileUtil.getExtension(fullPath));
+        return !(new File(fullPath).isDirectory()) && EPUB_FILE_EXTENSION.equalsIgnoreCase(this.fileUtil.getExtension(fullPath));
     }
 }

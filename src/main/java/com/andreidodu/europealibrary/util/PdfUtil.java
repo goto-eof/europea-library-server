@@ -17,9 +17,6 @@ public class PdfUtil {
     private final FileUtil fileUtil;
     private final RegularExpressionUtil regularExpressionUtil;
 
-    public boolean isPdf(String fullPath) {
-        return !(new File(fullPath).isDirectory()) && PDF_FILE_EXTENSION.equals(this.fileUtil.getExtension(fullPath));
-    }
 
     public BookCodesDTO<Optional<String>, Optional<String>> retrieveISBN(PDDocument pdDocument) throws IOException {
         PDFTextStripper reader = new PDFTextStripper();
@@ -36,4 +33,7 @@ public class PdfUtil {
         return PDF_FILE_EXTENSION;
     }
 
+    public boolean isPdf(String fullPath) {
+        return !(new File(fullPath).isDirectory()) && PDF_FILE_EXTENSION.equalsIgnoreCase(this.fileUtil.getExtension(fullPath));
+    }
 }
