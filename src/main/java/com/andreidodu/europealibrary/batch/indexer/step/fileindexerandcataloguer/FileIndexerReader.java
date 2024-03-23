@@ -25,6 +25,9 @@ public class FileIndexerReader implements ItemStreamReader<File> {
     @Value("${com.andreidodu.europea-library.skip-file-extensions}")
     private List<String> fileExtensionsToIgnore;
 
+    @Value("${com.andreidodu.europea-library.allow-file-extensions}")
+    private List<String> fileExtensionsToAllow;
+
     private final FileUtil fileUtil;
     ListIterator<Path> iterator;
     List<Path> directories = new ArrayList<>();
@@ -44,11 +47,17 @@ public class FileIndexerReader implements ItemStreamReader<File> {
             if (file.isDirectory()) {
                 Arrays.stream(Objects.requireNonNull(file.listFiles()))
                         .peek(fileItem -> {
-                            if (fileItem.isFile() && fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase())) {
+                            if (!fileExtensionsToIgnore.isEmpty() && fileItem.isFile() && fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase())) {
                                 log.info("ignoring file: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
                             }
                         })
-                        .filter(fileItem -> !fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
+                        .peek(fileItem -> {
+                            if (!fileExtensionsToAllow.isEmpty() && fileItem.isFile() && fileExtensionsToAllow.contains(fileUtil.getExtension(file.getName()).toLowerCase())) {
+                                log.info("the following file will be processed: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
+                            }
+                        })
+                        .filter(fileItem -> fileExtensionsToIgnore.isEmpty() || fileItem.isDirectory() || !fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
+                        .filter(fileItem -> fileExtensionsToAllow.isEmpty() || fileItem.isDirectory() || fileExtensionsToAllow.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
                         .sorted(sortByIsDirectoryAndName())
                         .map(File::toPath)
                         .forEach(pathItem -> {
