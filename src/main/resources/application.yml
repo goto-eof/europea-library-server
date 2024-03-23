@@ -52,7 +52,7 @@ com:
       cron:
         expression: "0 0 */23 * * ?"
 
-batchdb:
+batch-db:
   url: jdbc:postgresql://localhost:5436/db
   username: postgres
   password: postgres
