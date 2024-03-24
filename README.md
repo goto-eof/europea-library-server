@@ -12,7 +12,8 @@
 
 # Europea Library (server - Work In Progress)
 
-A library web application that allows to index, retrieve information about books from file metadata/web (Google Books API) and search for ebooks. The front-end
+A library web application that allows to index, retrieve information about books from file metadata/web (Google Books
+API) and search for ebooks. The front-end
 project
 can be
 found [here](https://github.com/goto-eof/europea-library-client).
@@ -45,6 +46,10 @@ Google Books API
 ![db_schema](images/db_schema.png)
 
 ## Changes log
+
+- 2024-03-24 - changed the two boolean columns which describes the file metadata extraction and web metadata
+  retrievement of book info table to integer type because need to have more info about the processing status. This
+  change will speed up the reindexing and recataloging of the directory.
 - 2024-03-23 - filter by file extensions (new properties: `skip-file-extensions` and `allow-file-extensions`)
 - 2024-03-22 - Added categories table, which is filled up by google books response. Now epub metadata extractor fills up
   also the tags table. Fixed hibernate exception bug when trying to store parent with child. Filling up the file
