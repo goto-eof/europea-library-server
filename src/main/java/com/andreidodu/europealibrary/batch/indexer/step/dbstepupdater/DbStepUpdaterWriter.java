@@ -21,8 +21,8 @@ public class DbStepUpdaterWriter implements ItemWriter<FileSystemItem> {
         chunk.getItems().forEach(item -> {
             item.setJobStep(JobStepEnum.READY.getStepNumber());
             item.setRecordStatus(RecordStatusEnum.ENABLED.getStatus());
-            fileSystemItemRepository.save(item);
             log.info("changed to ready: " + item);
         });
+        fileSystemItemRepository.saveAll(chunk.getItems());
     }
 }
