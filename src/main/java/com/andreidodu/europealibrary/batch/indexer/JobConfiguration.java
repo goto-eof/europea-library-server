@@ -31,15 +31,15 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class JobConfiguration {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size}")
     private Integer stepIndexerBatchSize;
 
-    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
     private Integer stepStepUpdaterBatchSize;
-    @Value("${com.andreidodu.europea-library.job.indexer.step-fmi-obsolete-deleter.batch-size")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-fmi-obsolete-deleter.batch-size}")
     private Integer stepFmiObsoleteDeleterBatchSize;
 
-    @Value("${com.andreidodu.europea-library.job.indexer.step-fsi-obsolete-deleter.batch-size")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-fsi-obsolete-deleter.batch-size}")
     private Integer stepFsiObsoleteDeleterBatchSize;
 
     final private EntityManagerFactory emFactory;
