@@ -49,7 +49,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
 
     @Override
     public boolean accept(FileSystemItem fileSystemItem) {
-        return (forceLoadMetaInfoFromWeb || wasNotAlreadyRetrievedFromWeb(fileSystemItem)) && hasISBNOrTitleAuthorsOrPublisher(fileSystemItem);
+        return (StringUtil.isNotEmpty(googleBooksApiKey) && forceLoadMetaInfoFromWeb || wasNotAlreadyRetrievedFromWeb(fileSystemItem)) && hasISBNOrTitleAuthorsOrPublisher(fileSystemItem);
     }
 
     private boolean wasNotAlreadyRetrievedFromWeb(FileSystemItem fileSystemItem) {
