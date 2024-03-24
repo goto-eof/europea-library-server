@@ -31,7 +31,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
     private final TagRepository tagRepository;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final BookInfoRepository bookInfoRepository;
-    @Value("${com.andreidodu.europea-library.disable-epub-metadata-extractor}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
 
     @Override

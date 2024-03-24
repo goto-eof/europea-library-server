@@ -33,7 +33,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final BookInfoRepository bookInfoRepository;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
-    @Value("${com.andreidodu.europea-library.disable-pdf-metadata-extractor}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-pdf-metadata-extractor}")
     private boolean disablePDFMetadataExtractor;
 
 

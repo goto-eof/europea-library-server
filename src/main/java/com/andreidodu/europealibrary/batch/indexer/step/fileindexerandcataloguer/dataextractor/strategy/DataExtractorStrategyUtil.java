@@ -15,7 +15,7 @@ import java.util.Optional;
 @Component
 @Transactional
 public class DataExtractorStrategyUtil {
-    @Value("${com.andreidodu.europea-library.do-not-extract-metadata-from-file-extensions}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.do-not-extract-metadata-from-file-extensions}")
     List<String> doNotProcessFileExtensions;
 
     public boolean wasNotAlreadyProcessed(FileSystemItem fileSystemItem) {

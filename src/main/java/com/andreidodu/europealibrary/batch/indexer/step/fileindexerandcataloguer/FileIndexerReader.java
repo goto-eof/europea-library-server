@@ -20,12 +20,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FileIndexerReader implements ItemStreamReader<File> {
 
-    @Value("${com.andreidodu.europea-library.e-books-directory}")
+    @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
     private String ebookDirectory;
-    @Value("${com.andreidodu.europea-library.skip-file-extensions}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.skip-file-extensions}")
     private List<String> fileExtensionsToIgnore;
 
-    @Value("${com.andreidodu.europea-library.allow-file-extensions}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.allow-file-extensions}")
     private List<String> fileExtensionsToAllow;
 
     private final FileUtil fileUtil;

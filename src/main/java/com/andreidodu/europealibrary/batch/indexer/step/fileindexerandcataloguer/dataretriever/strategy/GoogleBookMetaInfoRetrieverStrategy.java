@@ -39,7 +39,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final StringUtil stringUtil;
     private final CategoryRepository categoryRepository;
 
-    @Value("${com.andreidodu.europea-library.force-load-meta-info-from-web}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
 
     @Override

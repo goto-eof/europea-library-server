@@ -30,9 +30,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem> {
     public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
-    @Value("${com.andreidodu.europea-library.force-load-meta-info-from-web}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
-    @Value("${com.andreidodu.europea-library.override-meta-info}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.override-meta-info}")
     private boolean overrideMetaInfo;
     final private FileMapper fileMapper;
     final private FileUtil fileUtil;
