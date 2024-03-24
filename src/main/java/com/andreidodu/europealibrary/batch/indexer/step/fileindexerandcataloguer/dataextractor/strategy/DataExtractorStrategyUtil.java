@@ -22,14 +22,17 @@ public class DataExtractorStrategyUtil {
         if (fileSystemItem == null || fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
             return true;
         }
-        return fileSystemItem.getFileMetaInfo().getBookInfo().getIsInfoExtractedFromFile() != null &&
-                fileSystemItem.getFileMetaInfo().getBookInfo().getIsInfoExtractedFromFile();
+        Integer fileExtractionStatus = fileSystemItem.getFileMetaInfo().getBookInfo().getFileExtractionStatus();
+        List<Integer> statusesToIgnore = List.of(FileExtractionStatusEnum.SUCCESS.getStatus(), FileExtractionStatusEnum.SUCCESS_EMPTY.getStatus(), FileExtractionStatusEnum.FAILED.getStatus());
+        return fileExtractionStatus == null || !statusesToIgnore.contains(fileExtractionStatus);
+
     }
 
     public boolean isFileExtensionInWhiteList(String fileExtension) {
         return doNotProcessFileExtensions.stream()
                 .noneMatch(ext -> ext.equalsIgnoreCase(fileExtension));
     }
+
     public void setISBN13(BookCodesDTO<Optional<String>, Optional<String>> bookCodes, BookInfo bookInfo) {
         bookCodes.getIsbn13()
                 .ifPresent(isbn -> {

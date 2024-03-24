@@ -57,7 +57,9 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             return false;
         }
         BookInfo bookInfo = fileSystemItem.getFileMetaInfo().getBookInfo();
-        return bookInfo.getIsInfoRetrievedFromWeb() == null || !bookInfo.getIsInfoRetrievedFromWeb();
+        List<Integer> successStatuses = List.of(WebRetrievementStatusEnum.SUCCESS.getStatus(), WebRetrievementStatusEnum.SUCCESS_EMPTY.getStatus());
+        Integer webRetrievementStatus = bookInfo.getWebRetrievementStatus();
+        return webRetrievementStatus == null || !successStatuses.contains(webRetrievementStatus);
     }
 
     private static boolean hasISBNOrTitleAuthorsOrPublisher(FileSystemItem fileSystemItem) {
@@ -86,17 +88,17 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             googleBookResponse = retrieveGoogleBook(fileSystemItem);
         } catch (Exception e) {
             log.error("google books api throw an error: {}", e.getMessage());
-            fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(false);
+            fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.FAILED.getStatus());
             return ApiStatusEnum.FATAL_ERROR;
         }
         if (isEmptyResponse(googleBookResponse)) {
             log.info("book information not found for {}", fileSystemItem);
-            fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(true);
+            fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS_EMPTY.getStatus());
             return ApiStatusEnum.SUCCESS_EMPTY_RESPONSE;
         }
         log.info("book information retrieved: {}", googleBookResponse);
         updateModel(fileSystemItem, googleBookResponse);
-        fileSystemItem.getFileMetaInfo().getBookInfo().setIsInfoRetrievedFromWeb(true);
+        fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS.getStatus());
         return ApiStatusEnum.SUCCESS;
     }
 

@@ -7,6 +7,7 @@ import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.PdfUtil;
+import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,33 +53,49 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
         log.info("applying strategy: {}", getStrategyName());
         try {
-            File file = new File(filename);
-            PDDocument pdf = Loader.loadPDF(file);
-            PDDocumentInformation documentInformation = pdf.getDocumentInformation();
-
-            if (documentInformation.getTitle() == null) {
-                return Optional.empty();
-            }
-
-            if (documentInformation.getAuthor() == null) {
-                return Optional.empty();
-            }
-
-            FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
-            FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
-            fileMetaInfo.setTitle(documentInformation.getTitle());
-            this.fileMetaInfoRepository.save(fileMetaInfo);
-            BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
-            fileMetaInfo.setBookInfo(bookInfo);
-            bookInfo.setFileMetaInfo(fileMetaInfo);
-
-            log.info("PDF METADATA extracted: {}", fileMetaInfo);
-            bookInfo.setIsInfoExtractedFromFile(true);
-            return Optional.of(fileMetaInfo);
+            return buildMetainfoFromFileMetainfo(filename, fileSystemItem);
         } catch (IOException e) {
-            log.error("Unable to parse PDF");
+            log.error("failed to load pdf metadata: {}", filename);
+            return Optional.of(buildMetainfoFromFileName(filename, fileSystemItem, FileExtractionStatusEnum.FAILED));
         }
-        return Optional.empty();
+    }
+
+    private Optional<FileMetaInfo> buildMetainfoFromFileMetainfo(String filename, FileSystemItem fileSystemItem) throws IOException {
+        File file = new File(filename);
+        PDDocument pdf = Loader.loadPDF(file);
+        PDDocumentInformation documentInformation = pdf.getDocumentInformation();
+        if (StringUtil.isEmpty(documentInformation.getTitle())) {
+            log.warn("pdf metadata is empty: {}", filename);
+            return Optional.of(buildMetainfoFromFileName(filename, fileSystemItem, FileExtractionStatusEnum.SUCCESS_EMPTY));
+        }
+        FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
+        FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
+        fileMetaInfo.setTitle(documentInformation.getTitle());
+        this.fileMetaInfoRepository.save(fileMetaInfo);
+        BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
+        fileMetaInfo.setBookInfo(bookInfo);
+        bookInfo.setFileMetaInfo(fileMetaInfo);
+
+        log.info("PDF METADATA extracted: {}", fileMetaInfo);
+        bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
+        return Optional.of(fileMetaInfo);
+    }
+
+    private FileMetaInfo buildMetainfoFromFileName(String filename, FileSystemItem fileSystemItem, FileExtractionStatusEnum fileExtractionStatusEnum) {
+        FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
+        FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
+        fileMetaInfo.setTitle(filename);
+        this.fileMetaInfoRepository.save(fileMetaInfo);
+        BookInfo bookInfo = buildBookInfo(fileMetaInfo);
+        fileMetaInfo.setBookInfo(bookInfo);
+        bookInfo.setFileMetaInfo(fileMetaInfo);
+        bookInfo.setFileExtractionStatus(fileExtractionStatusEnum.getStatus());
+        return fileMetaInfo;
+    }
+
+    private BookInfo buildBookInfo(FileMetaInfo fileMetaInfo) {
+        BookInfo bookInfoOld = fileMetaInfo.getBookInfo();
+        return bookInfoOld == null ? new BookInfo() : bookInfoOld;
     }
 
     private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld) throws IOException {

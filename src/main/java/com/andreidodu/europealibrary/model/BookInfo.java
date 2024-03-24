@@ -51,11 +51,11 @@ public class BookInfo extends ModelCommon {
     @Column(name = "ratings_count")
     private Long ratingsCount;
 
-    @Column(name = "is_info_extracted_from_file")
-    private Boolean isInfoExtractedFromFile;
+    @Column(name = "file_extraction_status")
+    private Integer fileExtractionStatus;
 
-    @Column(name = "is_info_retrieved_from_web")
-    private Boolean isInfoRetrievedFromWeb;
+    @Column(name = "web_retrievement_status")
+    private Integer webRetrievementStatus;
 
     @Column(name = "record_status")
     private Integer recordStatus;
@@ -88,8 +88,8 @@ public class BookInfo extends ModelCommon {
                 ", publishedDate='" + publishedDate + '\'' +
                 ", averageRating=" + averageRating +
                 ", ratingsCount=" + ratingsCount +
-                ", isInfoExtractedFromFile=" + isInfoExtractedFromFile +
-                ", isInfoRetrievedFromWeb=" + isInfoRetrievedFromWeb +
+                ", fileExtractionStatus=" + fileExtractionStatus +
+                ", webRetrievementStatus=" + webRetrievementStatus +
                 ", recordStatus=" + recordStatus +
                 ", categoryList=" + categoryList +
                 '}';

@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.util;
 
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.siegmann.epublib.domain.Book;
@@ -30,8 +31,8 @@ public class EpubUtil {
             return Optional.of(epubReader.readEpub(new FileInputStream(filename)));
         } catch (IOException e) {
             log.error("failed to read epub: {}", filename);
+            throw new ApplicationException("failed to read the ebook", e);
         }
-        return Optional.empty();
     }
 
     public BookCodesDTO<Optional<String>, Optional<String>> extractISBN(Book book) {

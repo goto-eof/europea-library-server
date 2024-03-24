@@ -22,8 +22,8 @@ public class FileMetaInfoBookDTO extends FileMetaInfoDTO {
     private String publishedDate;
     private Double averageRating;
     private Long ratingsCount;
-    private Boolean isInfoExtractedFromFile;
-    private Boolean isInfoRetrievedFromWeb;
+    private Integer fileExtractionStatus;
+    private Integer webRetrievementStatus;
     private List<Long> fileSystemItemIdList;
     private List<CategoryDTO> categoryList;
 }

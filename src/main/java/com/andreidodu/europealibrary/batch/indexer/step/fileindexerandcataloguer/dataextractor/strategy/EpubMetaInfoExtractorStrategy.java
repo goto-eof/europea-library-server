@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcatalogue
 
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
-import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
@@ -55,13 +54,34 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
             return epubUtil.retrieveBook(filename)
                     .map(book -> {
                         if (book.getMetadata().getFirstTitle().trim().isEmpty()) {
-                            return null;
+                            log.info("metadata not found for: {}", filename);
+                            return manageCaseBookMetadataNotAvailable(filename, fileSystemItem, FileExtractionStatusEnum.SUCCESS_EMPTY);
                         }
+                        log.info("metadata found for: {}", filename);
                         return manageCaseBookTitleNotEmpty(book, filename, fileMetaInfo);
                     });
         } catch (Exception e) {
-            throw new ApplicationException(e);
+            log.info("invalid file: {}", filename);
+            return Optional.of(manageCaseBookMetadataNotAvailable(filename, fileSystemItem, FileExtractionStatusEnum.FAILED));
         }
+    }
+
+    private FileMetaInfo manageCaseBookMetadataNotAvailable(String filename, FileSystemItem fileSystemItem, FileExtractionStatusEnum fileExtractionStatusEnum) {
+        FileMetaInfo existingFileMetaInfo = fileSystemItem.getFileMetaInfo();
+        FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
+        fileMetaInfo.setTitle(filename);
+        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+        BookInfo bookInfo = buildBookInfo(fileMetaInfo);
+        fileMetaInfo.setBookInfo(bookInfo);
+        fileMetaInfo.getBookInfo().setFileExtractionStatus(fileExtractionStatusEnum.getStatus());
+        return fileMetaInfo;
+    }
+
+    private BookInfo buildBookInfo(FileMetaInfo fileMetaInfo) {
+        BookInfo oldBookInfo = fileMetaInfo.getBookInfo();
+        BookInfo bookInfo = oldBookInfo != null ? oldBookInfo : new BookInfo();
+        bookInfo.setFileMetaInfo(fileMetaInfo);
+        return bookInfo;
     }
 
     private FileMetaInfo manageCaseBookTitleNotEmpty(Book book, String fullPath, FileMetaInfo existingFileMetaInfo) {
@@ -76,7 +96,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
 
         fileMetaInfo.setBookInfo(bookInfo);
-        fileMetaInfo.getBookInfo().setIsInfoExtractedFromFile(true);
+        fileMetaInfo.getBookInfo().setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         return fileMetaInfo;
     }
 
