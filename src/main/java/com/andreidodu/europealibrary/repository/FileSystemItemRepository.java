@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface FileSystemItemRepository extends TransactionalRepository<FileSystemItem, Long>, CustomFileSystemItemRepository {
     Optional<FileSystemItem> findByBasePathAndNameAndJobStep(String basePAth, String name, int jobStep);
 
-    @Query("select fsi from FileSystemItem fsi where id = (select min(id) from FileSystemItem) and jobStep=:jobStep")
+    @Query("select fsi from FileSystemItem fsi where id = (select min(id) from FileSystemItem where jobStep=:jobStep) and jobStep=:jobStep")
     Optional<FileSystemItem> findByLowestId(Integer jobStep);
 
     List<FileSystemItem> findBySha256AndJobStep(String sha256, int stepNumber);

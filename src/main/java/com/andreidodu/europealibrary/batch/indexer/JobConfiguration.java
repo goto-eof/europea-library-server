@@ -107,7 +107,6 @@ public class JobConfiguration {
         parameterValues.put("recordStatus", RecordStatusEnum.ENABLED.getStatus());
         jpaCursorItemReader.setParameterValues(parameterValues);
         jpaCursorItemReader.setSaveState(true);
-        jpaCursorItemReader.setMaxItemCount(100);
         return jpaCursorItemReader;
     }
 
@@ -117,7 +116,6 @@ public class JobConfiguration {
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
         jpaCursorItemReader.setQueryString("SELECT p FROM FileMetaInfo p where p.fileSystemItemList IS EMPTY");
         jpaCursorItemReader.setSaveState(true);
-        jpaCursorItemReader.setMaxItemCount(100);
         return jpaCursorItemReader;
     }
 
@@ -130,7 +128,6 @@ public class JobConfiguration {
         parameterValues.put("recordStatus", RecordStatusEnum.JUST_UPDATED.getStatus());
         jpaCursorItemReader.setParameterValues(parameterValues);
         jpaCursorItemReader.setSaveState(true);
-        jpaCursorItemReader.setMaxItemCount(100);
         return jpaCursorItemReader;
     }
 
