@@ -31,9 +31,6 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class JobConfiguration {
-    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
-    private Integer batchSize;
-
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size")
     private Integer stepIndexerBatchSize;
 
@@ -60,7 +57,7 @@ public class JobConfiguration {
     @Bean("fileIndexerAndCataloguerStep")
     public Step fileIndexerAndCataloguerStep(JobRepository jobRepository, FileIndexerProcessor processor, FileIndexerReader fileIndexerReader, FileIndexerWriter writer, HibernateTransactionManager transactionManager) {
         return new StepBuilder("indexDirectoriesAndFiles", jobRepository)
-                .<File, FileSystemItem>chunk(batchSize, transactionManager)
+                .<File, FileSystemItem>chunk(stepIndexerBatchSize, transactionManager)
                 .reader(fileIndexerReader)
                 .allowStartIfComplete(true)
                 .processor(processor)
@@ -71,7 +68,7 @@ public class JobConfiguration {
     @Bean("dbFSIObsoleteDeleterStep")
     public Step dbFSIObsoleteDeleterStep(JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("deleteDbFilesStep", jobRepository)
-                .<FileSystemItem, FileSystemItem>chunk(batchSize, transactionManager)
+                .<FileSystemItem, FileSystemItem>chunk(stepFsiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFSIObsoleteDeleterReader)
                 .processor(processor)
@@ -82,7 +79,7 @@ public class JobConfiguration {
     @Bean("dbFMIObsoleteDeleterStep")
     public Step dbFMIObsoleteDeleterStep(JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("deleteDbFilesStep", jobRepository)
-                .<FileMetaInfo, FileMetaInfo>chunk(batchSize, transactionManager)
+                .<FileMetaInfo, FileMetaInfo>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFMIObsoleteDeleterReader)
                 .processor(processor)
@@ -93,7 +90,7 @@ public class JobConfiguration {
     @Bean("dbJobStepUpdaterStep")
     public Step dbJobStepUpdaterStep(JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("finalizeJobStep", jobRepository)
-                .<FileSystemItem, FileSystemItem>chunk(batchSize, transactionManager)
+                .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbStepUpdaterReader)
                 .processor(processor)
