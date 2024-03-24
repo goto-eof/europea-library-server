@@ -8,7 +8,7 @@ spring:
     dispatch-options-request: true
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5436/db
+    url: jdbc:postgresql://localhost:5439/db
     username: postgres
     password: postgres
     testOnBorrow: true
@@ -72,11 +72,11 @@ com:
             batch-size: 100
 
 batch-db:
-  url: jdbc:postgresql://localhost:5436/db
+  url: jdbc:postgresql://localhost:5439/db
   username: postgres
   password: postgres
 
 google:
   books:
     query-url: https://www.googleapis.com/books/v1/volumes
-    api_key: ABCDEFGHI
+    api_key:
