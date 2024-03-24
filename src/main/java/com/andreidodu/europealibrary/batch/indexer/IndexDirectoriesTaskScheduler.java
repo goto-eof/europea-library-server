@@ -23,7 +23,7 @@ public class IndexDirectoriesTaskScheduler {
     private final JobLauncher jobLauncher;
     private final Job job;
 
-    @Scheduled(cron = "${com.andreidodu.task.cron.expression}")
+    @Scheduled(cron = "${com.andreidodu.europea-library.task.indexer.cron.expression}")
     public void runIndexAndCatalogueTaskScheduler() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException {
         try {
             jobLauncher.run(job, generateJobParameters());

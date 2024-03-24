@@ -34,6 +34,17 @@ public class JobConfiguration {
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     private Integer batchSize;
 
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size")
+    private Integer stepIndexerBatchSize;
+
+    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size")
+    private Integer stepStepUpdaterBatchSize;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-fmi-obsolete-deleter.batch-size")
+    private Integer stepFmiObsoleteDeleterBatchSize;
+
+    @Value("${com.andreidodu.europea-library.job.indexer.step-fsi-obsolete-deleter.batch-size")
+    private Integer stepFsiObsoleteDeleterBatchSize;
+
     final private EntityManagerFactory emFactory;
 
     @Bean("indexerJob")
@@ -92,13 +103,14 @@ public class JobConfiguration {
 
     @Bean("dbFSIObsoleteDeleterReader")
     public JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader() {
-        JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<FileSystemItem>());
+        JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = new JpaCursorItemReader<FileSystemItem>();
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
         jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where recordStatus = :recordStatus");
         Map<String, Object> parameterValues = new HashMap<>();
         parameterValues.put("recordStatus", RecordStatusEnum.ENABLED.getStatus());
         jpaCursorItemReader.setParameterValues(parameterValues);
         jpaCursorItemReader.setSaveState(true);
+        jpaCursorItemReader.setMaxItemCount(100);
         return jpaCursorItemReader;
     }
 
@@ -108,6 +120,7 @@ public class JobConfiguration {
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
         jpaCursorItemReader.setQueryString("SELECT p FROM FileMetaInfo p where p.fileSystemItemList IS EMPTY");
         jpaCursorItemReader.setSaveState(true);
+        jpaCursorItemReader.setMaxItemCount(100);
         return jpaCursorItemReader;
     }
 
@@ -120,6 +133,7 @@ public class JobConfiguration {
         parameterValues.put("recordStatus", RecordStatusEnum.JUST_UPDATED.getStatus());
         jpaCursorItemReader.setParameterValues(parameterValues);
         jpaCursorItemReader.setSaveState(true);
+        jpaCursorItemReader.setMaxItemCount(100);
         return jpaCursorItemReader;
     }
 
