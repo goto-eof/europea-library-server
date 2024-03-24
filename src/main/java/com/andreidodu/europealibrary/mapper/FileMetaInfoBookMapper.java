@@ -20,6 +20,8 @@ public abstract class FileMetaInfoBookMapper {
     private FileMetaInfoMapper fileMetaInfoMapper;
     @Autowired
     private FileSystemItemMapper fileSystemItemMapper;
+    @Autowired
+    private CategoryMapper categoryMapper;
 
 
     public FileMetaInfoBookDTO toDTO(FileMetaInfo fileMetaInfo) {
@@ -32,6 +34,7 @@ public abstract class FileMetaInfoBookMapper {
                             .stream()
                             .map(FileSystemItem::getId)
                             .toList());
+                    book.setCategoryList(this.categoryMapper.toDTO(fileMetaInfo.getBookInfo().getCategoryList()));
                     return book;
                 }).orElse(null);
 
