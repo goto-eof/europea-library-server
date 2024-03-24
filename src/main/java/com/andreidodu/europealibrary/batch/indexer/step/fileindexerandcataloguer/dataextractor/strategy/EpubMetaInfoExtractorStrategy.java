@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcatalogue
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.*;
+import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
@@ -29,6 +30,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final TagRepository tagRepository;
     private final FileMetaInfoRepository fileMetaInfoRepository;
+    private final BookInfoRepository bookInfoRepository;
     @Value("${com.andreidodu.europea-library.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
 
@@ -74,6 +76,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         BookInfo bookInfo = buildBookInfo(fileMetaInfo);
         fileMetaInfo.setBookInfo(bookInfo);
         fileMetaInfo.getBookInfo().setFileExtractionStatus(fileExtractionStatusEnum.getStatus());
+        bookInfoRepository.save(bookInfo);
         return fileMetaInfo;
     }
 
@@ -92,11 +95,11 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
 
         fileMetaInfo.setTitle(metadata.getFirstTitle());
         fileMetaInfo.setDescription(getFirst(metadata.getDescriptions()));
-        this.fileMetaInfoRepository.save(fileMetaInfo);
+        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
-
-        fileMetaInfo.setBookInfo(bookInfo);
+        bookInfo.setFileMetaInfo(fileMetaInfo);
         fileMetaInfo.getBookInfo().setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
+        this.bookInfoRepository.save(bookInfo);
         return fileMetaInfo;
     }
 

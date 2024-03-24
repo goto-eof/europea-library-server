@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.PdfUtil;
 import com.andreidodu.europealibrary.util.StringUtil;
@@ -30,6 +31,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
 
     private final PdfUtil pdfUtil;
     private final FileMetaInfoRepository fileMetaInfoRepository;
+    private final BookInfoRepository bookInfoRepository;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     @Value("${com.andreidodu.europea-library.disable-pdf-metadata-extractor}")
     private boolean disablePDFMetadataExtractor;
@@ -71,13 +73,12 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
         fileMetaInfo.setTitle(documentInformation.getTitle());
-        this.fileMetaInfoRepository.save(fileMetaInfo);
+        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
-        fileMetaInfo.setBookInfo(bookInfo);
         bookInfo.setFileMetaInfo(fileMetaInfo);
-
         log.info("PDF METADATA extracted: {}", fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
+        this.bookInfoRepository.save(bookInfo);
         return Optional.of(fileMetaInfo);
     }
 
@@ -85,11 +86,11 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
         fileMetaInfo.setTitle(filename);
-        this.fileMetaInfoRepository.save(fileMetaInfo);
+        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(fileMetaInfo);
-        fileMetaInfo.setBookInfo(bookInfo);
         bookInfo.setFileMetaInfo(fileMetaInfo);
         bookInfo.setFileExtractionStatus(fileExtractionStatusEnum.getStatus());
+        bookInfoRepository.save(bookInfo);
         return fileMetaInfo;
     }
 
