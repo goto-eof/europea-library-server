@@ -54,7 +54,7 @@ com:
       # disables the strategy
       disable-pdf-metadata-extractor: false
       # the directory that contains all your e-book which need to be indexed
-      e-books-directory: "/your/path/to/e-books/directory
+      e-books-directory: "/your/path/to/e-books/directory"
       #e-books-directory: "/your/path/to/e-books/directory"
       task:
         indexer:
