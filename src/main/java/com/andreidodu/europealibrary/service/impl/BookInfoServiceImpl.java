@@ -86,7 +86,7 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     private FileMetaInfo checkFileMetaInfoExistence(Long id) {
         return this.repository.findById(id)
-                .orElseThrow(() -> new ApplicationException("Entity not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
     }
 
 }
