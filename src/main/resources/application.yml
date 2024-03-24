@@ -56,9 +56,20 @@ com:
       # the directory that contains all your e-book which need to be indexed
       e-books-directory: "/home/andrei/Documents/backuped/multimedia/ebook"
       #e-books-directory: "/home/andrei/Desktop/ciao"
-    task:
-      cron:
-        expression: "0 0 */23 * * ?"
+      task:
+        indexer:
+          cron:
+            expression: "0 0 */23 * * ?"
+      job:
+        indexer:
+          step-indexer:
+            batch-size: 1
+          step-step-updater:
+            batch-size: 100
+          step-fmi-obsolete-deleter:
+            batch-size: 100
+          step-fsi-obsolete-deleter:
+            batch-size: 100
 
 batch-db:
   url: jdbc:postgresql://localhost:5436/db
