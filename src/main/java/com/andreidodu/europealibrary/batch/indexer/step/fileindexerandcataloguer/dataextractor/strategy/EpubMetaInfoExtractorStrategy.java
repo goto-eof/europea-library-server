@@ -98,7 +98,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
         bookInfo.setFileMetaInfo(fileMetaInfo);
-        fileMetaInfo.getBookInfo().setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
+        bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         this.bookInfoRepository.save(bookInfo);
         return fileMetaInfo;
     }
