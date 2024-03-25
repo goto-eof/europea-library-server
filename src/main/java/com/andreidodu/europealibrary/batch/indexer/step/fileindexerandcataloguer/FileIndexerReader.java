@@ -72,10 +72,11 @@ public class FileIndexerReader implements ItemStreamReader<File> {
     }
 
     private static Comparator<File> sortByIsDirectoryAndName() {
-        return Comparator
+        return (Comparator
                 .comparing(File::isDirectory)
                 .reversed()
-                .thenComparing(File::getName);
+                .thenComparing(File::getName)
+                .reversed());
     }
 
     @Override

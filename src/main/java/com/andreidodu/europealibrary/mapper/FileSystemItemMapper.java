@@ -4,7 +4,6 @@ import com.andreidodu.europealibrary.dto.CursoredFileSystemItemDTO;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.model.FileSystemItem;
-import jdk.jfr.Name;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.*;
 
@@ -55,7 +54,28 @@ public abstract class FileSystemItemMapper {
     @Named("toCursoredDTO")
     @MapMapping(valueQualifiedByName = "toDTOWithChildAndParent")
     @Mapping(ignore = true, target = "nextCursor")
-    public abstract CursoredFileSystemItemDTO toCursoredDTO(FileSystemItem model);
+    public CursoredFileSystemItemDTO toCursoredDTO(FileSystemItem model) {
+        FileSystemItemDTO dto = this.toDTOWithoutChildrenAndParent(model);
+        CursoredFileSystemItemDTO cursoredFileSystemItemDTO = new CursoredFileSystemItemDTO();
+        this.map(cursoredFileSystemItemDTO, dto);
+        cursoredFileSystemItemDTO.setChildrenList(toDTOWithoutChildrenAndParent(model.getChildrenList()));
+        cursoredFileSystemItemDTO.setParent(this.toDTOParent(model.getParent()));
+        this.toParentDTORecursively(cursoredFileSystemItemDTO.getParent(), model.getParent());
+        return cursoredFileSystemItemDTO;
+    }
+
+
+    public void toParentDTORecursively(FileSystemItemDTO dto, FileSystemItem model) {
+        if (model == null) {
+            return;
+        }
+        dto.setParent(this.toDTOParent(model.getParent()));
+        toParentDTORecursively(dto.getParent(), model.getParent());
+    }
+
+    @Mapping(ignore = true, target = "nextCursor")
+    public abstract void map(@MappingTarget CursoredFileSystemItemDTO cursoredFileSystemItemDTO, FileSystemItemDTO parent);
+
 
     @Mapping(ignore = true, target = "nextCursor")
     @MapMapping(valueQualifiedByName = "toCursoredDTO")

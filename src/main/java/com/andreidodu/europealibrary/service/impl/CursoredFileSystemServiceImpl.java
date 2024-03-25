@@ -42,6 +42,8 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
     private CursoredFileSystemItemDTO manageCaseReadDirectoryIdProvided(CursorRequestDTO cursorRequestDTO) {
         CursoredFileSystemItemDTO cursoredFileSystemItemDTO = new CursoredFileSystemItemDTO();
         FileSystemItem parent = checkFileSystemItemExistence(cursorRequestDTO.getParentId());
+        cursoredFileSystemItemDTO.setParent(this.fileSystemItemMapper.toDTOWithoutChildrenAndParent(parent));
+        this.fileSystemItemMapper.toParentDTORecursively(cursoredFileSystemItemDTO.getParent(), parent);
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursor(cursorRequestDTO.getParentId(), cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit());
         cursoredFileSystemItemDTO.setChildrenList(calculateChildren(children));
         cursoredFileSystemItemDTO.setNextCursor(calculateNextCursor(children));
