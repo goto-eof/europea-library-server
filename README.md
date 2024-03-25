@@ -57,7 +57,7 @@ Google Books API
 ![db_schema](images/db_schema.png)
 
 ## Changes log
-
+- 2024-03-25 - fix sort by directory and filename.
 - 2024-03-24 - changed the two boolean columns which describes the file metadata extraction and web metadata
   retrievement of book info table to integer type because need to have more info about the processing status. This
   change will speed up the reindexing and recataloging of the directory.
