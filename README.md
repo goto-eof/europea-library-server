@@ -77,6 +77,6 @@ Google Books API
   it is necessary to drop all tables and restart the application.
 - Because I cannot predict everything, including bugs, now I am testing the jar on a collection of 100.000 files (most
   of them are e-books) on a Raspberry Pi 4 (Quad core Cortex-A72 (ARM v8) 64-bit 1.8GHz, 8GB LPDDR4-3200 SDRAM, USB
-  pendrive with e-books, connected to USB 3.0 port).
+  pendrive with e-books, connected to USB 3.0 port) on which I installed Ubuntu server.
 - developed and tested on Linux.
 - if you have any suggestions or found a bug please contact me [here](https://andre-i.eu/#contactme)
