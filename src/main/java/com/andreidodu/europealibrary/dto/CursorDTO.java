@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class CursorDTO<T> {
-    List<T> items;
-    Long nextCursor;
+    private List<T> items;
+    private Long nextCursor;
 }

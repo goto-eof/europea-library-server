@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.service.impl;
 
-import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
+import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.exception.WorkInProgressException;

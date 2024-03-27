@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "el_file_system_item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "base_path", "job_step"})})
+@Table(name = "${com.andreidodu.europea-library.table-prefix}file_system_item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "base_path", "job_step"})})
 @EntityListeners(AuditingEntityListener.class)
 public class FileSystemItem extends ModelCommon {
 

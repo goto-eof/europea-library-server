@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "el_file_meta_info")
+@Table(name = "${com.andreidodu.europea-library.table-prefix}file_meta_info")
 @EntityListeners(AuditingEntityListener.class)
 public class FileMetaInfo extends ModelCommon {
     @Id

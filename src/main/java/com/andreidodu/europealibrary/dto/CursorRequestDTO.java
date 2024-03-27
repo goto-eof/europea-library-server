@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CursorRequestDTO {
-    Long parentId;
-    Long nextCursor;
-    Integer limit;
+    private Long parentId;
+    private Long nextCursor;
+    private Integer limit;
 }

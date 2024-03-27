@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "el_tag")
+@Table(name = "${com.andreidodu.europea-library.table-prefix}tag")
 @EntityListeners(AuditingEntityListener.class)
 public class Tag extends ModelCommon {
     @Id

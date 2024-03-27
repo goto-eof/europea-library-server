@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater;
 
-import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
-import com.andreidodu.europealibrary.batch.indexer.RecordStatusEnum;
+import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
+import com.andreidodu.europealibrary.batch.indexer.enums.RecordStatusEnum;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.repository.impl;
 
-import com.andreidodu.europealibrary.batch.indexer.JobStepEnum;
+import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.model.FileSystemItem;

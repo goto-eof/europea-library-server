@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer;
 
+import com.andreidodu.europealibrary.batch.indexer.enums.RecordStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter.DbFMIObsoleteDeleterProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter.DbFMIObsoleteDeleterWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterProcessor;
@@ -33,12 +34,10 @@ import java.util.Map;
 public class JobConfiguration {
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size}")
     private Integer stepIndexerBatchSize;
-
     @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
     private Integer stepStepUpdaterBatchSize;
     @Value("${com.andreidodu.europea-library.job.indexer.step-fmi-obsolete-deleter.batch-size}")
     private Integer stepFmiObsoleteDeleterBatchSize;
-
     @Value("${com.andreidodu.europea-library.job.indexer.step-fsi-obsolete-deleter.batch-size}")
     private Integer stepFsiObsoleteDeleterBatchSize;
 
