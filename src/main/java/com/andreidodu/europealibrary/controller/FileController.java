@@ -1,8 +1,6 @@
 package com.andreidodu.europealibrary.controller;
 
-import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
-import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import com.andreidodu.europealibrary.service.FileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Deprecated
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/file")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "${com.andreidodu.europea-library.client.url}")
 @RequiredArgsConstructor
 public class FileController {
     final private FileSystemService fileSystemService;

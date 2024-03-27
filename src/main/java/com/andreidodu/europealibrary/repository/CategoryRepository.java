@@ -5,6 +5,6 @@ import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
 
 import java.util.Optional;
 
-public interface CategoryRepository extends TransactionalRepository<Category, Long> {
+public interface CategoryRepository extends TransactionalRepository<Category, Long>, CustomCategoryRepository {
     Optional<Category> findByNameIgnoreCase(String category);
 }

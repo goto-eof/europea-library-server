@@ -43,6 +43,20 @@ Before running the software as Spring Boot application it is necessary to follow
     - start from the projects root directory the DBMS with `sudo docker-compose up -d` command
     - run the project as Spring Boot application
 
+## How the application works?
+
+The core of the application is the indexer job. It retrieves all the information about files and saves them on the db.
+The indexing process consists of file metadata extraction and web metadata retrievement (in particular from Google Books
+API). On the first run the job it will take some time to index and extract information from files or retrieve
+them from web. This happens because the file metadata extraction and the web metadata retrievement is expensive in terms
+of resources. The next job run will take less time, because the metadata extraction was done for all the files (except
+the cases when the directory contains new e-books). During my tests I noticed that the job, in order
+to index and extract metadata from 10.000 files, takes about 1 hour on a notebook (based on Ubuntu) with Intel i5 (4
+core, 2.40GHz) equipped with an SSD. After the job completed all steps, the API becomes available for queries, so that
+the client application can interact with the API (otherwise an HTTP 404 status is returned). Moreover, the indexer job
+starts every night at 11:00 PM. If the another job is already running then it will continue to process files and no
+other jobs will run.
+
 ## Technologies
 
 Java (JDK 21) • Spring Boot • Spring Batch • Spring JPA • Feign • Queryds • Hibernate • Liquibase • PostgreSQL
@@ -55,40 +69,6 @@ Google Books API
 ## DB schema
 
 ![db_schema](images/db_schema.png)
-
-## Changes log
-- 2024-03-25 - fix sort by directory and filename.
-- 2024-03-24 - changed the two boolean columns which describes the file metadata extraction and web metadata
-  retrievement of book info table to integer type because need to have more info about the processing status. This
-  change will speed up the reindexing and recataloging of the directory.
-- 2024-03-23 - filter by file extensions (new properties: `skip-file-extensions` and `allow-file-extensions`)
-- 2024-03-22 - Added categories table, which is filled up by google books response. Now epub metadata extractor fills up
-  also the tags table. Fixed hibernate exception bug when trying to store parent with child. Filling up the file
-  extension column. Added option to avoid the extraction of metadata from a specified file
-  list (`do-not-extract-metadata-from-file-extensions`).
-- 2024-03-21 - Improved job performance.
-- 2024-03-20
-    - added PDF meta-data extractor strategy in addition to the EPUB meta-data extractor.
-    - refactor of the indexer and cataloguer job (for the first step I moved the business logic in the
-      processor as should be done)
-    - added the language, num_pages, average_rating and number of raters columns
-    - changed column names sbn and isbn to isbn10 and isbn13
-    - integration with Google Books API -> now Europea Library downloads book's information from web
-    - removed openlibrary.org client (obsolete)
-- 2024-03-19 - added Feign (login to openlibrary.org) and implemented .epub meta-data extractor.
-- 2024-03-18 - indexer job now restores the relationship between file system item and meta info record.
-- 2024-03-16 - finished CRUD implementation of Book info module and fixed the db schema.
-- 2024-03-15 - finished implementation regarding the file meta-info schema.
-- 2024-03-13 - Job and files/directories DB schema
-    - completed implementation of the db schema for storing files and directories information
-    - completed implementation of the job that indexes the directory files and stores them on DB hierarchically
-        - added an endpoint that allows to run the job
-        - the job starts every X minutes (configurable)
-        - the job consists of 3 steps:
-            - step 0 - directory/subdirectory indexer - retrieves information about directories and subdirectories and
-              stores them on DB (job step = INSERTED). Extracts information from epub files and stores them into db.
-            - step 1 - record remover - delete all obsolete files/directories records from DB
-            - step 2 - record updater - update the step number of new files/directories (from INSERTED to READY)
 
 ## More
 

@@ -88,7 +88,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             googleBookResponse = retrieveGoogleBook(fileSystemItem);
         } catch (Exception e) {
             log.error("google books api throw an error: {}", e.getMessage());
-            fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.FAILED.getStatus());
             return ApiStatusEnum.FATAL_ERROR;
         }
         if (isEmptyResponse(googleBookResponse)) {

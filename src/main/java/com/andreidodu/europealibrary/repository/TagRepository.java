@@ -5,6 +5,6 @@ import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
 
 import java.util.Optional;
 
-public interface TagRepository extends TransactionalRepository<Tag, Long> {
+public interface TagRepository extends TransactionalRepository<Tag, Long>, CustomTagRepository {
     Optional<Tag> findByNameIgnoreCase(String tag);
 }
