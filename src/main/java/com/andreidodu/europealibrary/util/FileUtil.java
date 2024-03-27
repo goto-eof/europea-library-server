@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -15,11 +16,11 @@ public class FileUtil {
 
     public static final int EXTENSION_LENGTH_MAX = 100;
 
-    public String fileToSha256(File file) {
+    public Optional<String> fileToSha256(File file) {
         try (InputStream is = Files.newInputStream(file.toPath())) {
-            return org.apache.commons.codec.digest.DigestUtils.sha256Hex(is);
+            return Optional.of(org.apache.commons.codec.digest.DigestUtils.sha256Hex(is));
         } catch (IOException e) {
-            return null;
+            return Optional.empty();
         }
     }
 

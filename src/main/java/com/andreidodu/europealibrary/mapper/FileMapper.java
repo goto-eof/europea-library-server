@@ -38,7 +38,8 @@ public abstract class FileMapper {
         fileDTO.setIsDirectory(file.isDirectory());
         fileDTO.setBasePath(file.getParentFile().getAbsolutePath());
         if (file.isFile()) {
-            fileDTO.setSha256(this.fileUtil.fileToSha256(file));
+            this.fileUtil.fileToSha256(file)
+                    .ifPresent(fileDTO::setSha256);
         }
         return fileDTO;
     }
