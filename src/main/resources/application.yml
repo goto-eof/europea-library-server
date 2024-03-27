@@ -41,6 +41,7 @@ server:
 com:
   andreidodu:
     europea-library:
+      table-prefix: el_
       client:
         url: http://localhost:4200
       task:
