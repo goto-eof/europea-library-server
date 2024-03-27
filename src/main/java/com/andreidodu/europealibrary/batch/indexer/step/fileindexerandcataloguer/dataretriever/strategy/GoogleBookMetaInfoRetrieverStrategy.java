@@ -1,6 +1,8 @@
 package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.strategy;
 
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
+import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
+import com.andreidodu.europealibrary.batch.indexer.enums.WebRetrievementStatusEnum;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;

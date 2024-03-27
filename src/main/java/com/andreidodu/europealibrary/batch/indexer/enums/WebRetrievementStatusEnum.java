@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.strategy;
+package com.andreidodu.europealibrary.batch.indexer.enums;
 
 import lombok.Getter;
 

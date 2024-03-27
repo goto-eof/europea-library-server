@@ -4,7 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.RecordStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
-import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.strategy.ApiStatusEnum;
+import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.mapper.FileMapper;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
