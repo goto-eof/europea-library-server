@@ -54,7 +54,7 @@ the cases when the directory contains new e-books). During my tests I noticed th
 to index and extract metadata from 1.850 files, takes about 1 hour on a notebook (based on Ubuntu) with Intel i5 (4
 core, 2.40GHz) equipped with an SSD. After the job completed all steps, the API becomes available for queries, so that
 the client application can interact with the API (otherwise an HTTP 404 status is returned). Moreover, the indexer job
-starts every night at 11:00 PM. If the job is already running then it will continue to process files and no
+starts every night at 11:00 PM (configurable). If the job is already running then it will continue to process files and no
 other job will run.
 
 ## Technologies
