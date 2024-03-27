@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.model;
 
 import com.andreidodu.europealibrary.mapper.FileMetaInfoMapper;
+import com.andreidodu.europealibrary.model.common.Identificable;
 import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,9 +16,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "${com.andreidodu.europea-library.table-prefix}file_system_item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "base_path", "job_step"})})
+@Table(name = "el_file_system_item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "base_path", "job_step"})})
 @EntityListeners(AuditingEntityListener.class)
-public class FileSystemItem extends ModelCommon {
+public class FileSystemItem extends ModelCommon implements Identificable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -38,9 +38,7 @@ public class BookInfoServiceImpl implements BookInfoService {
     public FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto) {
         FileMetaInfo model = this.fileMetaInfoBookMapper.toModel(dto);
         List<FileSystemItem> fileSystemItemList = this.fileSystemItemRepository.findAllById(dto.getFileSystemItemIdList());
-        fileSystemItemList.forEach(fileSystemItem -> {
-            fileSystemItem.setFileMetaInfo(model);
-        });
+        fileSystemItemList.forEach(fileSystemItem -> fileSystemItem.setFileMetaInfo(model));
         model.setFileSystemItemList(fileSystemItemList);
 
         FileMetaInfo newModel = this.repository.save(model);

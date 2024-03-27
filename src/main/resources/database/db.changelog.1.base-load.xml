@@ -32,7 +32,7 @@
             </column>
             <column name="sha256" type="VARCHAR"/>
             <column name="size" type="bigint"/>
-            <column name="extension" type="VARCHAR(30)"/>
+            <column name="extension" type="VARCHAR(100)"/>
             <column name="file_create_date" type="DATETIME">
                 <constraints nullable="false"/>
             </column>

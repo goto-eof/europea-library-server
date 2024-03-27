@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.model;
 
+import com.andreidodu.europealibrary.model.common.Identificable;
 import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,9 +14,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "${com.andreidodu.europea-library.table-prefix}tag")
+@Table(name = "el_tag")
 @EntityListeners(AuditingEntityListener.class)
-public class Tag extends ModelCommon {
+public class Tag extends ModelCommon implements Identificable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

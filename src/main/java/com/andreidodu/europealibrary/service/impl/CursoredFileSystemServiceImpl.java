@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class CursoredFileSystemServiceImpl implements CursoredFileSystemService {
+public class CursoredFileSystemServiceImpl extends CursoredServiceCommon implements CursoredFileSystemService {
     private final FileSystemItemRepository fileSystemItemRepository;
     private final FileSystemItemMapper fileSystemItemMapper;
     private final CategoryRepository categoryRepository;
@@ -51,8 +51,8 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
                 .orElseThrow(() -> new EntityNotFoundException("Invalid category id"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCategoryId(cursorRequestDTO);
         CursoredCategoryDTO cursoredCategoryDTO = new CursoredCategoryDTO();
-        cursoredCategoryDTO.setChildrenList(calculateChildren(children));
-        cursoredCategoryDTO.setNextCursor(calculateNextCursor(children));
+        cursoredCategoryDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE)));
+        super.calculateNextId(children, ApplicationConst.MAX_ITEMS_RETRIEVE).ifPresent(cursoredCategoryDTO::setNextCursor);
         this.categoryRepository.findById(cursorRequestDTO.getParentId())
                 .ifPresent(category -> cursoredCategoryDTO.setCategoryDTO(this.categoryMapper.toDTO(category)));
         return cursoredCategoryDTO;
@@ -64,8 +64,8 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
                 .orElseThrow(() -> new EntityNotFoundException("Invalid tag id"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByTagId(cursorRequestDTO);
         CursoredTagDTO cursoredTagDTO = new CursoredTagDTO();
-        cursoredTagDTO.setChildrenList(calculateChildren(children));
-        cursoredTagDTO.setNextCursor(calculateNextCursor(children));
+        cursoredTagDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE)));
+        super.calculateNextId(children, ApplicationConst.MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
         this.tagRepository.findById(cursorRequestDTO.getParentId())
                 .ifPresent(tag -> cursoredTagDTO.setTag(this.tagMapper.toDTO(tag)));
         return cursoredTagDTO;
@@ -77,28 +77,11 @@ public class CursoredFileSystemServiceImpl implements CursoredFileSystemService 
         cursoredFileSystemItemDTO.setParent(this.fileSystemItemMapper.toDTOWithoutChildrenAndParent(parent));
         this.fileSystemItemMapper.toParentDTORecursively(cursoredFileSystemItemDTO.getParent(), parent);
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursor(cursorRequestDTO);
-        cursoredFileSystemItemDTO.setChildrenList(calculateChildren(children));
-        cursoredFileSystemItemDTO.setNextCursor(calculateNextCursor(children));
+        cursoredFileSystemItemDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE)));
+        super.calculateNextId(children, ApplicationConst.MAX_ITEMS_RETRIEVE).ifPresent(cursoredFileSystemItemDTO::setNextCursor);
         return cursoredFileSystemItemDTO;
     }
 
-    private Long calculateNextCursor(List<FileSystemItem> children) {
-        if (children.size() <= ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            return null;
-        }
-        return children.get(ApplicationConst.MAX_ITEMS_RETRIEVE)
-                .getId();
-    }
-
-    private List<FileSystemItemDTO> calculateChildren(List<FileSystemItem> children) {
-        List<FileSystemItemDTO> childrenList = this.fileSystemItemMapper.toDTO(children);
-        if (children.size() <= ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            return childrenList;
-        }
-        return childrenList.stream()
-                .limit(ApplicationConst.MAX_ITEMS_RETRIEVE)
-                .collect(Collectors.toList());
-    }
 
     private CursoredFileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber())

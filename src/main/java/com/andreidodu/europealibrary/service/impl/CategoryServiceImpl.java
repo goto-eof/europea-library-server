@@ -14,13 +14,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CategoryServiceImpl implements CategoryService {
+public class CategoryServiceImpl extends CursoredServiceCommon implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
@@ -28,26 +29,12 @@ public class CategoryServiceImpl implements CategoryService {
     public CursorDTO<CategoryDTO> retrieveAllCategories(CommonCursoredRequestDTO commonCursoredRequestDTO) {
         CursorDTO<CategoryDTO> cursoredResult = new CursorDTO<>();
         List<Category> categoryList = this.categoryRepository.retrieveCategoriesCursored(commonCursoredRequestDTO);
-        List<CategoryDTO> tagListDTO = this.categoryMapper.toDTO(limit(categoryList));
-        Long nextId = calculateNextId(categoryList);
+        List<CategoryDTO> tagListDTO = this.categoryMapper.toDTO(limit(categoryList, ApplicationConst.MAX_ITEMS_RETRIEVE));
+        calculateNextId(categoryList, ApplicationConst.MAX_ITEMS_RETRIEVE)
+                .ifPresent(cursoredResult::setNextCursor);
         cursoredResult.setItems(tagListDTO);
-        cursoredResult.setNextCursor(nextId);
         return cursoredResult;
     }
 
-    private Long calculateNextId(List<Category> categoryList) {
-        if (categoryList.size() <= ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            return null;
-        }
-        return categoryList.get(ApplicationConst.MAX_ITEMS_RETRIEVE).getId();
-    }
 
-    private List<Category> limit(List<Category> tagList) {
-        if (tagList.size() <= ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            return tagList;
-        }
-        return tagList.stream()
-                .limit(ApplicationConst.MAX_ITEMS_RETRIEVE)
-                .collect(Collectors.toList());
-    }
 }

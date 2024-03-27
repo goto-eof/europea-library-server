@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "${com.andreidodu.europea-library.table-prefix}book_info", uniqueConstraints = {@UniqueConstraint(columnNames = {"file_meta_info_id", "authors", "publisher"})})
+@Table(name = "el_book_info", uniqueConstraints = {@UniqueConstraint(columnNames = {"file_meta_info_id", "authors", "publisher"})})
 @EntityListeners(AuditingEntityListener.class)
 public class BookInfo extends ModelCommon {
     @Id

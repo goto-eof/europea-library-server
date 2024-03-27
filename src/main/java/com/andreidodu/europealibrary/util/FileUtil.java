@@ -12,6 +12,9 @@ import java.nio.file.Files;
 @Slf4j
 @Component
 public class FileUtil {
+
+    public static final int EXTENSION_LENGTH_MAX = 100;
+
     public String fileToSha256(File file) {
         try (InputStream is = Files.newInputStream(file.toPath())) {
             return org.apache.commons.codec.digest.DigestUtils.sha256Hex(is);
@@ -29,7 +32,11 @@ public class FileUtil {
     }
 
     public String getExtension(String filename) {
-        return FilenameUtils.getExtension(filename).trim();
+        String extension = FilenameUtils.getExtension(filename).trim();
+        if (extension.length() > EXTENSION_LENGTH_MAX) {
+            return extension.substring(0, EXTENSION_LENGTH_MAX);
+        }
+        return extension;
     }
 
 }
