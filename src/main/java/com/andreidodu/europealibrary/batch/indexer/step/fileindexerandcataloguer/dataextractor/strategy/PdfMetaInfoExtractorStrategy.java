@@ -101,9 +101,9 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
 
     private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld) throws IOException {
         BookInfo bookInfo = bookInfoOld == null ? new BookInfo() : bookInfoOld;
-        bookInfo.setLanguage(pdDocument.getDocumentCatalog().getLanguage());
+        bookInfo.setLanguage(StringUtil.clean(pdDocument.getDocumentCatalog().getLanguage()));
         bookInfo.setNumberOfPages(pdDocument.getNumberOfPages());
-        bookInfo.setAuthors(pdDocument.getDocumentInformation().getAuthor());
+        bookInfo.setAuthors(StringUtil.clean(pdDocument.getDocumentInformation().getAuthor()));
         BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.pdfUtil.retrieveISBN(pdDocument);
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);

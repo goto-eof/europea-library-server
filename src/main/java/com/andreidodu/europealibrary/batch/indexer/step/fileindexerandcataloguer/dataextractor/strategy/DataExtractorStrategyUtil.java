@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcatalogue
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,16 +37,16 @@ public class DataExtractorStrategyUtil {
     public void setISBN13(BookCodesDTO<Optional<String>, Optional<String>> bookCodes, BookInfo bookInfo) {
         bookCodes.getIsbn13()
                 .ifPresent(isbn -> {
-                    bookInfo.setIsbn13(isbn);
+                    bookInfo.setIsbn13(StringUtil.clean(isbn));
                     log.info("ISBN-13 found: {}", isbn);
                 });
     }
 
     public void setISBN10(BookCodesDTO<Optional<String>, Optional<String>> bookCodes, BookInfo bookInfo) {
         bookCodes.getIsbn10()
-                .ifPresent(sbn -> {
-                    bookInfo.setIsbn10(sbn);
-                    log.info("ISBN-10 found: {}", sbn);
+                .ifPresent(isbn10 -> {
+                    bookInfo.setIsbn10(StringUtil.clean(isbn10));
+                    log.info("ISBN-10 found: {}", isbn10);
                 });
     }
 

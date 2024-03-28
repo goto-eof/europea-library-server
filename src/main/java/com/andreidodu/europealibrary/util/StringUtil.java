@@ -14,6 +14,9 @@ public class StringUtil {
     }
 
     public static String clean(String str) {
-        return str.replaceAll("\u0000", "");
+        if (str != null) {
+            return str.replaceAll("\u0000", "");
+        }
+        return null;
     }
 }
