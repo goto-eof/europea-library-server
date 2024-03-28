@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -109,16 +110,19 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         bookInfo.setFileMetaInfo(fileMetaInfo);
         Optional.ofNullable(metadata.getLanguage())
                 .ifPresent(language ->
-                        bookInfo.setLanguage(language.substring(0, Math.min(language.length(), 10))));
+                        bookInfo.setLanguage(StringUtil.clean(language.substring(0, Math.min(language.length(), 10)))));
         bookInfo.setNumberOfPages(book.getContents().size());
-        bookInfo.setAuthors(String.join(", ", metadata.getAuthors()
-                .stream()
-                .map(author -> author.getFirstname() + " " + author.getLastname())
-                .toList()));
+        final List<String> authors = StringUtil.cleanOrtrimToNull(metadata.getAuthors().stream().map(auth -> auth.getFirstname() + " " + auth.getLastname()).collect(Collectors.toList()));
+        if (!authors.isEmpty()) {
+            bookInfo.setAuthors(String.join(",", authors));
+        }
         BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.epubUtil.extractISBN(book);
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
-        bookInfo.setPublisher(String.join(", ", metadata.getPublishers()));
+        final List<String> publishers = StringUtil.cleanOrtrimToNull(metadata.getPublishers());
+        if (!publishers.isEmpty()) {
+            bookInfo.setPublisher(String.join(",", publishers));
+        }
         addTagsIfPresent(metadata, fileMetaInfo);
         return bookInfo;
     }
@@ -133,7 +137,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
                     tags.stream()
                             .filter(tag -> !tag.trim().isEmpty())
                             .forEach(tag -> {
-                                String resizedTag = tag.substring(0, Math.min(tag.length(), 100));
+                                String resizedTag = StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100)));
                                 Optional<Tag> tagOptional = this.tagRepository.findByNameIgnoreCase(resizedTag);
                                 tagOptional.ifPresentOrElse(tagEntity -> {
                                             if (!fileMetaInfo.getTagList().contains(tagEntity)) {
