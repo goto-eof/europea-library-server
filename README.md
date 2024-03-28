@@ -45,7 +45,7 @@ Before running the software as Spring Boot application it is necessary to follow
 
 ## How the application works?
 
-The core of the application is the indexer job. It retrieves all the information about files and saves them on the db.
+The core of the application is the indexer job. It retrieves all the information about files and saves them on the DB.
 The indexing process consists of file metadata extraction and web metadata retrievement (in particular from Google Books
 API). On the first run the job it will take some time to index and extract information from files or retrieve
 them from web. This happens because the file metadata extraction and the web metadata retrievement is expensive in terms
