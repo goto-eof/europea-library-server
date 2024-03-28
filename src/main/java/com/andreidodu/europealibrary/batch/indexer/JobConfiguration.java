@@ -91,14 +91,13 @@ public class JobConfiguration {
     }
 
     @Bean("dbJobStepUpdaterStep")
-    public Step dbJobStepUpdaterStep(TaskExecutor asyncTaskExecutor, JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
+    public Step dbJobStepUpdaterStep(JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("finalizeJobStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbStepUpdaterReader)
                 .processor(processor)
                 .writer(dbStepUpdaterWriter)
-                .taskExecutor(asyncTaskExecutor)
                 .build();
     }
 
