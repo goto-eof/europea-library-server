@@ -67,26 +67,24 @@ public class JobConfiguration {
     }
 
     @Bean("dbFSIObsoleteDeleterStep")
-    public Step dbFSIObsoleteDeleterStep(TaskExecutor asyncTaskExecutor, JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    public Step dbFSIObsoleteDeleterStep(JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("deleteDbFilesStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepFsiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFSIObsoleteDeleterReader)
                 .processor(processor)
                 .writer(fileItemWriter)
-                .taskExecutor(asyncTaskExecutor)
                 .build();
     }
 
     @Bean("dbFMIObsoleteDeleterStep")
-    public Step dbFMIObsoleteDeleterStep(TaskExecutor asyncTaskExecutor, JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    public Step dbFMIObsoleteDeleterStep(JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("deleteDbFilesStep", jobRepository)
                 .<FileMetaInfo, FileMetaInfo>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFMIObsoleteDeleterReader)
                 .processor(processor)
                 .writer(fileItemWriter)
-                .taskExecutor(asyncTaskExecutor)
                 .build();
     }
 
