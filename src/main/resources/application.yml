@@ -82,3 +82,7 @@ google:
   books:
     query-url: https://www.googleapis.com/books/v1/volumes
     api_key:
+
+logging:
+  file:
+    path: .
