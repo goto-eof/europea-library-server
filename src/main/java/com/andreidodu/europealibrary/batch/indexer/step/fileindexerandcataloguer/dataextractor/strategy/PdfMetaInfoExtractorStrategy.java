@@ -72,7 +72,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         }
         FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
-        fileMetaInfo.setTitle(documentInformation.getTitle());
+        fileMetaInfo.setTitle(StringUtil.clean(documentInformation.getTitle()));
         fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
         bookInfo.setFileMetaInfo(fileMetaInfo);
