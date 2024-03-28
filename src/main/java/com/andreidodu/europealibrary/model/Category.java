@@ -28,11 +28,4 @@ public class Category extends ModelCommon implements Identificable {
     @Fetch(FetchMode.JOIN)
     private List<BookInfo> bookInfoList;
 
-    @Override
-    public String toString() {
-        return "Category{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

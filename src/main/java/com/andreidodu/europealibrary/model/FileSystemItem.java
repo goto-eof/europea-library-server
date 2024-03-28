@@ -69,23 +69,4 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     @Column(name = "record_status")
     private Integer recordStatus;
 
-
-    @Override
-    public String toString() {
-        return "FileSystemItem{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", size=" + size +
-                ", basePath='" + basePath + '\'' +
-                ", sha256='" + sha256 + '\'' +
-                ", fileCreateDate=" + fileCreateDate +
-                ", fileUpdateDate=" + fileUpdateDate +
-                ", isDirectory=" + isDirectory +
-                ", jobStep=" + jobStep +
-                ", jobStatus=" + jobStatus +
-                ", extension='" + extension + '\'' +
-                ", fileMetaInfo=" + fileMetaInfo +
-                ", recordStatus=" + recordStatus +
-                '}';
-    }
 }

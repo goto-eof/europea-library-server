@@ -73,25 +73,4 @@ public class BookInfo extends ModelCommon {
     )
     private List<Category> categoryList;
 
-    @Override
-    public String toString() {
-        return "BookInfo{" +
-                "id=" + id +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", authors='" + authors + '\'' +
-                ", note='" + note + '\'' +
-                ", isbn10='" + isbn10 + '\'' +
-                ", isbn13='" + isbn13 + '\'' +
-                ", publisher='" + publisher + '\'' +
-                ", language='" + language + '\'' +
-                ", numberOfPages=" + numberOfPages +
-                ", publishedDate='" + publishedDate + '\'' +
-                ", averageRating=" + averageRating +
-                ", ratingsCount=" + ratingsCount +
-                ", fileExtractionStatus=" + fileExtractionStatus +
-                ", webRetrievementStatus=" + webRetrievementStatus +
-                ", recordStatus=" + recordStatus +
-                ", categoryList=" + categoryList +
-                '}';
-    }
 }

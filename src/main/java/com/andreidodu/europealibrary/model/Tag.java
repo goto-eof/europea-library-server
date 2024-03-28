@@ -28,11 +28,4 @@ public class Tag extends ModelCommon implements Identificable {
     @Fetch(FetchMode.JOIN)
     private List<FileMetaInfo> fileMetaInfoList;
 
-    @Override
-    public String toString() {
-        return "Tag{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

@@ -26,7 +26,7 @@ public class FileMetaInfo extends ModelCommon {
     @Column(length = 4000)
     private String description;
 
-    @OneToOne(mappedBy = "fileMetaInfo", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @OneToOne(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private BookInfo bookInfo;
 
 
@@ -43,12 +43,4 @@ public class FileMetaInfo extends ModelCommon {
     @Fetch(FetchMode.JOIN)
     private List<FileSystemItem> fileSystemItemList;
 
-    @Override
-    public String toString() {
-        return "FileMetaInfo{" +
-                "title='" + title + '\'' +
-                ", bookInfo=" + bookInfo +
-                ", tagList=" + tagList +
-                '}';
-    }
 }
