@@ -7,6 +7,7 @@ import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
+import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,8 +94,8 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
 
         Metadata metadata = book.getMetadata();
 
-        fileMetaInfo.setTitle(metadata.getFirstTitle());
-        fileMetaInfo.setDescription(getFirst(metadata.getDescriptions()));
+        fileMetaInfo.setTitle(StringUtil.clean(metadata.getFirstTitle()));
+        fileMetaInfo.setDescription(StringUtil.clean(getFirst(metadata.getDescriptions())));
         fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
         bookInfo.setFileMetaInfo(fileMetaInfo);

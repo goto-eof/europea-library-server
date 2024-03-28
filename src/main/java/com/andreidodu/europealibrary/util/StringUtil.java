@@ -8,8 +8,12 @@ public class StringUtil {
     public static boolean isNotEmpty(String str) {
         return str != null && !str.trim().isEmpty();
     }
+
     public static boolean isEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
 
+    public static String clean(String str) {
+        return str.replaceAll("\u0000", "");
+    }
 }

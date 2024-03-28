@@ -23,6 +23,8 @@ import org.springframework.batch.item.database.JpaCursorItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 
 import java.io.File;
@@ -65,35 +67,38 @@ public class JobConfiguration {
     }
 
     @Bean("dbFSIObsoleteDeleterStep")
-    public Step dbFSIObsoleteDeleterStep(JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    public Step dbFSIObsoleteDeleterStep(TaskExecutor asyncTaskExecutor, JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("deleteDbFilesStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepFsiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFSIObsoleteDeleterReader)
                 .processor(processor)
                 .writer(fileItemWriter)
+                .taskExecutor(asyncTaskExecutor)
                 .build();
     }
 
     @Bean("dbFMIObsoleteDeleterStep")
-    public Step dbFMIObsoleteDeleterStep(JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    public Step dbFMIObsoleteDeleterStep(TaskExecutor asyncTaskExecutor, JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("deleteDbFilesStep", jobRepository)
                 .<FileMetaInfo, FileMetaInfo>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFMIObsoleteDeleterReader)
                 .processor(processor)
                 .writer(fileItemWriter)
+                .taskExecutor(asyncTaskExecutor)
                 .build();
     }
 
     @Bean("dbJobStepUpdaterStep")
-    public Step dbJobStepUpdaterStep(JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
+    public Step dbJobStepUpdaterStep(TaskExecutor asyncTaskExecutor, JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("finalizeJobStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbStepUpdaterReader)
                 .processor(processor)
                 .writer(dbStepUpdaterWriter)
+                .taskExecutor(asyncTaskExecutor)
                 .build();
     }
 
@@ -128,6 +133,11 @@ public class JobConfiguration {
         jpaCursorItemReader.setParameterValues(parameterValues);
         jpaCursorItemReader.setSaveState(true);
         return jpaCursorItemReader;
+    }
+
+    @Bean(name = "asyncTaskExecutor")
+    public TaskExecutor taskExecutor() {
+        return new SimpleAsyncTaskExecutor("asyncExecutor");
     }
 
 }
