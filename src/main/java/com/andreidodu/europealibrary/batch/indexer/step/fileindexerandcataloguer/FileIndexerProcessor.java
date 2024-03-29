@@ -30,6 +30,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem> {
     public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
+    public static final int SLEEP_TIME_ETWEEN_API_REQUESTS = 1000;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.override-meta-info}")
@@ -54,19 +55,15 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         // if job was stopped prematurely, then I have already a record on DB
         Optional<FileSystemItem> fileSystemIteminInsertedOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.INSERTED.getStepNumber());
         if (fileSystemIteminInsertedOptional.isPresent()) {
-            return recoverExistingFileSystemItem(fileSystemIteminInsertedOptional);
+            return recoverExistingFileSystemItem(fileSystemIteminInsertedOptional.get());
         }
-        // case when file is in the same directory
         Optional<FileSystemItem> fileSystemItemInReadyOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.READY.getStepNumber());
-        if (fileSystemItemInReadyOptional.isPresent()) {
-            return reprocessOldFileSystemItem(fileSystemItemInReadyOptional);
-        }
-        // case when file is new
-        return buildFileSystemItemFromScratch(file);
+        return fileSystemItemInReadyOptional.map(/*case when file is in the same directory*/this::reprocessOldFileSystemItem)
+                .orElseGet(() -> /*case when file is new*/ buildFileSystemItemFromScratch(file));
+
     }
 
-    private FileSystemItem reprocessOldFileSystemItem(Optional<FileSystemItem> fileSystemItemInReadyOptional) {
-        FileSystemItem fileSystemItem = fileSystemItemInReadyOptional.get();
+    private FileSystemItem reprocessOldFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         buildMetaInfoFromEbookIfNecessary(fileSystemItem);
         buildMetaInfoFromWebIfNecessary(fileSystemItem);
@@ -74,8 +71,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         return fileSystemItem;
     }
 
-    private FileSystemItem recoverExistingFileSystemItem(Optional<FileSystemItem> fileSystemIteminInsertedOptional) {
-        FileSystemItem fileSystemItem = fileSystemIteminInsertedOptional.get();
+    private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         buildMetaInfoFromEbookIfNecessary(fileSystemItem);
         buildMetaInfoFromWebIfNecessary(fileSystemItem);
@@ -149,7 +145,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
 
     private static void putThreadOnSleep() {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(SLEEP_TIME_ETWEEN_API_REQUESTS);
         } catch (InterruptedException e) {
             log.error("failed to put thread in sleep mode");
         }
