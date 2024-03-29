@@ -29,10 +29,10 @@ public class CategoryServiceImpl extends CursoredServiceCommon implements Catego
     public CursorDTO<CategoryDTO> retrieveAllCategories(CommonCursoredRequestDTO commonCursoredRequestDTO) {
         CursorDTO<CategoryDTO> cursoredResult = new CursorDTO<>();
         List<Category> categoryList = this.categoryRepository.retrieveCategoriesCursored(commonCursoredRequestDTO);
-        List<CategoryDTO> tagListDTO = this.categoryMapper.toDTO(limit(categoryList, ApplicationConst.MAX_ITEMS_RETRIEVE));
+        List<CategoryDTO> categoryListDTO = this.categoryMapper.toDTO(limit(categoryList, ApplicationConst.MAX_ITEMS_RETRIEVE));
         calculateNextId(categoryList, ApplicationConst.MAX_ITEMS_RETRIEVE)
                 .ifPresent(cursoredResult::setNextCursor);
-        cursoredResult.setItems(tagListDTO);
+        cursoredResult.setItems(categoryListDTO);
         return cursoredResult;
     }
 

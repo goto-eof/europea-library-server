@@ -13,5 +13,5 @@ public interface FileSystemItemRepository extends TransactionalRepository<FileSy
     @Query("select fsi from FileSystemItem fsi where id = (select min(id) from FileSystemItem where jobStep=:jobStep) and jobStep=:jobStep")
     Optional<FileSystemItem> findByLowestId(Integer jobStep);
 
-    List<FileSystemItem> findBySha256AndJobStep(String sha256, int stepNumber);
+    List<FileSystemItem> findBySha256(String hash);
 }

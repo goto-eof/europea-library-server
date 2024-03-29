@@ -65,19 +65,18 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(category.id.eq(parentId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
-        if (cursorRequestDTO.getNextCursor() != null) {
+        if (cursorId != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
 
-        if (cursorRequestDTO.getLimit() > ApplicationConst.MAX_ITEMS_RETRIEVE) {
+        if (numberOfResults > ApplicationConst.MAX_ITEMS_RETRIEVE) {
             numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVE;
         }
 
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
-                .from(fileSystemItem)
-                .innerJoin(fileSystemItem.fileMetaInfo.bookInfo.categoryList, category)
-                .where(booleanBuilder)
+                .from(fileSystemItem, category)
+                .where(booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.categoryList.contains(category)))
                 .limit(numberOfResults + 1)
                 .orderBy(fileSystemItem.id.asc())
                 .fetch();

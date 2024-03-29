@@ -73,11 +73,18 @@ public abstract class FileSystemItemMapper {
         toParentDTORecursively(dto.getParent(), model.getParent());
     }
 
+
+    public FileSystemItemDTO toDTOWithParentDTORecursively(FileSystemItem model) {
+        if (model == null) {
+            return null;
+        }
+        FileSystemItemDTO dto = this.toDTOWithoutChildrenAndParent(model);
+        dto.setParent(this.toDTOParent(model.getParent()));
+        toParentDTORecursively(dto.getParent(), model.getParent());
+        return dto;
+    }
+
     @Mapping(ignore = true, target = "nextCursor")
     public abstract void map(@MappingTarget CursoredFileSystemItemDTO cursoredFileSystemItemDTO, FileSystemItemDTO parent);
 
-
-    @Mapping(ignore = true, target = "nextCursor")
-    @MapMapping(valueQualifiedByName = "toCursoredDTO")
-    public abstract void map(@MappingTarget CursoredFileSystemItemDTO cursoredFileSystemItemDTO, FileSystemItem parent);
 }

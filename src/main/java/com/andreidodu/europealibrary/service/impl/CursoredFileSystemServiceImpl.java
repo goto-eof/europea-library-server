@@ -51,10 +51,13 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid category id"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCategoryId(cursorRequestDTO);
         CursoredCategoryDTO cursoredCategoryDTO = new CursoredCategoryDTO();
-        cursoredCategoryDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE)));
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE);
+        cursoredCategoryDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
         super.calculateNextId(children, ApplicationConst.MAX_ITEMS_RETRIEVE).ifPresent(cursoredCategoryDTO::setNextCursor);
         this.categoryRepository.findById(cursorRequestDTO.getParentId())
-                .ifPresent(category -> cursoredCategoryDTO.setCategoryDTO(this.categoryMapper.toDTO(category)));
+                .ifPresent(category -> cursoredCategoryDTO.setCategory(this.categoryMapper.toDTO(category)));
         return cursoredCategoryDTO;
     }
 
@@ -64,7 +67,10 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid tag id"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByTagId(cursorRequestDTO);
         CursoredTagDTO cursoredTagDTO = new CursoredTagDTO();
-        cursoredTagDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE)));
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE);
+        cursoredTagDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
         super.calculateNextId(children, ApplicationConst.MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
         this.tagRepository.findById(cursorRequestDTO.getParentId())
                 .ifPresent(tag -> cursoredTagDTO.setTag(this.tagMapper.toDTO(tag)));

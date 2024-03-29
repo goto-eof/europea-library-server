@@ -111,8 +111,18 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         if (fileSystemItem.getIsDirectory()) {
             return;
         }
+        associateMetaInfoByHashIfFound(fileSystemItem);
         buildMetaInfoFromEbookIfNecessary(fileSystemItem);
         buildMetaInfoFromWebIfNecessary(fileSystemItem);
+    }
+
+    private void associateMetaInfoByHashIfFound(FileSystemItem fileSystemItem) {
+        Optional.ofNullable(fileSystemItem.getSha256())
+                .flatMap(hash -> this.fileSystemItemRepository.findBySha256(hash)
+                        .stream()
+                        .filter(fsi -> fsi.getFileMetaInfo() != null)
+                        .findFirst().map(FileSystemItem::getFileMetaInfo))
+                .ifPresent(fileSystemItem::setFileMetaInfo);
     }
 
     private void buildMetaInfoFromWebIfNecessary(FileSystemItem fileSystemItem) {

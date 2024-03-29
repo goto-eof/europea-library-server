@@ -8,7 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class CursoredCategoryDTO {
-    private CategoryDTO categoryDTO;
+    private CategoryDTO category;
     private List<FileSystemItemDTO> childrenList;
     private Long nextCursor;
 }
