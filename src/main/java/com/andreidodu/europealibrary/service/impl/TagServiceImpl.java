@@ -11,12 +11,9 @@ import com.andreidodu.europealibrary.service.TagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.aot.ApplicationContextAotGenerator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,8 +27,8 @@ public class TagServiceImpl extends CursoredServiceCommon implements TagService 
     public CursorDTO<TagDTO> retrieveAllTags(CommonCursoredRequestDTO commonCursoredRequestDTO) {
         CursorDTO<TagDTO> cursoredResult = new CursorDTO<>();
         List<Tag> tagList = this.tagRepository.retrieveTagsCursored(commonCursoredRequestDTO);
-        List<TagDTO> tagListDTO = this.tagMapper.toDTO(limit(tagList, ApplicationConst.MAX_ITEMS_RETRIEVE));
-        calculateNextId(tagList, ApplicationConst.MAX_ITEMS_RETRIEVE)
+        List<TagDTO> tagListDTO = this.tagMapper.toDTO(limit(tagList, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE));
+        calculateNextId(tagList, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
                 .ifPresent(cursoredResult::setNextCursor);
         cursoredResult.setItems(tagListDTO);
         return cursoredResult;

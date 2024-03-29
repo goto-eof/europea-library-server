@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,17 +26,19 @@ public class CustomTagRepositoryImpl implements CustomTagRepository {
     public List<Tag> retrieveTagsCursored(CommonCursoredRequestDTO commonCursoredRequestDTO) {
 
         Long cursorId = commonCursoredRequestDTO.getNextCursor();
-        int numberOfResults = commonCursoredRequestDTO.getLimit() == null ? ApplicationConst.MAX_ITEMS_RETRIEVE : commonCursoredRequestDTO.getLimit();
+
+        int numberOfResults = Optional.ofNullable(commonCursoredRequestDTO.getLimit())
+                .orElse(ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QTag tag = QTag.tag;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (cursorId != null) {
-            booleanBuilder.and(tag.id.goe(cursorId));
-        }
 
-        if (numberOfResults > ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVE;
+        Optional.ofNullable(cursorId)
+                .ifPresent(id -> booleanBuilder.and(tag.id.goe(id)));
+
+        if (numberOfResults > ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE) {
+            numberOfResults = ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE;
         }
 
         return new JPAQuery<FileSystemItem>(entityManager)

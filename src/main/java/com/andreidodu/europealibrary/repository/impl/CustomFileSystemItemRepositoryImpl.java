@@ -27,7 +27,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         Long parentId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
-        int numberOfResults = cursorRequestDTO.getLimit() == null ? ApplicationConst.MAX_ITEMS_RETRIEVE : cursorRequestDTO.getLimit();
+        int numberOfResults = cursorRequestDTO.getLimit() == null ? ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE : cursorRequestDTO.getLimit();
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -38,8 +38,8 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
 
-        if (numberOfResults > ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVE;
+        if (numberOfResults > ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE) {
+            numberOfResults = ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE;
         }
 
         return new JPAQuery<FileSystemItem>(entityManager)
@@ -57,7 +57,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         Long parentId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
-        int numberOfResults = cursorRequestDTO.getLimit() == null ? ApplicationConst.MAX_ITEMS_RETRIEVE : cursorRequestDTO.getLimit();
+        int numberOfResults = cursorRequestDTO.getLimit() == null ? ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE : cursorRequestDTO.getLimit();
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
         QCategory category = QCategory.category;
@@ -69,8 +69,8 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
 
-        if (numberOfResults > ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVE;
+        if (numberOfResults > ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE) {
+            numberOfResults = ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE;
         }
 
         return new JPAQuery<FileSystemItem>(entityManager)
@@ -88,7 +88,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         Long parentId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
-        int numberOfResults = cursorRequestDTO.getLimit() == null ? ApplicationConst.MAX_ITEMS_RETRIEVE : cursorRequestDTO.getLimit();
+        int numberOfResults = cursorRequestDTO.getLimit() == null ? ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE : cursorRequestDTO.getLimit();
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
         QTag tag = QTag.tag;
@@ -100,8 +100,8 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
 
-        if (cursorRequestDTO.getLimit() > ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVE;
+        if (cursorRequestDTO.getLimit() > ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE) {
+            numberOfResults = ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE;
         }
 
         return new JPAQuery<FileSystemItem>(entityManager)

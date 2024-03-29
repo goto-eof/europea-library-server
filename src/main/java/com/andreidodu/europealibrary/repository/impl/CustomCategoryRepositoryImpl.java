@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,17 +24,19 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
     public List<Category> retrieveCategoriesCursored(CommonCursoredRequestDTO commonCursoredRequestDTO) {
 
         Long cursorId = commonCursoredRequestDTO.getNextCursor();
-        int numberOfResults = commonCursoredRequestDTO.getLimit() == null ? ApplicationConst.MAX_ITEMS_RETRIEVE : commonCursoredRequestDTO.getLimit();
+
+        int numberOfResults = Optional.ofNullable(commonCursoredRequestDTO.getLimit())
+                .orElse(ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QCategory category = QCategory.category;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        if (cursorId != null) {
-            booleanBuilder.and(category.id.goe(cursorId));
-        }
 
-        if (numberOfResults > ApplicationConst.MAX_ITEMS_RETRIEVE) {
-            numberOfResults = ApplicationConst.MAX_ITEMS_RETRIEVE;
+        Optional.ofNullable(cursorId)
+                .ifPresent(id -> booleanBuilder.and(category.id.goe(id)));
+
+        if (numberOfResults > ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE) {
+            numberOfResults = ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE;
         }
 
         return new JPAQuery<Category>(entityManager)

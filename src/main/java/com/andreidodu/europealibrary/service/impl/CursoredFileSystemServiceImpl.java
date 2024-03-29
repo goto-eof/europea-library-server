@@ -51,11 +51,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid category id"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCategoryId(cursorRequestDTO);
         CursoredCategoryDTO cursoredCategoryDTO = new CursoredCategoryDTO();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredCategoryDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.MAX_ITEMS_RETRIEVE).ifPresent(cursoredCategoryDTO::setNextCursor);
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredCategoryDTO::setNextCursor);
         this.categoryRepository.findById(cursorRequestDTO.getParentId())
                 .ifPresent(category -> cursoredCategoryDTO.setCategory(this.categoryMapper.toDTO(category)));
         return cursoredCategoryDTO;
@@ -67,11 +67,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid tag id"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByTagId(cursorRequestDTO);
         CursoredTagDTO cursoredTagDTO = new CursoredTagDTO();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredTagDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
         this.tagRepository.findById(cursorRequestDTO.getParentId())
                 .ifPresent(tag -> cursoredTagDTO.setTag(this.tagMapper.toDTO(tag)));
         return cursoredTagDTO;
@@ -83,8 +83,8 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
         cursoredFileSystemItemDTO.setParent(this.fileSystemItemMapper.toDTOWithoutChildrenAndParent(parent));
         this.fileSystemItemMapper.toParentDTORecursively(cursoredFileSystemItemDTO.getParent(), parent);
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursor(cursorRequestDTO);
-        cursoredFileSystemItemDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.MAX_ITEMS_RETRIEVE)));
-        super.calculateNextId(children, ApplicationConst.MAX_ITEMS_RETRIEVE).ifPresent(cursoredFileSystemItemDTO::setNextCursor);
+        cursoredFileSystemItemDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredFileSystemItemDTO::setNextCursor);
         return cursoredFileSystemItemDTO;
     }
 
@@ -94,7 +94,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
         CursorRequestDTO cursorRequestDTO = new CursorRequestDTO();
         cursorRequestDTO.setParentId(fileSystemItem.getId());
-        cursorRequestDTO.setLimit(ApplicationConst.MAX_ITEMS_RETRIEVE);
+        cursorRequestDTO.setLimit(ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         return manageCaseReadDirectoryIdProvided(cursorRequestDTO);
     }
 
