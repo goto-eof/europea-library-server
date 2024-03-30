@@ -22,15 +22,13 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem> {
-    public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
-    public static final int SLEEP_TIME_ETWEEN_API_REQUESTS = 1000;
+
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.override-meta-info}")
@@ -39,15 +37,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     final private FileUtil fileUtil;
     final private FileSystemItemMapper fileSystemItemMapper;
     final private FileSystemItemRepository fileSystemItemRepository;
-    final private EpubUtil epubUtil;
-    final private List<MetaInfoExtractorStrategy> metaInfoExtractorStrategyList;
-    final private List<MetaInfoRetrieverStrategy> metaInfoRetrieverStrategyList;
-    private StepExecution stepExecution;
 
-    @BeforeStep
-    public void setStepExecution(StepExecution stepExecution) {
-        this.stepExecution = stepExecution;
-    }
 
     @Override
     public FileSystemItem process(final File file) {
@@ -65,16 +55,16 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
 
     private FileSystemItem reprocessOldFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
-        buildMetaInfoFromEbookIfNecessary(fileSystemItem);
-        buildMetaInfoFromWebIfNecessary(fileSystemItem);
+        //buildMetaInfoFromEbookIfNecessary(fileSystemItem);
+        //buildMetaInfoFromWebIfNecessary(fileSystemItem);
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         return fileSystemItem;
     }
 
     private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
-        buildMetaInfoFromEbookIfNecessary(fileSystemItem);
-        buildMetaInfoFromWebIfNecessary(fileSystemItem);
+        //buildMetaInfoFromEbookIfNecessary(fileSystemItem);
+        //buildMetaInfoFromWebIfNecessary(fileSystemItem);
         return fileSystemItem;
     }
 
@@ -108,8 +98,8 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
             return;
         }
         associateMetaInfoByHashIfFound(fileSystemItem);
-        buildMetaInfoFromEbookIfNecessary(fileSystemItem);
-        buildMetaInfoFromWebIfNecessary(fileSystemItem);
+        //buildMetaInfoFromEbookIfNecessary(fileSystemItem);
+        //buildMetaInfoFromWebIfNecessary(fileSystemItem);
     }
 
     private void associateMetaInfoByHashIfFound(FileSystemItem fileSystemItem) {
@@ -120,49 +110,6 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
                         .findFirst().map(FileSystemItem::getFileMetaInfo))
                 .ifPresent(fileSystemItem::setFileMetaInfo);
     }
-
-    private void buildMetaInfoFromWebIfNecessary(FileSystemItem fileSystemItem) {
-        metaInfoRetrieverStrategyList.stream()
-                .filter(strategy -> strategy.accept(fileSystemItem))
-                .findFirst()
-                .ifPresent(strategy -> {
-                    if (doNotCallApiIsTrue()) {
-                        return;
-                    }
-                    ApiStatusEnum result = strategy.process(fileSystemItem);
-                    if (result == ApiStatusEnum.FATAL_ERROR) {
-                        this.stepExecution.getExecutionContext().put(DO_NOT_CALL_WEB_API, true);
-                        return;
-                    }
-                    putThreadOnSleep();
-                });
-    }
-
-    private boolean doNotCallApiIsTrue() {
-        Object doNotCallApiIdTrue = stepExecution.getExecutionContext().get(DO_NOT_CALL_WEB_API);
-        return doNotCallApiIdTrue != null && (boolean) doNotCallApiIdTrue;
-    }
-
-    private static void putThreadOnSleep() {
-        try {
-            Thread.sleep(SLEEP_TIME_ETWEEN_API_REQUESTS);
-        } catch (InterruptedException e) {
-            log.error("failed to put thread in sleep mode");
-        }
-    }
-
-    private void buildMetaInfoFromEbookIfNecessary(FileSystemItem fileSystemItem) {
-        String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        log.info("checking for meta-info for file {}...", fullPath);
-        this.metaInfoExtractorStrategyList
-                .stream()
-                .filter(strategy -> strategy.accept(fullPath, fileSystemItem))
-                .findFirst()
-                .map(strategy -> strategy.extract(fullPath, fileSystemItem))
-                .flatMap(fileMetaInfo -> fileMetaInfo)
-                .ifPresent(fileSystemItem::setFileMetaInfo);
-    }
-
 
     private Optional<FileSystemItem> getFileSystemItemByPathNameAndJobStep(String basePath, String name, int jobStep) {
         return this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(basePath, name, jobStep);

@@ -50,7 +50,7 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     private FileSystemItem parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY,
-            cascade = {CascadeType.REMOVE}, orphanRemoval = true)
+            cascade = {CascadeType.REMOVE})
     private List<FileSystemItem> childrenList;
 
     @Column(name = "job_step", nullable = false)

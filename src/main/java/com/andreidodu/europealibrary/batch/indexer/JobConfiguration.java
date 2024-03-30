@@ -10,6 +10,8 @@ import com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater.DbStepUpda
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerReader;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.metainfo.MetaInfoProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.metainfo.MetaInfoWriter;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import jakarta.persistence.EntityManagerFactory;
@@ -19,14 +21,20 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.JpaCursorItemReader;
+import org.springframework.batch.item.database.Order;
+import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,12 +54,14 @@ public class JobConfiguration {
     final private EntityManagerFactory emFactory;
 
     @Bean("indexerJob")
-    public Job indexerJob(JobRepository jobRepository, Step fileIndexerAndCataloguerStep, Step dbFSIObsoleteDeleterStep, Step dbFMIObsoleteDeleterStep, Step dbJobStepUpdaterStep) {
+    public Job indexerJob(JobRepository jobRepository, Step metaInfoBuilderStep, Step fileIndexerAndCataloguerStep, Step dbFSIObsoleteDeleterStep, Step dbFMIObsoleteDeleterStep, Step dbJobStepUpdaterStep) {
         return new JobBuilder("indexerJob", jobRepository)
                 .start(fileIndexerAndCataloguerStep)
-                .next(dbFSIObsoleteDeleterStep)
-                .next(dbFMIObsoleteDeleterStep)
-                .next(dbJobStepUpdaterStep)
+                .on("COMPLETED").to(metaInfoBuilderStep)
+                .on("COMPLETED").to(dbFSIObsoleteDeleterStep)
+                .on("COMPLETED").to(dbFMIObsoleteDeleterStep)
+                .on("COMPLETED").to(dbJobStepUpdaterStep)
+                .end()
                 .build();
     }
 
@@ -68,7 +78,7 @@ public class JobConfiguration {
 
     @Bean("dbFSIObsoleteDeleterStep")
     public Step dbFSIObsoleteDeleterStep(JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
-        return new StepBuilder("deleteDbFilesStep", jobRepository)
+        return new StepBuilder("dbFSIObsoleteDeleterStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepFsiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFSIObsoleteDeleterReader)
@@ -79,7 +89,7 @@ public class JobConfiguration {
 
     @Bean("dbFMIObsoleteDeleterStep")
     public Step dbFMIObsoleteDeleterStep(JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
-        return new StepBuilder("deleteDbFilesStep", jobRepository)
+        return new StepBuilder("dbFMIObsoleteDeleterStep", jobRepository)
                 .<FileMetaInfo, FileMetaInfo>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFMIObsoleteDeleterReader)
@@ -90,12 +100,24 @@ public class JobConfiguration {
 
     @Bean("dbJobStepUpdaterStep")
     public Step dbJobStepUpdaterStep(JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
-        return new StepBuilder("finalizeJobStep", jobRepository)
+        return new StepBuilder("dbJobStepUpdaterStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbStepUpdaterReader)
                 .processor(processor)
                 .writer(dbStepUpdaterWriter)
+                .build();
+    }
+
+    @Bean("metaInfoBuilderStep")
+    public Step metaInfoBuilderStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> metaInfoBuilderReader, MetaInfoProcessor processor, MetaInfoWriter metaInfoWriter, HibernateTransactionManager transactionManager) {
+        return new StepBuilder("metaInfoBuilderStep", jobRepository)
+                .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .allowStartIfComplete(true)
+                .taskExecutor(threadPoolTaskExecutor)
+                .reader(metaInfoBuilderReader)
+                .processor(processor)
+                .writer(metaInfoWriter)
                 .build();
     }
 
@@ -132,9 +154,43 @@ public class JobConfiguration {
         return jpaCursorItemReader;
     }
 
+    private final DataSource dataSource;
+
+    @Bean("metaInfoBuilderReader")
+    public JdbcPagingItemReader<FileSystemItem> metaInfoBuilderReader() {
+        JdbcPagingItemReader<FileSystemItem> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
+        jdbcPagingItemReader.setDataSource(dataSource);
+        jdbcPagingItemReader.setFetchSize(16);
+        jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
+        jdbcPagingItemReader.setQueryProvider(getPostgresQueryProvider());
+        return jdbcPagingItemReader;
+    }
+
+
+    public PostgresPagingQueryProvider getPostgresQueryProvider() {
+        PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
+        queryProvider.setSelectClause("SELECT *");
+        queryProvider.setFromClause("FROM el_file_system_item");
+        queryProvider.setWhereClause("WHERE record_status = 1");
+        Map<String, Order> orderByKeys = new HashMap<>();
+        orderByKeys.put("id", Order.ASCENDING);
+        queryProvider.setSortKeys(orderByKeys);
+        return queryProvider;
+    }
+
     @Bean(name = "asyncTaskExecutor")
-    public TaskExecutor taskExecutor() {
+    public TaskExecutor asyncTaskExecutor() {
         return new SimpleAsyncTaskExecutor("asyncExecutor");
+    }
+
+    @Bean("threadPoolTaskExecutor")
+    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setMaxPoolSize(Runtime.getRuntime().availableProcessors());
+        taskExecutor.setCorePoolSize(Runtime.getRuntime().availableProcessors());
+        taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+        taskExecutor.afterPropertiesSet();
+        return taskExecutor;
     }
 
 }

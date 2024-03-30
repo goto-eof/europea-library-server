@@ -8,13 +8,14 @@ import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
 import com.andreidodu.europealibrary.util.StringUtil;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +24,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "epub-meta-info-extractor-strategy";
-
+    private final TagUtil tagUtil;
     private final EpubUtil epubUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final TagRepository tagRepository;
@@ -97,13 +98,21 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
 
         fileMetaInfo.setTitle(StringUtil.clean(metadata.getFirstTitle()));
         fileMetaInfo.setDescription(StringUtil.clean(getFirst(metadata.getDescriptions())));
-        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+        fileMetaInfo = this.fileMetaInfoRepository.saveAndFlush(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
         bookInfo.setFileMetaInfo(fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
-        this.bookInfoRepository.save(bookInfo);
+        this.bookInfoRepository.saveAndFlush(bookInfo);
+        final FileMetaInfo fileMEtaInfoReference = fileMetaInfo;
+        Optional.ofNullable(metadata.getSubjects())
+                .ifPresent(tags -> tags.stream()
+                        .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
+                        .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
+                        .forEach(tag -> tagUtil.createAndAssociateTags(fileMEtaInfoReference, tag)));
+        this.bookInfoRepository.saveAndFlush(bookInfo);
         return fileMetaInfo;
     }
+
 
     private BookInfo buildBookInfo(Book book, FileMetaInfo fileMetaInfo, Metadata metadata) {
         BookInfo bookInfo = fileMetaInfo.getBookInfo() != null ? fileMetaInfo.getBookInfo() : new BookInfo();
@@ -123,11 +132,11 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         if (!publishers.isEmpty()) {
             bookInfo.setPublisher(String.join(",", publishers));
         }
-        addTagsIfPresent(metadata, fileMetaInfo);
+
         return bookInfo;
     }
 
-    private void addTagsIfPresent(Metadata metadata, FileMetaInfo fileMetaInfo) {
+    synchronized private void addTagsIfPresent(Metadata metadata, FileMetaInfo fileMetaInfo) {
         log.info("EPUB METADATA: {}", metadata.toString());
         Optional.ofNullable(metadata.getSubjects())
                 .ifPresent(tags -> {
@@ -135,7 +144,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
                         fileMetaInfo.setTagList(new ArrayList<>());
                     }
                     tags.stream()
-                            .filter(tag -> !tag.trim().isEmpty())
+                            .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
                             .forEach(tag -> {
                                 String resizedTag = StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100)));
                                 Optional<Tag> tagOptional = this.tagRepository.findByNameIgnoreCase(resizedTag);
@@ -147,7 +156,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
                                         () -> {
                                             Tag tagEntity = new Tag();
                                             tagEntity.setName(resizedTag);
-                                            this.tagRepository.save(tagEntity);
+                                            this.tagRepository.saveAndFlush(tagEntity);
                                             fileMetaInfo.getTagList().add(tagEntity);
                                         }
                                 );
