@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.WebRetrievementStatusEnum;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
+import com.andreidodu.europealibrary.dto.ApiResponseDTO;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
@@ -82,7 +83,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     }
 
     @Override
-    public ApiStatusEnum process(FileSystemItem fileSystemItem) {
+    public ApiResponseDTO<FileMetaInfo> process(FileSystemItem fileSystemItem) {
         log.info("applying strategy: {}", getStrategyName());
         log.info("retrieving book information from google books....");
         GoogleBookResponseDTO googleBookResponse = null;
@@ -90,17 +91,24 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             googleBookResponse = retrieveGoogleBook(fileSystemItem);
         } catch (Exception e) {
             log.error("google books api throw an error: {}", e.getMessage());
-            return ApiStatusEnum.FATAL_ERROR;
+            ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
+            apiResponseDTO.setStatus(ApiStatusEnum.FATAL_ERROR);
+            return apiResponseDTO;
         }
         if (isEmptyResponse(googleBookResponse)) {
             log.info("book information not found for {}", fileSystemItem);
             fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS_EMPTY.getStatus());
-            return ApiStatusEnum.SUCCESS_EMPTY_RESPONSE;
+            ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
+            apiResponseDTO.setStatus(ApiStatusEnum.SUCCESS_EMPTY_RESPONSE);
+            return apiResponseDTO;
         }
         log.info("book information retrieved: {}", googleBookResponse);
         updateModel(fileSystemItem, googleBookResponse);
         fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS.getStatus());
-        return ApiStatusEnum.SUCCESS;
+        ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
+        apiResponseDTO.setEntity(fileSystemItem.getFileMetaInfo());
+        apiResponseDTO.setStatus(ApiStatusEnum.SUCCESS);
+        return apiResponseDTO;
     }
 
     private void updateModel(FileSystemItem fileSystemItem, GoogleBookResponseDTO googleBookResponse) {

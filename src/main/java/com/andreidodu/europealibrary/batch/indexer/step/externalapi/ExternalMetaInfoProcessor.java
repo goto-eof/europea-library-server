@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.metainfo;
+package com.andreidodu.europealibrary.batch.indexer.step.externalapi;
 
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
@@ -15,16 +15,14 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
+public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
     public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
     public static final int SLEEP_TIME_BETWEEN_API_REQUESTS = 1000;
 
@@ -42,42 +40,33 @@ public class MetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
 
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
-        return Optional.ofNullable(buildMetaInfoFromEbookIfNecessary(fileSystemItemId))
+        return buildMetaInfoFromWebIfNecessary(fileSystemItemId)
                 .map(fileMetaInfo -> {
                     FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
                     fileSystemItem.setFileMetaInfoId(fileMetaInfo.getId());
                     return fileSystemItem;
                 })
                 .orElse(null);
-        //   FileSystemItem savedFileSystemItem = this.fileSystemItemRepository.save(fileSystemItem);
-//        buildMetaInfoFromWebIfNecessary(savedFileSystemItem);
-//        FileSystemItem saved2FileSystemItem = this.fileSystemItemRepository.save(fileSystemItem);
-//        return Optional.ofNullable(fileSystemItem.getFileMetaInfo()).map(fileMetaInfo ->
-//        {
-//            if (fileMetaInfo.getFileSystemItemList() == null) {
-//                fileMetaInfo.setFileSystemItemList(new ArrayList<>());
-//            }
-//            if (!fileMetaInfo.getFileSystemItemList().contains(saved2FileSystemItem)) {
-//                fileMetaInfo.getFileSystemItemList().add(saved2FileSystemItem);
-//            }
-//            return fileMetaInfo;
-//        }).orElse(null);
     }
 
-    private FileMetaInfo buildMetaInfoFromEbookIfNecessary(Long fileSystemItemId) {
+    private Optional<FileMetaInfo> buildMetaInfoFromWebIfNecessary(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
-        String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        log.info("checking for meta-info for file {}...", fullPath);
-        return this.metaInfoExtractorStrategyList
-                .stream()
-                .filter(strategy -> strategy.accept(fullPath, fileSystemItem))
+        return metaInfoRetrieverStrategyList.stream()
+                .filter(strategy -> strategy.accept(fileSystemItem))
                 .findFirst()
-                .map(strategy -> strategy.extract(fullPath, fileSystemItem))
-                .flatMap(fileMetaInfo -> fileMetaInfo)
-                .map(this.fileMetaInfoRepository::save)
-                .orElse(null);
-
+                .map(strategy -> {
+                    if (doNotCallApiIsTrue()) {
+                        return null;
+                    }
+                    ApiResponseDTO<FileMetaInfo> result = strategy.process(fileSystemItem);
+                    if (result.getStatus() == ApiStatusEnum.FATAL_ERROR) {
+                        this.stepExecution.getExecutionContext().put(DO_NOT_CALL_WEB_API, true);
+                        return result.getEntity();
+                    }
+                    return result.getEntity();
+                });
     }
+
 
     private boolean doNotCallApiIsTrue() {
         Object doNotCallApiIdTrue = stepExecution.getExecutionContext().get(DO_NOT_CALL_WEB_API);

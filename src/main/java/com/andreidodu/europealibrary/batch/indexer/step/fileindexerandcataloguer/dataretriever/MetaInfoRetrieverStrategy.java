@@ -1,6 +1,8 @@
 package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever;
 
-import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
+import com.andreidodu.europealibrary.dto.ApiResponseDTO;
+import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 
 public interface MetaInfoRetrieverStrategy {
@@ -8,5 +10,5 @@ public interface MetaInfoRetrieverStrategy {
 
     boolean accept(FileSystemItem fileSystemItem);
 
-    ApiStatusEnum process(FileSystemItem fileSystemItem);
+    ApiResponseDTO<FileMetaInfo> process(FileSystemItem fileSystemItem);
 }
