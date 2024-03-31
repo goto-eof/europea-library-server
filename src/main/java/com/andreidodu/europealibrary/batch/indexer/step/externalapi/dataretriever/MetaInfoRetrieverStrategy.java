@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever;
+package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever;
 
 import com.andreidodu.europealibrary.dto.ApiResponseDTO;
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;

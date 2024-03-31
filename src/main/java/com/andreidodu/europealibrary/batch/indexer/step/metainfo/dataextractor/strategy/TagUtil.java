@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.strategy;
+package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.Tag;
@@ -51,12 +51,10 @@ public class TagUtil {
         if (tag.getFileMetaInfoList() == null) {
             tag.setFileMetaInfoList(new ArrayList<>());
         }
-        //fileMetaInfo.getTagList().add(tag);
         tag.getFileMetaInfoList().add(fileMetaInfo);
         fileMetaInfo.getTagList().add(tag);
         this.tagRepository.save(tag);
         this.fileMetaInfoRepository.save(fileMetaInfo);
-        //  this.fileMetaInfoRepository.save(fileMetaInfo);
     }
 
     private static Tag createTag(String tag) {

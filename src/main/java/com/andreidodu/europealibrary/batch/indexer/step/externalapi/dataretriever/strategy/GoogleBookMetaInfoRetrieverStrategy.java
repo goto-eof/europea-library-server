@@ -1,6 +1,7 @@
-package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.strategy;
+package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.strategy;
 
-import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
+import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.CategoryUtil;
+import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.WebRetrievementStatusEnum;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
@@ -12,6 +13,7 @@ import com.andreidodu.europealibrary.model.Category;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.CategoryRepository;
+import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,9 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final GoogleBooksClient googleBooksClient;
     private final StringUtil stringUtil;
     private final CategoryRepository categoryRepository;
+    private final FileMetaInfoRepository fileMetaInfoRepository;
+    private final CategoryUtil categoryUtil;
+
 
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
@@ -134,7 +139,17 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         Optional.ofNullable(volumeInfo.getImageLinks())
                 .flatMap(imageLinks -> Optional.ofNullable(imageLinks.getThumbnail()))
                 .ifPresent(bookInfo::setImageUrl);
-        addCategoriesIfNecessary(volumeInfo, bookInfo);
+        FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+        Optional.ofNullable(volumeInfo.getCategories())
+                .ifPresent(tags -> tags.stream()
+                        .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
+                        .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
+                        .map(tag -> categoryUtil.createAndAssociateCategories(savedFileMetaInfo.getId(), tag))
+                        .forEach(tagEntity -> {
+                            fileMetaInfo.getBookInfo().getCategoryList().add(tagEntity);
+                            this.fileMetaInfoRepository.save(fileMetaInfo);
+                        })
+                );
 
     }
 

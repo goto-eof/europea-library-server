@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.strategy;
+package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
 import lombok.Getter;
 

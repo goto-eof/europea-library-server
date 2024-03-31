@@ -2,20 +2,14 @@ package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcatalogue
 
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.RecordStatusEnum;
-import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
-import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
-import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.mapper.FileMapper;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
-import com.andreidodu.europealibrary.util.EpubUtil;
 import com.andreidodu.europealibrary.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
