@@ -41,8 +41,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private String googleBooksApiKey;
 
     private final GoogleBooksClient googleBooksClient;
-    private final StringUtil stringUtil;
-    private final CategoryRepository categoryRepository;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final CategoryUtil categoryUtil;
 
@@ -151,31 +149,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
                         })
                 );
 
-    }
-
-    private void addCategoriesIfNecessary(GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo, BookInfo bookInfo) {
-        Optional.ofNullable(volumeInfo.getCategories())
-                .ifPresent(categories -> {
-                    if (bookInfo.getCategoryList() == null) {
-                        bookInfo.setCategoryList(new ArrayList<>());
-                    }
-                    categories.forEach(category -> {
-                        this.categoryRepository.findByNameIgnoreCase(category)
-                                .ifPresentOrElse(categoryEntity -> {
-                                            if (!bookInfo.getCategoryList().contains(categoryEntity)) {
-                                                bookInfo.getCategoryList().add(categoryEntity);
-                                            }
-                                        },
-                                        () -> {
-                                            Category categoryEntity = new Category();
-                                            categoryEntity.setName(category);
-                                            this.categoryRepository.save(categoryEntity);
-                                            bookInfo.getCategoryList().add(categoryEntity);
-                                        }
-                                );
-
-                    });
-                });
     }
 
     private static boolean isEmptyResponse(GoogleBookResponseDTO googleBookResponse) {

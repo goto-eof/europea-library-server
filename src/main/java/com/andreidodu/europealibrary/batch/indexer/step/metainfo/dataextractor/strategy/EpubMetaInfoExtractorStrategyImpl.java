@@ -32,7 +32,6 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
 
     private final EpubUtil epubUtil;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
-    private final TagRepository tagRepository;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final BookInfoRepository bookInfoRepository;
     private final TagUtil tagUtil;
@@ -72,20 +71,6 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
             log.info("invalid file: {} ({})", filename, e.getMessage());
             return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem);
         }
-    }
-
-    private FileMetaInfo manageCaseBookMetadataNotAvailable(String filename, FileSystemItem fileSystemItem, FileExtractionStatusEnum fileExtractionStatusEnum) {
-        FileMetaInfo existingFileMetaInfo = fileSystemItem.getFileMetaInfo();
-        FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
-        fileMetaInfo.setTitle(filename);
-        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
-        BookInfo bookInfo = buildBookInfo(fileMetaInfo);
-        fileMetaInfo.setBookInfo(bookInfo);
-        fileMetaInfo.getBookInfo().setFileExtractionStatus(fileExtractionStatusEnum.getStatus());
-        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
-        bookInfo.setFileMetaInfo(fileMetaInfo);
-        bookInfoRepository.save(bookInfo);
-        return fileMetaInfo;
     }
 
     private BookInfo buildBookInfo(FileMetaInfo fileMetaInfo) {
@@ -142,35 +127,6 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                         })
                 );
 
-    }
-
-    private void addTagsIfPresent(Metadata metadata, FileMetaInfo fileMetaInfo) {
-        log.info("EPUB METADATA: {}", metadata.toString());
-        Optional.ofNullable(metadata.getSubjects())
-                .ifPresent(tags -> {
-                    if (fileMetaInfo.getTagList() == null) {
-                        fileMetaInfo.setTagList(new ArrayList<>());
-                    }
-                    tags.stream()
-                            .filter(tag -> !tag.trim().isEmpty())
-                            .forEach(tag -> {
-                                String resizedTag = StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100)));
-                                Optional<Tag> tagOptional = this.tagRepository.findByNameIgnoreCase(resizedTag);
-                                tagOptional.ifPresentOrElse(tagEntity -> {
-                                            if (!fileMetaInfo.getTagList().contains(tagEntity)) {
-                                                fileMetaInfo.getTagList().add(tagEntity);
-                                            }
-                                        },
-                                        () -> {
-                                            Tag tagEntity = new Tag();
-                                            tagEntity.setName(resizedTag);
-                                            this.tagRepository.save(tagEntity);
-                                            fileMetaInfo.getTagList().add(tagEntity);
-                                        }
-                                );
-
-                            });
-                });
     }
 
     private String getFirst(List<String> list) {
