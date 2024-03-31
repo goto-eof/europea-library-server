@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MetaInfoWriter implements ItemWriter<FileMetaInfo> {
+public class MetaInfoWriter implements ItemWriter<FileSystemItem> {
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
-    public void write(Chunk<? extends FileMetaInfo> chunk) {
-        fileMetaInfoRepository.saveAll(chunk.getItems());
-        chunk.getItems().forEach(fileMetaInfo -> this.fileSystemItemRepository.saveAll(fileMetaInfo.getFileSystemItemList()));
+    public void write(Chunk<? extends FileSystemItem> chunk) {
+        // fileMetaInfoRepository.saveAll(chunk.getItems());
+        chunk.getItems().forEach(this.fileSystemItemRepository::save);
     }
 }

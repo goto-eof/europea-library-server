@@ -4,6 +4,10 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
+    <changeSet id="2024-03-31-001" author="Andrei Dodu">
+        <createSequence sequenceName="EL_FILE_META_INFO_ID" startValue="1000"/>
+    </changeSet>
+
     <changeSet id="2024-03-13-001" author="Andrei Dodu">
         <createTable tableName="${tablePrefix}file_meta_info">
             <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">

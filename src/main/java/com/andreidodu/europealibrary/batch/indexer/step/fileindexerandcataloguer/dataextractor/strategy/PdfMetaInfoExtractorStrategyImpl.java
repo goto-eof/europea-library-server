@@ -16,6 +16,7 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -23,10 +24,11 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
+@Order(2)
 @Component
 @Transactional
 @RequiredArgsConstructor
-public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
+public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "pdf-meta-info-extractor-strategy";
 
     private final PdfUtil pdfUtil;
@@ -79,7 +81,6 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         log.info("PDF METADATA extracted: {}", fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         this.bookInfoRepository.save(bookInfo);
-        fileSystemItem.setFileMetaInfo(fileMetaInfo);
         return Optional.of(fileMetaInfo);
     }
 
@@ -92,7 +93,6 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         bookInfo.setFileMetaInfo(fileMetaInfo);
         bookInfo.setFileExtractionStatus(fileExtractionStatusEnum.getStatus());
         bookInfoRepository.save(bookInfo);
-        fileSystemItem.setFileMetaInfo(fileMetaInfo);
         return fileMetaInfo;
     }
 

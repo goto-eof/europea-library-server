@@ -24,12 +24,12 @@ public class TagUtil {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
     public void createAndAssociateTags(FileMetaInfo fileMetaInfo, String tag) {
         Optional<Tag> tagOptional = Optional.empty();
         try {
             tagOptional = this.tagRepository.findByNameIgnoreCase(tag);
-            tagOptional = Optional.of(tagOptional.orElse(this.tagRepository.saveAndFlush(createTag(tag))));
+            tagOptional = Optional.of(tagOptional.orElse(this.tagRepository.save(createTag(tag))));
         } catch (Exception e) {
             tagOptional = this.tagRepository.findByNameIgnoreCase(tag);
         }
@@ -45,6 +45,7 @@ public class TagUtil {
         }
         fileMetaInfo.getTagList().add(tag);
         tag.getFileMetaInfoList().add(fileMetaInfo);
+        this.tagRepository.save(tag);
         this.fileMetaInfoRepository.save(fileMetaInfo);
     }
 

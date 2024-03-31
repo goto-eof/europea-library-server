@@ -113,9 +113,9 @@ public class JobConfiguration {
     }
 
     @Bean("metaInfoBuilderStep")
-    public Step metaInfoBuilderStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> metaInfoBuilderReader, MetaInfoProcessor processor, MetaInfoWriter metaInfoWriter, HibernateTransactionManager transactionManager) {
+    public Step metaInfoBuilderStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<Long> metaInfoBuilderReader, MetaInfoProcessor processor, MetaInfoWriter metaInfoWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("metaInfoBuilderStep", jobRepository)
-                .<FileSystemItem, FileMetaInfo>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .<Long, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(metaInfoBuilderReader)
@@ -125,12 +125,12 @@ public class JobConfiguration {
     }
 
     @Bean("fileSystemItemHashStep")
-    public Step fileSystemItemHashStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> dbStepUpdaterReader, FileSystemItemHashProcessor processor, FileSystemItemHashWriter writer, HibernateTransactionManager transactionManager) {
+    public Step fileSystemItemHashStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> hashStorerReader, FileSystemItemHashProcessor processor, FileSystemItemHashWriter writer, HibernateTransactionManager transactionManager) {
         return new StepBuilder("fileSystemItemHashStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
-                .reader(dbStepUpdaterReader)
+                .reader(hashStorerReader)
                 .processor(processor)
                 .writer(writer)
                 .build();
@@ -159,7 +159,7 @@ public class JobConfiguration {
 
     @Bean("dbStepUpdaterReader")
     public JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader() {
-        JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<FileSystemItem>());
+        JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<>());
         jpaCursorItemReader.setEntityManagerFactory(emFactory);
         jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where recordStatus = :recordStatus");
         Map<String, Object> parameterValues = new HashMap<>();
@@ -169,20 +169,43 @@ public class JobConfiguration {
         return jpaCursorItemReader;
     }
 
-    private final DataSource dataSource;
 
-    @Bean("metaInfoBuilderReader")
-    public JdbcPagingItemReader<FileSystemItem> metaInfoBuilderReader() {
+    @Bean("hashStorerReader")
+    public JdbcPagingItemReader<FileSystemItem> hashStorerReader() {
         JdbcPagingItemReader<FileSystemItem> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
         jdbcPagingItemReader.setFetchSize(16);
         jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
+        jdbcPagingItemReader.setQueryProvider(getPostgresHashQueryProvider());
+        return jdbcPagingItemReader;
+    }
+
+    private final DataSource dataSource;
+
+    @Bean("metaInfoBuilderReader")
+    public JdbcPagingItemReader<Long> metaInfoBuilderReader() {
+        JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
+        jdbcPagingItemReader.setDataSource(dataSource);
+        jdbcPagingItemReader.setFetchSize(16);
+        jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(getPostgresQueryProvider());
         return jdbcPagingItemReader;
     }
 
 
     public PostgresPagingQueryProvider getPostgresQueryProvider() {
+        PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
+        queryProvider.setSelectClause("SELECT id");
+        queryProvider.setFromClause("FROM el_file_system_item");
+        queryProvider.setWhereClause("WHERE record_status = 1");
+        Map<String, Order> orderByKeys = new HashMap<>();
+        orderByKeys.put("id", Order.ASCENDING);
+        queryProvider.setSortKeys(orderByKeys);
+        return queryProvider;
+    }
+
+
+    public PostgresPagingQueryProvider getPostgresHashQueryProvider() {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
         queryProvider.setSelectClause("SELECT *");
         queryProvider.setFromClause("FROM el_file_system_item");
@@ -192,7 +215,6 @@ public class JobConfiguration {
         queryProvider.setSortKeys(orderByKeys);
         return queryProvider;
     }
-
     @Bean(name = "asyncTaskExecutor")
     public TaskExecutor asyncTaskExecutor() {
         return new SimpleAsyncTaskExecutor("asyncExecutor");

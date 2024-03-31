@@ -32,6 +32,11 @@ public class FileUtil {
         return new File(basePath).getName();
     }
 
+    public String calculateFileName(String basePath) {
+        return new File(basePath).getName();
+    }
+
+
     public String calculateParentBasePath(String basePath) {
         return new File(basePath).getParentFile().getAbsolutePath();
     }
