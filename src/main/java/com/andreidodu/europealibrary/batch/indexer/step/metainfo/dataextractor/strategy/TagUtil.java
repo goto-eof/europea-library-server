@@ -27,15 +27,14 @@ public class TagUtil {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Tag createAndAssociateTags(Long fileMetaInfoId, String tag) {
         try {
-            entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)")
+            entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)", Tag.class)
                     .setParameter("name", tag)
                     .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                     .getResultList().stream().findFirst()
                     .ifPresentOrElse(entityManager::persist
                             , () -> entityManager.persist(createTag(tag)));
-
         } catch (Exception e) {
-            log.error("\n\n\n\nEEERRRRRROOOOOR: {}\n\n\n\n", e.getMessage());
+            log.error("\n\n\n\nERROR: {}\n\n\n\n", e.getMessage());
         }
         return entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)", Tag.class)
                 .setParameter("name", tag)

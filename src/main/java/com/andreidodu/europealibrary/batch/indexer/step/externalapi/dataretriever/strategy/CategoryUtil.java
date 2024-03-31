@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever;
+package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.strategy;
 
 import com.andreidodu.europealibrary.model.Category;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
@@ -28,7 +28,7 @@ public class CategoryUtil {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Category createAndAssociateCategories(Long fileMetaInfoId, String categoryName) {
         try {
-            entityManager.createQuery("select l from Category l where lower(l.name) like lower(:name)")
+            entityManager.createQuery("select l from Category l where lower(l.name) like lower(:name)", Category.class)
                     .setParameter("name", categoryName)
                     .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                     .getResultList().stream().findFirst()
@@ -36,7 +36,7 @@ public class CategoryUtil {
                             , () -> entityManager.persist(createCategory(categoryName)));
 
         } catch (Exception e) {
-            log.error("\n\n\n\nEEERRRRRROOOOOR: {}\n\n\n\n", e.getMessage());
+            log.error("\n\n\n\nERROR: {}\n\n\n\n", e.getMessage());
         }
         return entityManager.createQuery("select l from Category l where lower(l.name) like lower(:name)", Category.class)
                 .setParameter("name", categoryName)
