@@ -126,15 +126,21 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         if (!publishers.isEmpty()) {
             bookInfo.setPublisher(String.join(",", publishers));
         }
+
+        bookInfo.setFileMetaInfo(fileMetaInfo);
+        bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
+        fileMetaInfo.setBookInfo(this.bookInfoRepository.save(bookInfo));
+        FileMetaInfo savedFileMEtaInfo = this.fileMetaInfoRepository.saveAndFlush(fileMetaInfo);
         Optional.ofNullable(metadata.getSubjects())
                 .ifPresent(tags -> tags.stream()
                         .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
                         .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
-                        .forEach(tag -> tagUtil.createAndAssociateTags(fileMetaInfo, tag)));
-        bookInfo.setFileMetaInfo(fileMetaInfo);
-        bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
-        fileMetaInfo.setBookInfo(this.bookInfoRepository.save(bookInfo));
-        this.fileMetaInfoRepository.save(fileMetaInfo);
+                        .map(tag -> tagUtil.createAndAssociateTags(savedFileMEtaInfo.getId(), tag))
+                        .forEach(tagEntity -> {
+                            fileMetaInfo.getTagList().add(tagEntity);
+                            this.fileMetaInfoRepository.save(fileMetaInfo);
+                        })
+                );
 
     }
 

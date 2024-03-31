@@ -5,17 +5,17 @@ import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceContexts;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TagUtil {
@@ -24,29 +24,39 @@ public class TagUtil {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
-    public void createAndAssociateTags(FileMetaInfo fileMetaInfo, String tag) {
-        Optional<Tag> tagOptional = Optional.empty();
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Tag createAndAssociateTags(Long fileMetaInfoId, String tag) {
         try {
-            tagOptional = this.tagRepository.findByNameIgnoreCase(tag);
-            tagOptional = Optional.of(tagOptional.orElse(this.tagRepository.save(createTag(tag))));
+            entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)")
+                    .setParameter("name", tag)
+                    .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                    .getResultList().stream().findFirst()
+                    .ifPresentOrElse(entityManager::persist
+                            , () -> entityManager.persist(createTag(tag)));
+
         } catch (Exception e) {
-            tagOptional = this.tagRepository.findByNameIgnoreCase(tag);
+            log.error("\n\n\n\nEEERRRRRROOOOOR: {}\n\n\n\n", e.getMessage());
         }
-        this.associateTags(fileMetaInfo, tagOptional.get());
+        return entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)", Tag.class)
+                .setParameter("name", tag)
+                .setLockMode(LockModeType.NONE)
+                .getResultList().stream().findFirst().get();
     }
 
-    private void associateTags(FileMetaInfo fileMetaInfo, Tag tag) {
+    private void associateTags(Long fileMetaInfoId, Tag tag) {
+        FileMetaInfo fileMetaInfo = this.fileMetaInfoRepository.findById(fileMetaInfoId).get();
         if (fileMetaInfo.getTagList() == null) {
             fileMetaInfo.setTagList(new ArrayList<>());
         }
         if (tag.getFileMetaInfoList() == null) {
             tag.setFileMetaInfoList(new ArrayList<>());
         }
-        fileMetaInfo.getTagList().add(tag);
+        //fileMetaInfo.getTagList().add(tag);
         tag.getFileMetaInfoList().add(fileMetaInfo);
+        fileMetaInfo.getTagList().add(tag);
         this.tagRepository.save(tag);
         this.fileMetaInfoRepository.save(fileMetaInfo);
+        //  this.fileMetaInfoRepository.save(fileMetaInfo);
     }
 
     private static Tag createTag(String tag) {
