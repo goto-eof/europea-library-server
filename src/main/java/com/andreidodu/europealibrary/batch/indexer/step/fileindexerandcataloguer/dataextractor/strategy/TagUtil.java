@@ -24,7 +24,7 @@ public class TagUtil {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createAndAssociateTags(FileMetaInfo fileMetaInfo, String tag) {
         Optional<Tag> tagOptional = Optional.empty();
         try {
@@ -40,7 +40,11 @@ public class TagUtil {
         if (fileMetaInfo.getTagList() == null) {
             fileMetaInfo.setTagList(new ArrayList<>());
         }
+        if (tag.getFileMetaInfoList() == null) {
+            tag.setFileMetaInfoList(new ArrayList<>());
+        }
         fileMetaInfo.getTagList().add(tag);
+        tag.getFileMetaInfoList().add(fileMetaInfo);
         this.fileMetaInfoRepository.save(fileMetaInfo);
     }
 

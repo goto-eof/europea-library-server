@@ -24,6 +24,10 @@ public class FileUtil {
         }
     }
 
+    public Optional<String> fileNameToHash(String filename) {
+        return this.fileToSha256(new File(filename));
+    }
+
     public String calculateParentName(String basePath) {
         return new File(basePath).getName();
     }

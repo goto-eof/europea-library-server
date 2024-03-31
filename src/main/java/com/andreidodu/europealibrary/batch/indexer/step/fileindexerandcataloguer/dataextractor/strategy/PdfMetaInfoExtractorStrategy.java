@@ -79,6 +79,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         log.info("PDF METADATA extracted: {}", fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         this.bookInfoRepository.save(bookInfo);
+        fileSystemItem.setFileMetaInfo(fileMetaInfo);
         return Optional.of(fileMetaInfo);
     }
 
@@ -91,6 +92,7 @@ public class PdfMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy {
         bookInfo.setFileMetaInfo(fileMetaInfo);
         bookInfo.setFileExtractionStatus(fileExtractionStatusEnum.getStatus());
         bookInfoRepository.save(bookInfo);
+        fileSystemItem.setFileMetaInfo(fileMetaInfo);
         return fileMetaInfo;
     }
 

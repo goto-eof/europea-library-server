@@ -63,8 +63,11 @@ public class FileSystemItem extends ModelCommon implements Identificable {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Fetch(FetchMode.JOIN)
-    @JoinColumn(name = "file_meta_info_id", nullable = true)
+    @JoinColumn(name = "file_meta_info_id", nullable = true, insertable = false, updatable = false)
     private FileMetaInfo fileMetaInfo;
+
+    @Column(name = "file_meta_info_id", nullable = true)
+    private Long fileMetaInfoId;
 
     @Column(name = "record_status")
     private Integer recordStatus;

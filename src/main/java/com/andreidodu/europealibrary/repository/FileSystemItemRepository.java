@@ -2,6 +2,8 @@ package com.andreidodu.europealibrary.repository;
 
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
+import feign.Param;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -14,4 +16,8 @@ public interface FileSystemItemRepository extends TransactionalRepository<FileSy
     Optional<FileSystemItem> findByLowestId(Integer jobStep);
 
     List<FileSystemItem> findBySha256(String hash);
+
+    @Modifying
+    @Query("update FileSystemItem fsi set fsi.fileMetaInfoId = :fileMetaInfoId where fsi.id = :fileSystemItemId")
+    void updateFileMetaInfoId(@Param(value = "fileSystemItemId") Long fileSystemItemId, @Param(value = "fileMetaInfoId") Long fileMetaInfoId);
 }

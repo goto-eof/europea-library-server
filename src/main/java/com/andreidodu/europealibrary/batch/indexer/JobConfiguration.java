@@ -7,6 +7,8 @@ import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbF
 import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater.DbStepUpdaterProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater.DbStepUpdaterWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.filehash.FileSystemItemHashProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.filehash.FileSystemItemHashWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerReader;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.FileIndexerWriter;
@@ -54,9 +56,10 @@ public class JobConfiguration {
     final private EntityManagerFactory emFactory;
 
     @Bean("indexerJob")
-    public Job indexerJob(JobRepository jobRepository, Step metaInfoBuilderStep, Step fileIndexerAndCataloguerStep, Step dbFSIObsoleteDeleterStep, Step dbFMIObsoleteDeleterStep, Step dbJobStepUpdaterStep) {
+    public Job indexerJob(JobRepository jobRepository, Step fileSystemItemHashStep, Step metaInfoBuilderStep, Step fileIndexerAndCataloguerStep, Step dbFSIObsoleteDeleterStep, Step dbFMIObsoleteDeleterStep, Step dbJobStepUpdaterStep) {
         return new JobBuilder("indexerJob", jobRepository)
                 .start(fileIndexerAndCataloguerStep)
+                .on("COMPLETED").to(fileSystemItemHashStep)
                 .on("COMPLETED").to(metaInfoBuilderStep)
                 .on("COMPLETED").to(dbFSIObsoleteDeleterStep)
                 .on("COMPLETED").to(dbFMIObsoleteDeleterStep)
@@ -112,12 +115,24 @@ public class JobConfiguration {
     @Bean("metaInfoBuilderStep")
     public Step metaInfoBuilderStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> metaInfoBuilderReader, MetaInfoProcessor processor, MetaInfoWriter metaInfoWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("metaInfoBuilderStep", jobRepository)
-                .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .<FileSystemItem, FileMetaInfo>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(metaInfoBuilderReader)
                 .processor(processor)
                 .writer(metaInfoWriter)
+                .build();
+    }
+
+    @Bean("fileSystemItemHashStep")
+    public Step fileSystemItemHashStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> dbStepUpdaterReader, FileSystemItemHashProcessor processor, FileSystemItemHashWriter writer, HibernateTransactionManager transactionManager) {
+        return new StepBuilder("fileSystemItemHashStep", jobRepository)
+                .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .allowStartIfComplete(true)
+                .taskExecutor(threadPoolTaskExecutor)
+                .reader(dbStepUpdaterReader)
+                .processor(processor)
+                .writer(writer)
                 .build();
     }
 

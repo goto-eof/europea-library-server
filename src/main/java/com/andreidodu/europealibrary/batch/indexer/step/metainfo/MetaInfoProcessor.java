@@ -3,7 +3,9 @@ package com.andreidodu.europealibrary.batch.indexer.step.metainfo;
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataretriever.MetaInfoRetrieverStrategy;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +15,14 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MetaInfoProcessor implements ItemProcessor<FileSystemItem, FileSystemItem> {
+public class MetaInfoProcessor implements ItemProcessor<FileSystemItem, FileMetaInfo> {
     public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
     public static final int SLEEP_TIME_BETWEEN_API_REQUESTS = 1000;
 
@@ -34,10 +38,20 @@ public class MetaInfoProcessor implements ItemProcessor<FileSystemItem, FileSyst
     }
 
     @Override
-    public FileSystemItem process(FileSystemItem fileSystemItem) {
+    public FileMetaInfo process(FileSystemItem fileSystemItem) {
         buildMetaInfoFromEbookIfNecessary(fileSystemItem);
         buildMetaInfoFromWebIfNecessary(fileSystemItem);
-        return fileSystemItem;
+
+        return Optional.ofNullable(fileSystemItem.getFileMetaInfo()).map(fileMetaInfo ->
+        {
+            if (fileMetaInfo.getFileSystemItemList() == null) {
+                fileMetaInfo.setFileSystemItemList(new ArrayList<>());
+            }
+            if (!fileMetaInfo.getFileSystemItemList().contains(fileSystemItem)) {
+                fileMetaInfo.getFileSystemItemList().add(fileSystemItem);
+            }
+            return fileMetaInfo;
+        }).orElse(null);
     }
 
     private void buildMetaInfoFromWebIfNecessary(FileSystemItem fileSystemItem) {

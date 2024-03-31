@@ -77,7 +77,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_book_info"/>
             </column>
             <column name="file_meta_info_id" type="bigint">
-                <constraints nullable="false" foreignKeyName="fk_book_file_meta_info"
+                <constraints nullable="false" unique="true" foreignKeyName="fk_book_file_meta_info"
                              references="${tablePrefix}file_meta_info(id)"/>
             </column>
             <column name="image_url" type="VARCHAR(500)"/>

@@ -20,8 +20,6 @@ import java.time.LocalDateTime;
 public abstract class FileMapper {
 
     @Autowired
-    private FileUtil fileUtil;
-    @Autowired
     private DateUtil dateUtil;
 
     public FileDTO toDTO(File file) throws IOException {
@@ -37,10 +35,6 @@ public abstract class FileMapper {
         fileDTO.setName(file.getName());
         fileDTO.setIsDirectory(file.isDirectory());
         fileDTO.setBasePath(file.getParentFile().getAbsolutePath());
-        if (file.isFile()) {
-            this.fileUtil.fileToSha256(file)
-                    .ifPresent(fileDTO::setSha256);
-        }
         return fileDTO;
     }
 

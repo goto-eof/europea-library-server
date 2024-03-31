@@ -55,16 +55,12 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
 
     private FileSystemItem reprocessOldFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
-        //buildMetaInfoFromEbookIfNecessary(fileSystemItem);
-        //buildMetaInfoFromWebIfNecessary(fileSystemItem);
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         return fileSystemItem;
     }
 
     private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
-        //buildMetaInfoFromEbookIfNecessary(fileSystemItem);
-        //buildMetaInfoFromWebIfNecessary(fileSystemItem);
         return fileSystemItem;
     }
 
@@ -82,7 +78,6 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private FileSystemItem buildFileSystemItemFromScratch(FileDTO fileSystemItemDTO) {
         FileSystemItem fileSystemItem = this.fileSystemItemMapper.toModel(fileSystemItemDTO);
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
-        associateMetaInfoEntity(fileSystemItem);
         this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
                 .ifPresentOrElse(fileSystemItem::setParent,
                         () -> this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.READY.getStepNumber())
@@ -91,24 +86,6 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         fileSystemItem.setExtension(this.fileUtil.getExtension(fileSystemItemDTO.getName()));
         return fileSystemItem;
-    }
-
-    private void associateMetaInfoEntity(FileSystemItem fileSystemItem) {
-        if (fileSystemItem.getIsDirectory()) {
-            return;
-        }
-        associateMetaInfoByHashIfFound(fileSystemItem);
-        //buildMetaInfoFromEbookIfNecessary(fileSystemItem);
-        //buildMetaInfoFromWebIfNecessary(fileSystemItem);
-    }
-
-    private void associateMetaInfoByHashIfFound(FileSystemItem fileSystemItem) {
-        Optional.ofNullable(fileSystemItem.getSha256())
-                .flatMap(hash -> this.fileSystemItemRepository.findBySha256(hash)
-                        .stream()
-                        .filter(fsi -> fsi.getFileMetaInfo() != null)
-                        .findFirst().map(FileSystemItem::getFileMetaInfo))
-                .ifPresent(fileSystemItem::setFileMetaInfo);
     }
 
     private Optional<FileSystemItem> getFileSystemItemByPathNameAndJobStep(String basePath, String name, int jobStep) {

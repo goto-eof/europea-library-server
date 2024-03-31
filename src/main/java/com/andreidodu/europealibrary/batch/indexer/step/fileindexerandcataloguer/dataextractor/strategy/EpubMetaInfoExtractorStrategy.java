@@ -14,6 +14,7 @@ import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +53,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
 
 
     @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
         log.info("applying strategy: {}", getStrategyName());
         FileMetaInfo fileMetaInfo = fileSystemItem.getFileMetaInfo();
@@ -63,7 +65,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
                             return manageCaseBookMetadataNotAvailable(filename, fileSystemItem, FileExtractionStatusEnum.SUCCESS_EMPTY);
                         }
                         log.info("metadata found for: {}", filename);
-                        return manageCaseBookTitleNotEmpty(book, filename, fileMetaInfo);
+                        return manageCaseBookTitleNotEmpty(book, filename, fileMetaInfo, fileSystemItem);
                     });
         } catch (Exception e) {
             log.info("invalid file: {}", filename);
@@ -74,6 +76,7 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
     private FileMetaInfo manageCaseBookMetadataNotAvailable(String filename, FileSystemItem fileSystemItem, FileExtractionStatusEnum fileExtractionStatusEnum) {
         FileMetaInfo existingFileMetaInfo = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
+        fileSystemItem.setFileMetaInfo(fileMetaInfo);
         fileMetaInfo.setTitle(filename);
         fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(fileMetaInfo);
@@ -90,26 +93,27 @@ public class EpubMetaInfoExtractorStrategy implements MetaInfoExtractorStrategy 
         return bookInfo;
     }
 
-    private FileMetaInfo manageCaseBookTitleNotEmpty(Book book, String fullPath, FileMetaInfo existingFileMetaInfo) {
+    private FileMetaInfo manageCaseBookTitleNotEmpty(Book book, String fullPath, FileMetaInfo existingFileMetaInfo, FileSystemItem fileSystemItem) {
         log.info("gathering information from ebook {}", fullPath);
         FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
+        fileSystemItem.setFileMetaInfo(fileMetaInfo);
 
         Metadata metadata = book.getMetadata();
 
         fileMetaInfo.setTitle(StringUtil.clean(metadata.getFirstTitle()));
         fileMetaInfo.setDescription(StringUtil.clean(getFirst(metadata.getDescriptions())));
-        fileMetaInfo = this.fileMetaInfoRepository.saveAndFlush(fileMetaInfo);
+        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(book, fileMetaInfo, metadata);
         bookInfo.setFileMetaInfo(fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
-        this.bookInfoRepository.saveAndFlush(bookInfo);
+        this.bookInfoRepository.save(bookInfo);
         final FileMetaInfo fileMEtaInfoReference = fileMetaInfo;
         Optional.ofNullable(metadata.getSubjects())
                 .ifPresent(tags -> tags.stream()
                         .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
                         .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
                         .forEach(tag -> tagUtil.createAndAssociateTags(fileMEtaInfoReference, tag)));
-        this.bookInfoRepository.saveAndFlush(bookInfo);
+        this.bookInfoRepository.save(bookInfo);
         return fileMetaInfo;
     }
 
