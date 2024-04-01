@@ -84,4 +84,4 @@ google:
 
 logging:
   file:
-    path: .
+    name: europea-library.log
