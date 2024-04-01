@@ -50,7 +50,7 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     private FileSystemItem parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY,
-            cascade = {CascadeType.REMOVE}, orphanRemoval = true)
+            cascade = {CascadeType.REMOVE})
     private List<FileSystemItem> childrenList;
 
     @Column(name = "job_step", nullable = false)
@@ -61,10 +61,13 @@ public class FileSystemItem extends ModelCommon implements Identificable {
 
     private String extension;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY)
     @Fetch(FetchMode.JOIN)
-    @JoinColumn(name = "file_meta_info_id", nullable = true)
+    @JoinColumn(name = "file_meta_info_id", insertable = false, updatable = false)
     private FileMetaInfo fileMetaInfo;
+
+    @Column(name = "file_meta_info_id", nullable = true)
+    private Long fileMetaInfoId;
 
     @Column(name = "record_status")
     private Integer recordStatus;

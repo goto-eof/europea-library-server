@@ -24,9 +24,18 @@ public class FileUtil {
         }
     }
 
+    public Optional<String> fileNameToHash(String filename) {
+        return this.fileToSha256(new File(filename));
+    }
+
     public String calculateParentName(String basePath) {
         return new File(basePath).getName();
     }
+
+    public String calculateFileName(String basePath) {
+        return new File(basePath).getName();
+    }
+
 
     public String calculateParentBasePath(String basePath) {
         return new File(basePath).getParentFile().getAbsolutePath();
@@ -40,4 +49,7 @@ public class FileUtil {
         return extension;
     }
 
+    public boolean isDirectory(String filename) {
+        return new File(filename).isDirectory();
+    }
 }

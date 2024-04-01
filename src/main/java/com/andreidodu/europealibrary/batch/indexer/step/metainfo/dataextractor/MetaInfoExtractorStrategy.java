@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer.dataextractor;
+package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor;
 
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;

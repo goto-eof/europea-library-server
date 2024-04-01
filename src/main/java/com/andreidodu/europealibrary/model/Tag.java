@@ -9,6 +9,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,6 +27,6 @@ public class Tag extends ModelCommon implements Identificable {
 
     @ManyToMany(mappedBy = "tagList")
     @Fetch(FetchMode.JOIN)
-    private List<FileMetaInfo> fileMetaInfoList;
+    private List<FileMetaInfo> fileMetaInfoList = new ArrayList<>();
 
 }

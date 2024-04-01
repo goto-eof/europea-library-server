@@ -4,6 +4,10 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
+    <changeSet id="2024-03-31-001" author="Andrei Dodu">
+        <createSequence sequenceName="EL_FILE_META_INFO_ID" startValue="1000"/>
+    </changeSet>
+
     <changeSet id="2024-03-13-001" author="Andrei Dodu">
         <createTable tableName="${tablePrefix}file_meta_info">
             <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
@@ -77,7 +81,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_book_info"/>
             </column>
             <column name="file_meta_info_id" type="bigint">
-                <constraints nullable="false" foreignKeyName="fk_book_file_meta_info"
+                <constraints nullable="false" unique="true" foreignKeyName="fk_book_file_meta_info"
                              references="${tablePrefix}file_meta_info(id)"/>
             </column>
             <column name="image_url" type="VARCHAR(500)"/>

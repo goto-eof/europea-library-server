@@ -16,6 +16,7 @@ public class DbFMIObsoleteDeleterWriter implements ItemWriter<FileMetaInfo> {
 
     @Override
     public void write(Chunk<? extends FileMetaInfo> chunk) {
+        log.info("deleting: {}", chunk.getItems().toString());
         this.repository.deleteAll(chunk.getItems());
         log.info("deleted {} records", chunk.getItems().size());
     }

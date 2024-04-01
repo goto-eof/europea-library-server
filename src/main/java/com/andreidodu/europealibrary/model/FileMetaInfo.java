@@ -8,15 +8,19 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "el_file_meta_info")
+//@SequenceGenerator(name = "EL_FILE_META_INFO_ID", sequenceName = "EL_FILE_META_INFO_ID", allocationSize = 1)
 @EntityListeners(AuditingEntityListener.class)
 public class FileMetaInfo extends ModelCommon {
     @Id
+    @Column(nullable = false, updatable = false)
+    //@GeneratedValue(generator = "EL_FILE_META_INFO_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -26,21 +30,30 @@ public class FileMetaInfo extends ModelCommon {
     @Column(length = 4000)
     private String description;
 
-    @OneToOne(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @OneToOne(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private BookInfo bookInfo;
 
 
-    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
             uniqueConstraints = {@UniqueConstraint(columnNames = {"file_meta_info_id", "tag_id"})},
             name = "el_file_meta_info_tag",
             joinColumns = {@JoinColumn(name = "file_meta_info_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")}
     )
-    private List<Tag> tagList;
+    private List<Tag> tagList = new ArrayList<>();
 
     @OneToMany(mappedBy = "fileMetaInfo")
     @Fetch(FetchMode.JOIN)
     private List<FileSystemItem> fileSystemItemList;
 
+
+    @Override
+    public String toString() {
+        return "FileMetaInfo{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }
