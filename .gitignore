@@ -16,7 +16,8 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-
+images/.$europea-library.drawio.bkp
+.DS_Store
 ### IntelliJ IDEA ###
 .idea
 *.iws
