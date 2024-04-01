@@ -173,6 +173,7 @@ public class JobConfiguration {
         jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
         jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(dbFMIObsoleteDeleterReaderPostgresQueryProvider());
+        jdbcPagingItemReader.setSaveState(false);
         return jdbcPagingItemReader;
     }
 
@@ -194,6 +195,7 @@ public class JobConfiguration {
         jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
         jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(getDbStepUpdaterPostgresQueryProvider());
+        jdbcPagingItemReader.setSaveState(false);
         return jdbcPagingItemReader;
     }
 
@@ -216,6 +218,7 @@ public class JobConfiguration {
         jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
         jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
         jdbcPagingItemReader.setQueryProvider(getPostgresHashQueryProvider());
+        jdbcPagingItemReader.setSaveState(false);
         return jdbcPagingItemReader;
     }
 
@@ -228,6 +231,7 @@ public class JobConfiguration {
         jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
         jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(getPostgresQueryProvider());
+        jdbcPagingItemReader.setSaveState(false);
         return jdbcPagingItemReader;
     }
 
