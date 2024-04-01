@@ -166,15 +166,6 @@ public class JobConfiguration {
         return jpaCursorItemReader;
     }
 
-//    @Bean("dbFMIObsoleteDeleterReader")
-//    public JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader() {
-//        JpaCursorItemReader<FileMetaInfo> jpaCursorItemReader = (new JpaCursorItemReader<FileMetaInfo>());
-//        jpaCursorItemReader.setEntityManagerFactory(emFactory);
-//        jpaCursorItemReader.setQueryString("SELECT p FROM FileMetaInfo p where p.fileSystemItemList IS EMPTY");
-//        jpaCursorItemReader.setSaveState(true);
-//        return jpaCursorItemReader;
-//    }
-
     @Bean("dbFMIObsoleteDeleterReader")
     public JdbcPagingItemReader<Long> dbFMIObsoleteDeleterReader() {
         JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
