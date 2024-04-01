@@ -83,5 +83,6 @@ Google Books API
   need to index about 100.000 ebooks, I decided to rewrite the job by implementing a multi-thread job processor. On the
   same notebook I run
   the multi-thread job and the result is the following: about 30 minutes to index 8.850 files.
+  ![multi-threading](images/multi-threading.png)
 - developed and tested on Linux.
 - if you have any suggestions or found a bug please contact me [here](https://andre-i.eu/#contactme)
