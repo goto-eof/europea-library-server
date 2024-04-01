@@ -97,9 +97,9 @@ public class JobConfiguration {
     }
 
     @Bean("dbFMIObsoleteDeleterStep")
-    public Step dbFMIObsoleteDeleterStep(JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    public Step dbFMIObsoleteDeleterStep(JdbcPagingItemReader<Long> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("dbFMIObsoleteDeleterStep", jobRepository)
-                .<FileMetaInfo, FileMetaInfo>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
+                .<Long, FileMetaInfo>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(dbFMIObsoleteDeleterReader)
                 .processor(processor)
@@ -166,13 +166,34 @@ public class JobConfiguration {
         return jpaCursorItemReader;
     }
 
+//    @Bean("dbFMIObsoleteDeleterReader")
+//    public JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader() {
+//        JpaCursorItemReader<FileMetaInfo> jpaCursorItemReader = (new JpaCursorItemReader<FileMetaInfo>());
+//        jpaCursorItemReader.setEntityManagerFactory(emFactory);
+//        jpaCursorItemReader.setQueryString("SELECT p FROM FileMetaInfo p where p.fileSystemItemList IS EMPTY");
+//        jpaCursorItemReader.setSaveState(true);
+//        return jpaCursorItemReader;
+//    }
+
     @Bean("dbFMIObsoleteDeleterReader")
-    public JpaCursorItemReader<FileMetaInfo> dbFMIObsoleteDeleterReader() {
-        JpaCursorItemReader<FileMetaInfo> jpaCursorItemReader = (new JpaCursorItemReader<FileMetaInfo>());
-        jpaCursorItemReader.setEntityManagerFactory(emFactory);
-        jpaCursorItemReader.setQueryString("SELECT p FROM FileMetaInfo p where p.fileSystemItemList IS EMPTY");
-        jpaCursorItemReader.setSaveState(true);
-        return jpaCursorItemReader;
+    public JdbcPagingItemReader<Long> dbFMIObsoleteDeleterReader() {
+        JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
+        jdbcPagingItemReader.setDataSource(dataSource);
+        jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
+        jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
+        jdbcPagingItemReader.setQueryProvider(dbFMIObsoleteDeleterReaderPostgresQueryProvider());
+        return jdbcPagingItemReader;
+    }
+
+    public PostgresPagingQueryProvider dbFMIObsoleteDeleterReaderPostgresQueryProvider() {
+        PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
+        queryProvider.setSelectClause("SELECT distinct fmi.id");
+        queryProvider.setFromClause("FROM el_file_meta_info fmi, el_file_system_item fsi");
+        queryProvider.setWhereClause("WHERE fmi.id not in (select distinct file_meta_info_id from el_file_system_item)");
+        Map<String, Order> orderByKeys = new HashMap<>();
+        orderByKeys.put("id", Order.ASCENDING);
+        queryProvider.setSortKeys(orderByKeys);
+        return queryProvider;
     }
 
     @Bean("dbStepUpdaterReader")
