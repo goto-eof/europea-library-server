@@ -26,7 +26,7 @@ public class OtherMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStra
 
     @Override
     public boolean accept(String filename, FileSystemItem fileSystemItem) {
-        return true;
+        return fileSystemItem == null || fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null;
     }
 
     @Override

@@ -230,11 +230,6 @@ public class JobConfiguration {
         return queryProvider;
     }
 
-    @Bean(name = "asyncTaskExecutor")
-    public TaskExecutor asyncTaskExecutor() {
-        return new SimpleAsyncTaskExecutor("asyncExecutor");
-    }
-
     @Bean("threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();

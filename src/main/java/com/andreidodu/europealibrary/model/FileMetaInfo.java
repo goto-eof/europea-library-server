@@ -47,4 +47,13 @@ public class FileMetaInfo extends ModelCommon {
     @Fetch(FetchMode.JOIN)
     private List<FileSystemItem> fileSystemItemList;
 
+
+    @Override
+    public String toString() {
+        return "FileMetaInfo{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }
