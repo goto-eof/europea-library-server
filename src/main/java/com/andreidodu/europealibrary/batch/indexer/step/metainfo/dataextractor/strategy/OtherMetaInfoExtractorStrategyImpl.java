@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class OtherMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrategy {
     private final static String STRATEGY_NAME = "file-meta-info-other-extractor";
     private final FileUtil fileUtil;
+    private final FileMetaInfoRepository fileMetaInfoRepository;
 
     @Override
     public String getStrategyName() {
@@ -31,8 +33,9 @@ public class OtherMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStra
 
     @Override
     public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
-        FileMetaInfo fileMetaInfo = new FileMetaInfo();
+        FileMetaInfo oldFileMetaInfo = fileSystemItem.getFileMetaInfo();
+        FileMetaInfo fileMetaInfo = oldFileMetaInfo == null ? new FileMetaInfo() : oldFileMetaInfo;
         fileMetaInfo.setTitle(fileUtil.calculateFileName(filename));
-        return Optional.of(fileMetaInfo);
+        return Optional.of(this.fileMetaInfoRepository.save(fileMetaInfo));
     }
 }
