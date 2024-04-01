@@ -78,7 +78,7 @@ Google Books API
 - Currently, I do not add new changesets to liquibase (the base schema is still in definition status), so that sometimes
   it is necessary to drop all tables and restart the application.
 - During my tests (in debug mode) I noticed that the job, in order to index and extract metadata from 8.850 files in a
-  mono-thread context,
+  single-thread context,
   takes about 1 hour on a notebook (based on Ubuntu) with Intel i5 (4 core, 2.40GHz) equipped with an SSD. Because I
   need to index about 100.000 ebooks, I decided to rewrite the job by implementing a multi-thread job processor. On the
   same notebook I run
