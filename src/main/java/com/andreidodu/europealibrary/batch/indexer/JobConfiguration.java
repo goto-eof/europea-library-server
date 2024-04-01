@@ -20,6 +20,8 @@ import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.XSlf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -32,7 +34,6 @@ import org.springframework.batch.item.database.support.PostgresPagingQueryProvid
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -43,6 +44,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class JobConfiguration {
@@ -232,9 +234,11 @@ public class JobConfiguration {
 
     @Bean("threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+        int processors = Runtime.getRuntime().availableProcessors();
+        log.info("\n\n\n====================\nYou have {} processors\n=====================\n\n\n", processors);
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setMaxPoolSize(Runtime.getRuntime().availableProcessors());
-        taskExecutor.setCorePoolSize(Runtime.getRuntime().availableProcessors());
+        taskExecutor.setMaxPoolSize(processors);
+        taskExecutor.setCorePoolSize(processors);
         taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         taskExecutor.afterPropertiesSet();
         return taskExecutor;

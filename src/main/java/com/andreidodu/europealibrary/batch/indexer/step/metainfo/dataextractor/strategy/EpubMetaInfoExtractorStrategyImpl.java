@@ -5,7 +5,6 @@ import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
-import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.transaction.Transactional;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -113,10 +111,13 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                 .ifPresent(tags -> tags.stream()
                         .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
                         .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
-                        .map(tag -> tagUtil.createAndAssociateTags(savedFileMEtaInfo.getId(), tag))
+                        .map(tagUtil::createTag)
                         .forEach(tagEntity -> {
-                            fileMetaInfo.getTagList().add(tagEntity);
-                            this.fileMetaInfoRepository.save(fileMetaInfo);
+                            List<Tag> tagList = fileMetaInfo.getTagList();
+                            if (!tagList.contains(tagEntity)) {
+                                tagList.add(tagEntity);
+                                this.fileMetaInfoRepository.save(fileMetaInfo);
+                            }
                         })
                 );
 

@@ -25,14 +25,14 @@ public class TagUtil {
     private final EntityManager entityManager;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Tag createAndAssociateTags(Long fileMetaInfoId, String tag) {
+    public Tag createTag(String tag) {
         try {
             entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)", Tag.class)
                     .setParameter("name", tag)
                     .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                     .getResultList().stream().findFirst()
                     .ifPresentOrElse(entityManager::persist
-                            , () -> entityManager.persist(createTag(tag)));
+                            , () -> entityManager.persist(createTagFromName(tag)));
         } catch (Exception e) {
             log.error("\n\n\n\nERROR: {}\n\n\n\n", e.getMessage());
         }
@@ -42,21 +42,7 @@ public class TagUtil {
                 .getResultList().stream().findFirst().get();
     }
 
-    private void associateTags(Long fileMetaInfoId, Tag tag) {
-        FileMetaInfo fileMetaInfo = this.fileMetaInfoRepository.findById(fileMetaInfoId).get();
-        if (fileMetaInfo.getTagList() == null) {
-            fileMetaInfo.setTagList(new ArrayList<>());
-        }
-        if (tag.getFileMetaInfoList() == null) {
-            tag.setFileMetaInfoList(new ArrayList<>());
-        }
-        tag.getFileMetaInfoList().add(fileMetaInfo);
-        fileMetaInfo.getTagList().add(tag);
-        this.tagRepository.save(tag);
-        this.fileMetaInfoRepository.save(fileMetaInfo);
-    }
-
-    private static Tag createTag(String tag) {
+    private static Tag createTagFromName(String tag) {
         Tag tagEntity = new Tag();
         tagEntity.setName(tag);
         return tagEntity;

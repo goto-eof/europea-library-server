@@ -1,8 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.strategy;
 
 import com.andreidodu.europealibrary.model.Category;
-import com.andreidodu.europealibrary.model.FileMetaInfo;
-import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.CategoryRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import jakarta.persistence.EntityManager;
@@ -14,8 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,14 +22,14 @@ public class CategoryUtil {
     private final EntityManager entityManager;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Category createAndAssociateCategories(Long fileMetaInfoId, String categoryName) {
+    public Category createCategory(String categoryName) {
         try {
             entityManager.createQuery("select l from Category l where lower(l.name) like lower(:name)", Category.class)
                     .setParameter("name", categoryName)
                     .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                     .getResultList().stream().findFirst()
                     .ifPresentOrElse(entityManager::persist
-                            , () -> entityManager.persist(createCategory(categoryName)));
+                            , () -> entityManager.persist(createCategoryFromName(categoryName)));
 
         } catch (Exception e) {
             log.error("\n\n\n\nERROR: {}\n\n\n\n", e.getMessage());
@@ -45,7 +41,7 @@ public class CategoryUtil {
     }
 
 
-    private static Category createCategory(String categoryName) {
+    private static Category createCategoryFromName(String categoryName) {
         Category category = new Category();
         category.setName(categoryName);
         return category;

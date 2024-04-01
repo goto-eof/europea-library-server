@@ -8,6 +8,7 @@ import com.andreidodu.europealibrary.dto.ApiResponseDTO;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
+import com.andreidodu.europealibrary.model.Category;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
@@ -138,10 +139,13 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
                 .ifPresent(tags -> tags.stream()
                         .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
                         .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
-                        .map(tag -> categoryUtil.createAndAssociateCategories(savedFileMetaInfo.getId(), tag))
-                        .forEach(tagEntity -> {
-                            fileMetaInfo.getBookInfo().getCategoryList().add(tagEntity);
-                            this.fileMetaInfoRepository.save(fileMetaInfo);
+                        .map(categoryUtil::createCategory)
+                        .forEach(categoryEntity -> {
+                            List<Category> categoryList = fileMetaInfo.getBookInfo().getCategoryList();
+                            if (!categoryList.contains(categoryEntity)) {
+                                categoryList.add(categoryEntity);
+                                this.fileMetaInfoRepository.save(fileMetaInfo);
+                            }
                         })
                 );
 
