@@ -49,4 +49,7 @@ public class FileUtil {
         return extension;
     }
 
+    public boolean isDirectory(String filename) {
+        return new File(filename).isDirectory();
+    }
 }
