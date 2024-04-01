@@ -22,6 +22,7 @@ public class FileSystemItemHashProcessor implements ItemProcessor<FileSystemItem
     @Override
     public FileSystemItem process(FileSystemItem fileSystemItem) {
         calculateAndUpdateHashAndMetaInfoIdIfNecessary(fileSystemItem);
+        log.info("updated hash for {} record: {}", 1, fileSystemItem.getName());
         return null;
     }
 
