@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
-import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -25,7 +22,7 @@ public class TagUtil {
     private final EntityManager entityManager;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Tag createTag(String tag) {
+    public Tag createTagEntity(String tag) {
         try {
             entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)", Tag.class)
                     .setParameter("name", tag)

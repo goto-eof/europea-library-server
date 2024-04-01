@@ -113,7 +113,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                         .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
                         .collect(Collectors.toSet())
                         .stream()
-                        .map(tagUtil::createTag)
+                        .map(tagUtil::createTagEntity)
                         .forEach(tagEntity -> {
                             List<Tag> tagList = fileMetaInfo.getTagList();
                             if (!tagList.contains(tagEntity)) {

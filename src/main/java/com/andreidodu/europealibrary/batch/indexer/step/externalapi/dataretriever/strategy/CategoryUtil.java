@@ -22,7 +22,7 @@ public class CategoryUtil {
     private final EntityManager entityManager;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Category createCategory(String categoryName) {
+    public Category createCategoryEntity(String categoryName) {
         try {
             entityManager.createQuery("select l from Category l where lower(l.name) like lower(:name)", Category.class)
                     .setParameter("name", categoryName)

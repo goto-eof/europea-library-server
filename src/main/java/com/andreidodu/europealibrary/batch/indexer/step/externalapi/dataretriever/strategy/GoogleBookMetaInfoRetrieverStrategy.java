@@ -138,11 +138,11 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         Optional.ofNullable(volumeInfo.getCategories())
                 .ifPresent(tags -> tags.stream()
-                        .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
-                        .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
+                        .filter(category -> !StringUtil.clean(category.trim()).isEmpty())
+                        .map(category -> StringUtil.clean(category.substring(0, Math.min(category.length(), 100))))
                         .collect(Collectors.toSet())
                         .stream()
-                        .map(categoryUtil::createCategory)
+                        .map(categoryUtil::createCategoryEntity)
                         .forEach(categoryEntity -> {
                             List<Category> categoryList = fileMetaInfo.getBookInfo().getCategoryList();
                             if (!categoryList.contains(categoryEntity)) {
