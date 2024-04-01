@@ -66,7 +66,7 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     @JoinColumn(name = "file_meta_info_id", insertable = false, updatable = false)
     private FileMetaInfo fileMetaInfo;
 
-    @Column(name = "file_meta_info_id", nullable = true)
+    @Column(name = "file_meta_info_id")
     private Long fileMetaInfoId;
 
     @Column(name = "record_status")

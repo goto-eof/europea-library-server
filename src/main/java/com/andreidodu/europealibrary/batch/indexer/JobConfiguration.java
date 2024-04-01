@@ -48,6 +48,7 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class JobConfiguration {
+    public static final String STEP_STATUS_COMPLETED = "COMPLETED";
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size}")
     private Integer stepIndexerBatchSize;
     @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
@@ -63,12 +64,12 @@ public class JobConfiguration {
     public Job indexerJob(JobRepository jobRepository, Step fileSystemItemHashStep, Step metaInfoBuilderStep, Step externalMetaInfoBuilderStep, Step fileIndexerAndCataloguerStep, Step dbFSIObsoleteDeleterStep, Step dbFMIObsoleteDeleterStep, Step dbJobStepUpdaterStep) {
         return new JobBuilder("indexerJob", jobRepository)
                 .start(fileIndexerAndCataloguerStep)
-                .on("COMPLETED").to(fileSystemItemHashStep)
-                .on("COMPLETED").to(metaInfoBuilderStep)
-                .on("COMPLETED").to(externalMetaInfoBuilderStep)
-                .on("COMPLETED").to(dbFSIObsoleteDeleterStep)
-                .on("COMPLETED").to(dbFMIObsoleteDeleterStep)
-                .on("COMPLETED").to(dbJobStepUpdaterStep)
+                .on(STEP_STATUS_COMPLETED).to(fileSystemItemHashStep)
+                .on(STEP_STATUS_COMPLETED).to(metaInfoBuilderStep)
+                .on(STEP_STATUS_COMPLETED).to(externalMetaInfoBuilderStep)
+                .on(STEP_STATUS_COMPLETED).to(dbFSIObsoleteDeleterStep)
+                .on(STEP_STATUS_COMPLETED).to(dbFMIObsoleteDeleterStep)
+                .on(STEP_STATUS_COMPLETED).to(dbJobStepUpdaterStep)
                 .end()
                 .build();
     }
@@ -107,10 +108,11 @@ public class JobConfiguration {
     }
 
     @Bean("dbJobStepUpdaterStep")
-    public Step dbJobStepUpdaterStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
+    public Step dbJobStepUpdaterStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<Long> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("dbJobStepUpdaterStep", jobRepository)
-                .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .<Long, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
+                .taskExecutor(threadPoolTaskExecutor)
                 .reader(dbStepUpdaterReader)
                 .processor(processor)
                 .writer(dbStepUpdaterWriter)
@@ -174,15 +176,24 @@ public class JobConfiguration {
     }
 
     @Bean("dbStepUpdaterReader")
-    public JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader() {
-        JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = (new JpaCursorItemReader<>());
-        jpaCursorItemReader.setEntityManagerFactory(emFactory);
-        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where recordStatus = :recordStatus");
-        Map<String, Object> parameterValues = new HashMap<>();
-        parameterValues.put("recordStatus", RecordStatusEnum.JUST_UPDATED.getStatus());
-        jpaCursorItemReader.setParameterValues(parameterValues);
-        jpaCursorItemReader.setSaveState(true);
-        return jpaCursorItemReader;
+    public JdbcPagingItemReader<Long> dbStepUpdaterReader() {
+        JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
+        jdbcPagingItemReader.setDataSource(dataSource);
+        jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
+        jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
+        jdbcPagingItemReader.setQueryProvider(getDbStepUpdaterPostgresQueryProvider());
+        return jdbcPagingItemReader;
+    }
+
+    public PostgresPagingQueryProvider getDbStepUpdaterPostgresQueryProvider() {
+        PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
+        queryProvider.setSelectClause("SELECT id");
+        queryProvider.setFromClause("FROM el_file_system_item");
+        queryProvider.setWhereClause("WHERE record_status = 1");
+        Map<String, Order> orderByKeys = new HashMap<>();
+        orderByKeys.put("id", Order.ASCENDING);
+        queryProvider.setSortKeys(orderByKeys);
+        return queryProvider;
     }
 
 
@@ -190,7 +201,7 @@ public class JobConfiguration {
     public JdbcPagingItemReader<FileSystemItem> hashStorerReader() {
         JdbcPagingItemReader<FileSystemItem> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
-        jdbcPagingItemReader.setFetchSize(16);
+        jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
         jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
         jdbcPagingItemReader.setQueryProvider(getPostgresHashQueryProvider());
         return jdbcPagingItemReader;
@@ -202,7 +213,7 @@ public class JobConfiguration {
     public JdbcPagingItemReader<Long> metaInfoBuilderReader() {
         JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
-        jdbcPagingItemReader.setFetchSize(16);
+        jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
         jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(getPostgresQueryProvider());
         return jdbcPagingItemReader;
