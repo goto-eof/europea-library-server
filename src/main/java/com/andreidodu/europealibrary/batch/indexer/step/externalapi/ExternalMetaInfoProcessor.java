@@ -26,10 +26,7 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
     public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
     public static final int SLEEP_TIME_BETWEEN_API_REQUESTS = 1000;
 
-    final private EpubUtil epubUtil;
-    final private List<MetaInfoExtractorStrategy> metaInfoExtractorStrategyList;
     final private List<MetaInfoRetrieverStrategy> metaInfoRetrieverStrategyList;
-    private final FileMetaInfoRepository fileMetaInfoRepository;
     private StepExecution stepExecution;
     final private FileSystemItemRepository fileSystemItemRepository;
 
@@ -44,6 +41,7 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
                 .map(fileMetaInfo -> {
                     FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
                     fileSystemItem.setFileMetaInfoId(fileMetaInfo.getId());
+                    putThreadOnSleep();
                     return fileSystemItem;
                 })
                 .orElse(null);
