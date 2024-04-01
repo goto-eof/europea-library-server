@@ -11,7 +11,7 @@ ext {
     jakartaPersistenceApi = '3.2.0-M2'
 }
 group = 'com.andreidodu'
-version = '1.0.0'
+version = '2.0.0'
 
 java {
     sourceCompatibility = '21'
