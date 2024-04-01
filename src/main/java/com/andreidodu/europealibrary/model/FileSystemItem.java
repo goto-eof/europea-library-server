@@ -63,7 +63,7 @@ public class FileSystemItem extends ModelCommon implements Identificable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @Fetch(FetchMode.JOIN)
-    @JoinColumn(name = "file_meta_info_id", nullable = true, insertable = false, updatable = false)
+    @JoinColumn(name = "file_meta_info_id", insertable = false, updatable = false)
     private FileMetaInfo fileMetaInfo;
 
     @Column(name = "file_meta_info_id", nullable = true)

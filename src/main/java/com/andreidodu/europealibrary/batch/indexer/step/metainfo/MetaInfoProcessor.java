@@ -21,20 +21,10 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class MetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
-    public static final String DO_NOT_CALL_WEB_API = "do-not-call-web-api";
-    public static final int SLEEP_TIME_BETWEEN_API_REQUESTS = 1000;
 
-    final private EpubUtil epubUtil;
     final private List<MetaInfoExtractorStrategy> metaInfoExtractorStrategyList;
-    final private List<MetaInfoRetrieverStrategy> metaInfoRetrieverStrategyList;
-    private final FileMetaInfoRepository fileMetaInfoRepository;
-    private StepExecution stepExecution;
+    final private FileMetaInfoRepository fileMetaInfoRepository;
     final private FileSystemItemRepository fileSystemItemRepository;
-
-    @BeforeStep
-    public void setStepExecution(StepExecution stepExecution) {
-        this.stepExecution = stepExecution;
-    }
 
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
