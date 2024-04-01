@@ -137,21 +137,20 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
                 .ifPresent(bookInfo::setImageUrl);
         FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         Optional.ofNullable(volumeInfo.getCategories())
-                .ifPresent(tags -> tags.stream()
-                        .filter(category -> !StringUtil.clean(category.trim()).isEmpty())
-                        .map(category -> StringUtil.clean(category.substring(0, Math.min(category.length(), 100))))
+                .ifPresent(categoryList -> categoryList.stream()
+                        .filter(categoryName -> !StringUtil.clean(categoryName.trim()).isEmpty())
+                        .map(categoryName -> StringUtil.clean(categoryName.substring(0, Math.min(categoryName.length(), 100))))
                         .collect(Collectors.toSet())
                         .stream()
                         .map(categoryUtil::createCategoryEntity)
                         .forEach(categoryEntity -> {
-                            List<Category> categoryList = fileMetaInfo.getBookInfo().getCategoryList();
-                            if (!categoryList.contains(categoryEntity)) {
-                                categoryList.add(categoryEntity);
-                                this.fileMetaInfoRepository.save(fileMetaInfo);
+                            List<Category> categoryEntityList = savedFileMetaInfo.getBookInfo().getCategoryList();
+                            if (!categoryEntityList.contains(categoryEntity)) {
+                                categoryEntityList.add(categoryEntity);
+                                this.fileMetaInfoRepository.save(savedFileMetaInfo);
                             }
                         })
                 );
-
     }
 
     private static boolean isEmptyResponse(GoogleBookResponseDTO googleBookResponse) {

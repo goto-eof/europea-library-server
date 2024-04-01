@@ -106,23 +106,22 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         bookInfo.setFileMetaInfo(fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         fileMetaInfo.setBookInfo(this.bookInfoRepository.save(bookInfo));
-        FileMetaInfo savedFileMEtaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+        FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         Optional.ofNullable(metadata.getSubjects())
-                .ifPresent(tags -> tags.stream()
-                        .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
-                        .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
+                .ifPresent(ragNameList -> ragNameList.stream()
+                        .filter(tagName -> !StringUtil.clean(tagName.trim()).isEmpty())
+                        .map(tagName -> StringUtil.clean(tagName.substring(0, Math.min(tagName.length(), 100))))
                         .collect(Collectors.toSet())
                         .stream()
                         .map(tagUtil::createTagEntity)
                         .forEach(tagEntity -> {
-                            List<Tag> tagList = fileMetaInfo.getTagList();
-                            if (!tagList.contains(tagEntity)) {
-                                tagList.add(tagEntity);
-                                this.fileMetaInfoRepository.save(fileMetaInfo);
+                            List<Tag> tagEntityList = savedFileMetaInfo.getTagList();
+                            if (!tagEntityList.contains(tagEntity)) {
+                                tagEntityList.add(tagEntity);
+                                this.fileMetaInfoRepository.save(savedFileMetaInfo);
                             }
                         })
                 );
-
     }
 
     private String getFirst(List<String> list) {
