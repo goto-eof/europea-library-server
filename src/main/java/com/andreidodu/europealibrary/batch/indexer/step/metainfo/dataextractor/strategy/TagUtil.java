@@ -22,19 +22,19 @@ public class TagUtil {
     private final EntityManager entityManager;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Tag createTagEntity(String tag) {
+    public Tag createTagEntity(String tagName) {
         try {
             entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)", Tag.class)
-                    .setParameter("name", tag)
+                    .setParameter("name", tagName)
                     .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                     .getResultList().stream().findFirst()
                     .ifPresentOrElse(entityManager::persist
-                            , () -> entityManager.persist(createTagFromName(tag)));
+                            , () -> entityManager.persist(createTagFromName(tagName)));
         } catch (Exception e) {
             log.error("\n\n\n\nERROR: {}\n\n\n\n", e.getMessage());
         }
         return entityManager.createQuery("select l from Tag l where lower(l.name) like lower(:name)", Tag.class)
-                .setParameter("name", tag)
+                .setParameter("name", tagName)
                 .setLockMode(LockModeType.NONE)
                 .getResultList().stream().findFirst().get();
     }
