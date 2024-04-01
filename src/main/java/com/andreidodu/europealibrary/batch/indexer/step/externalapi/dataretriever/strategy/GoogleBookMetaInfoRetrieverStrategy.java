@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -139,6 +140,8 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
                 .ifPresent(tags -> tags.stream()
                         .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())
                         .map(tag -> StringUtil.clean(tag.substring(0, Math.min(tag.length(), 100))))
+                        .collect(Collectors.toSet())
+                        .stream()
                         .map(categoryUtil::createCategory)
                         .forEach(categoryEntity -> {
                             List<Category> categoryList = fileMetaInfo.getBookInfo().getCategoryList();
