@@ -105,7 +105,7 @@ public class JobConfiguration {
     }
 
     @Bean("dbJobStepUpdaterStep")
-    public Step dbJobStepUpdaterStep(JobRepository jobRepository, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
+    public Step dbJobStepUpdaterStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JpaCursorItemReader<FileSystemItem> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("dbJobStepUpdaterStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
@@ -127,7 +127,7 @@ public class JobConfiguration {
                 .build();
     }
 
-  @Bean("externalMetaInfoBuilderStep")
+    @Bean("externalMetaInfoBuilderStep")
     public Step externalMetaInfoBuilderStep(JobRepository jobRepository, JdbcPagingItemReader<Long> metaInfoBuilderReader, ExternalMetaInfoProcessor processor, ExternalMetaInfoWriter metaInfoWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("externalMetaInfoBuilderStep", jobRepository)
                 .<Long, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)

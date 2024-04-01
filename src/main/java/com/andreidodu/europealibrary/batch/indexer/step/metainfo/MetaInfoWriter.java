@@ -16,12 +16,10 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MetaInfoWriter implements ItemWriter<FileSystemItem> {
-    private final FileMetaInfoRepository fileMetaInfoRepository;
     private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        // fileMetaInfoRepository.saveAll(chunk.getItems());
-        chunk.getItems().forEach(this.fileSystemItemRepository::save);
+        fileSystemItemRepository.saveAll(chunk.getItems());
     }
 }

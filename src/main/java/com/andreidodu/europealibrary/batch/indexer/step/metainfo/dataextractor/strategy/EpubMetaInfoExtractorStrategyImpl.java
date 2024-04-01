@@ -73,13 +73,6 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         }
     }
 
-    private BookInfo buildBookInfo(FileMetaInfo fileMetaInfo) {
-        BookInfo oldBookInfo = fileMetaInfo.getBookInfo();
-        BookInfo bookInfo = oldBookInfo != null ? oldBookInfo : new BookInfo();
-        bookInfo.setFileMetaInfo(fileMetaInfo);
-        return bookInfo;
-    }
-
     private FileMetaInfo manageCaseBookTitleNotEmpty(Book book, String fullPath, FileMetaInfo existingFileMetaInfo) {
         log.info("gathering information from ebook {}", fullPath);
         FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
@@ -115,7 +108,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         bookInfo.setFileMetaInfo(fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         fileMetaInfo.setBookInfo(this.bookInfoRepository.save(bookInfo));
-        FileMetaInfo savedFileMEtaInfo = this.fileMetaInfoRepository.saveAndFlush(fileMetaInfo);
+        FileMetaInfo savedFileMEtaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         Optional.ofNullable(metadata.getSubjects())
                 .ifPresent(tags -> tags.stream()
                         .filter(tag -> !StringUtil.clean(tag.trim()).isEmpty())

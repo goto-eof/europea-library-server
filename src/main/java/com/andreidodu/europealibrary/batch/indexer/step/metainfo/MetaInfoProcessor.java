@@ -45,19 +45,6 @@ public class MetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
                     return fileSystemItem;
                 })
                 .orElse(null);
-        //   FileSystemItem savedFileSystemItem = this.fileSystemItemRepository.save(fileSystemItem);
-//        buildMetaInfoFromWebIfNecessary(savedFileSystemItem);
-//        FileSystemItem saved2FileSystemItem = this.fileSystemItemRepository.save(fileSystemItem);
-//        return Optional.ofNullable(fileSystemItem.getFileMetaInfo()).map(fileMetaInfo ->
-//        {
-//            if (fileMetaInfo.getFileSystemItemList() == null) {
-//                fileMetaInfo.setFileSystemItemList(new ArrayList<>());
-//            }
-//            if (!fileMetaInfo.getFileSystemItemList().contains(saved2FileSystemItem)) {
-//                fileMetaInfo.getFileSystemItemList().add(saved2FileSystemItem);
-//            }
-//            return fileMetaInfo;
-//        }).orElse(null);
     }
 
     private FileMetaInfo buildMetaInfoFromEbookIfNecessary(Long fileSystemItemId) {
@@ -75,16 +62,4 @@ public class MetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
 
     }
 
-    private boolean doNotCallApiIsTrue() {
-        Object doNotCallApiIdTrue = stepExecution.getExecutionContext().get(DO_NOT_CALL_WEB_API);
-        return doNotCallApiIdTrue != null && (boolean) doNotCallApiIdTrue;
-    }
-
-    private static void putThreadOnSleep() {
-        try {
-            Thread.sleep(SLEEP_TIME_BETWEEN_API_REQUESTS);
-        } catch (InterruptedException e) {
-            log.error("failed to put thread in sleep mode");
-        }
-    }
 }

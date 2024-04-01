@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.filehash;
 
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.FileUtil;
@@ -21,7 +22,7 @@ public class FileSystemItemHashProcessor implements ItemProcessor<FileSystemItem
     @Override
     public FileSystemItem process(FileSystemItem fileSystemItem) {
         calculateAndUpdateHashAndMetaInfoIdIfNecessary(fileSystemItem);
-        return fileSystemItem;
+        return null;
     }
 
     private void calculateAndUpdateHashAndMetaInfoIdIfNecessary(FileSystemItem fileSystemItem) {
@@ -32,30 +33,34 @@ public class FileSystemItemHashProcessor implements ItemProcessor<FileSystemItem
             return;
         }
         final String fileFullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        this.fileUtil.fileNameToHash(fileFullPath)
-                .ifPresent(fileSystemItem::setSha256);
-        fileSystemItem = this.fileSystemItemRepository.save(fileSystemItem);
-        associateMetaInfoEntityIfFound(fileSystemItem);
+        String sha256 = this.fileUtil.fileNameToHash(fileFullPath)
+                .orElse(null);
+        associateMetaInfoEntityIfFound(fileSystemItem, sha256);
     }
 
-    private void associateMetaInfoEntityIfFound(FileSystemItem fileSystemItem) {
+    private void associateMetaInfoEntityIfFound(FileSystemItem fileSystemItem, String sha256) {
         if (fileSystemItem.getIsDirectory()) {
             return;
         }
-        if (StringUtil.isEmpty(fileSystemItem.getSha256())) {
+        if (StringUtil.isEmpty(sha256)) {
             return;
         }
-        associateMetaInfoByHashIfFound(fileSystemItem);
+        associateMetaInfoByHashIfFound(fileSystemItem.getId(), sha256);
     }
 
-    private void associateMetaInfoByHashIfFound(FileSystemItem fileSystemItem) {
+    private void associateMetaInfoByHashIfFound(Long fileSystemItemId, String sha256) {
+        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
         Optional.ofNullable(fileSystemItem.getSha256())
                 .flatMap(hash -> this.fileSystemItemRepository.findBySha256(hash)
                         .stream()
                         .filter(fsi -> fsi.getFileMetaInfo() != null)
-                        .findFirst()
-                        .map(fsi -> fileSystemItem.getFileMetaInfo().getId()))
-                .ifPresent(fileMetaInfoId -> this.fileSystemItemRepository.updateFileMetaInfoId(fileSystemItem.getId(), fileMetaInfoId));
+                        .findFirst().flatMap(fsi -> Optional.ofNullable(fileSystemItem.getFileMetaInfo())
+                                .map(FileMetaInfo::getId)))
+                .ifPresentOrElse(fileMetaInfoId ->
+                        this.fileSystemItemRepository.updateFileMetaInfoId(fileSystemItem.getId(), fileMetaInfoId), () -> {
+                    fileSystemItem.setSha256(sha256);
+                    this.fileSystemItemRepository.save(fileSystemItem);
+                });
     }
 
 

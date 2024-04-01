@@ -16,6 +16,5 @@ public class FileSystemItemHashWriter implements ItemWriter<FileSystemItem> {
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        //fileSystemItemRepository.saveAll(chunk.getItems());
     }
 }
