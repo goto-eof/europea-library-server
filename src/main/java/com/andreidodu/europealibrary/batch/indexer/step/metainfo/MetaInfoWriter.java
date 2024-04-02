@@ -21,5 +21,6 @@ public class MetaInfoWriter implements ItemWriter<FileSystemItem> {
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
         fileSystemItemRepository.saveAll(chunk.getItems());
+        log.info("saved {} records", chunk.getItems().size());
     }
 }

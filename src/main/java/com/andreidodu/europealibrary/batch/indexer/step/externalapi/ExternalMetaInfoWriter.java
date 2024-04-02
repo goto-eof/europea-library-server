@@ -18,7 +18,7 @@ public class ExternalMetaInfoWriter implements ItemWriter<FileSystemItem> {
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        // fileMetaInfoRepository.saveAll(chunk.getItems());
         chunk.getItems().forEach(this.fileSystemItemRepository::save);
+        log.info("saved {} records", chunk.getItems().size());
     }
 }
