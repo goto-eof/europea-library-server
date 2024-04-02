@@ -260,7 +260,7 @@ public class JobConfiguration {
 
     @Bean("threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
-        int processors = Runtime.getRuntime().availableProcessors();
+        int processors = Runtime.getRuntime().availableProcessors() - 1;
         log.info("\n\n\n====================\nYou have {} processors\n=====================\n\n\n", processors);
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setMaxPoolSize(processors);

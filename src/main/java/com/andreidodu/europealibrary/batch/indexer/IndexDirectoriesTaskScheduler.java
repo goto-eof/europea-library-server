@@ -26,9 +26,11 @@ public class IndexDirectoriesTaskScheduler {
     @Scheduled(cron = "${com.andreidodu.europea-library.task.indexer.cron.expression}")
     public void runIndexAndCatalogueTaskScheduler() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException {
         try {
-            jobLauncher.run(job, generateJobParameters());
+            jobLauncher.run(job, new JobParameters());
         } catch (JobExecutionAlreadyRunningException e) {
-            log.warn("Job is already running");
+            log.warn("Job is already running: {}", e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("Error starting job: {}", e.getMessage());
         }
     }
 
