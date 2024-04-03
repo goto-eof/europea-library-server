@@ -43,4 +43,14 @@ public class StringUtil {
         }
         return str.toLowerCase();
     }
+
+    public static String substring(String str, int i) {
+        if (str == null) {
+            return null;
+        }
+        if (str.length() > i) {
+            return str.substring(i);
+        }
+        return str;
+    }
 }

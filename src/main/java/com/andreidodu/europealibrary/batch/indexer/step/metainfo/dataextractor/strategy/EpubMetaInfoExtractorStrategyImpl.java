@@ -78,7 +78,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         Metadata metadata = book.getMetadata();
 
         fileMetaInfo.setTitle(StringUtil.clean(metadata.getFirstTitle()));
-        fileMetaInfo.setDescription(StringUtil.clean(getFirst(metadata.getDescriptions())));
+        fileMetaInfo.setDescription(StringUtil.substring(StringUtil.clean(getFirst(metadata.getDescriptions())), 4000));
         fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         buildBookInfo(book, fileMetaInfo, metadata);
         return fileMetaInfo;
