@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
+import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
@@ -78,7 +79,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         Metadata metadata = book.getMetadata();
 
         fileMetaInfo.setTitle(StringUtil.clean(metadata.getFirstTitle()));
-        fileMetaInfo.setDescription(StringUtil.substring(StringUtil.clean(getFirst(metadata.getDescriptions())), 4000));
+        fileMetaInfo.setDescription(StringUtil.substring(StringUtil.clean(getFirst(metadata.getDescriptions())), DataPropertiesConst.FILE_META_INFO_DESCRIPTION_MAX_LENGTH));
         fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         buildBookInfo(book, fileMetaInfo, metadata);
         return fileMetaInfo;

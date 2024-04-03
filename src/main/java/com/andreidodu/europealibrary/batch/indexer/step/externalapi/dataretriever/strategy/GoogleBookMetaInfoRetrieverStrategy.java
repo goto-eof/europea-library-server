@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretrieve
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.WebRetrievementStatusEnum;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
+import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.ApiResponseDTO;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
@@ -118,7 +119,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         FileMetaInfo fileMetaInfo = fileMetaInfoOld == null ? new FileMetaInfo() : fileMetaInfoOld;
         Optional.ofNullable(volumeInfo.getTitle()).ifPresent(fileMetaInfo::setTitle);
         Optional.ofNullable(volumeInfo.getDescription()).ifPresent(description -> {
-            String descriptionNew = description.substring(0, Math.min(description.length(), 4000));
+            String descriptionNew = description.substring(0, Math.min(description.length(), DataPropertiesConst.FILE_META_INFO_DESCRIPTION_MAX_LENGTH));
             fileMetaInfo.setDescription(descriptionNew);
         });
 
