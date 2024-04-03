@@ -51,9 +51,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="file_meta_info_id" type="bigint">
-<!--                <constraints nullable="true"-->
-<!--                             foreignKeyName="fk_file_meta_info"-->
-<!--                             references="${tablePrefix}file_meta_info(id)"/>-->
+                <constraints nullable="true"
+                             foreignKeyName="fk_file_meta_info"
+                             references="${tablePrefix}file_meta_info(id)"/>
             </column>
             <column name="job_status" type="int"/>
             <column name="record_status" type="int"/>
@@ -62,12 +62,12 @@
             <column name="version" type="INT"/>
         </createTable>
 
-        <addForeignKeyConstraint baseColumnNames="parent_id"
-                                 baseTableName="${tablePrefix}file_system_item"
-                                 constraintName="fk_fs_item_parent"
-                                 referencedColumnNames="id"
-                                 referencedTableName="${tablePrefix}file_system_item"
-                                 validate="true"/>
+<!--        <addForeignKeyConstraint baseColumnNames="parent_id"-->
+<!--                                 baseTableName="${tablePrefix}file_system_item"-->
+<!--                                 constraintName="fk_fs_item_parent"-->
+<!--                                 referencedColumnNames="id"-->
+<!--                                 referencedTableName="${tablePrefix}file_system_item"-->
+<!--                                 validate="true"/>-->
 
 
         <addUniqueConstraint
