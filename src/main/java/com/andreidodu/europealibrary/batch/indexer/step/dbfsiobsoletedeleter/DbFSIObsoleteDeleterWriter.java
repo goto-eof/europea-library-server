@@ -8,6 +8,8 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class DbFSIObsoleteDeleterWriter implements ItemWriter<FileSystemItem> {
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        this.fileSystemItemRepository.deleteAll(chunk.getItems());
+        this.fileSystemItemRepository.deleteAllInBatch(chunk.getItems().stream().map(fsi -> (FileSystemItem) fsi).collect(Collectors.toList()));
         log.info("deleted {} records", chunk.getItems().size());
     }
 }

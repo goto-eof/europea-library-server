@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.batch.indexer;
 
-import com.andreidodu.europealibrary.batch.indexer.enums.RecordStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter.DbFMIObsoleteDeleterProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter.DbFMIObsoleteDeleterWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterProcessor;
@@ -27,7 +26,6 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
-import org.springframework.batch.item.database.JpaCursorItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +49,7 @@ public class JobConfiguration {
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size}")
     private Integer stepIndexerBatchSize;
     @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
-    private Integer stepStepUpdaterBatchSize;
+    private Integer batchSize;
     @Value("${com.andreidodu.europea-library.job.indexer.step-fmi-obsolete-deleter.batch-size}")
     private Integer stepFmiObsoleteDeleterBatchSize;
     @Value("${com.andreidodu.europea-library.job.indexer.step-fsi-obsolete-deleter.batch-size}")
@@ -85,10 +83,11 @@ public class JobConfiguration {
     }
 
     @Bean("dbFSIObsoleteDeleterStep")
-    public Step dbFSIObsoleteDeleterStep(JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    public Step dbFSIObsoleteDeleterStep(TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("dbFSIObsoleteDeleterStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepFsiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
+                .taskExecutor(threadPoolTaskExecutor)
                 .reader(dbFSIObsoleteDeleterReader)
                 .processor(processor)
                 .writer(fileItemWriter)
@@ -109,7 +108,7 @@ public class JobConfiguration {
     @Bean("dbJobStepUpdaterStep")
     public Step dbJobStepUpdaterStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<Long> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("dbJobStepUpdaterStep", jobRepository)
-                .<Long, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .<Long, FileSystemItem>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(dbStepUpdaterReader)
@@ -121,7 +120,7 @@ public class JobConfiguration {
     @Bean("metaInfoBuilderStep")
     public Step metaInfoBuilderStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<Long> metaInfoBuilderReader, MetaInfoProcessor processor, MetaInfoWriter metaInfoWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("metaInfoBuilderStep", jobRepository)
-                .<Long, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .<Long, FileSystemItem>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(metaInfoBuilderReader)
@@ -133,7 +132,7 @@ public class JobConfiguration {
     @Bean("externalMetaInfoBuilderStep")
     public Step externalMetaInfoBuilderStep(JobRepository jobRepository, JdbcPagingItemReader<Long> metaInfoBuilderReader, ExternalMetaInfoProcessor processor, ExternalMetaInfoWriter metaInfoWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("externalMetaInfoBuilderStep", jobRepository)
-                .<Long, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .<Long, FileSystemItem>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .reader(metaInfoBuilderReader)
                 .processor(processor)
@@ -144,7 +143,7 @@ public class JobConfiguration {
     @Bean("fileSystemItemHashStep")
     public Step fileSystemItemHashStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> hashStorerReader, FileSystemItemHashProcessor processor, FileSystemItemHashWriter writer, HibernateTransactionManager transactionManager) {
         return new StepBuilder("fileSystemItemHashStep", jobRepository)
-                .<FileSystemItem, FileSystemItem>chunk(stepStepUpdaterBatchSize, transactionManager)
+                .<FileSystemItem, FileSystemItem>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(hashStorerReader)
@@ -154,22 +153,32 @@ public class JobConfiguration {
     }
 
     @Bean("dbFSIObsoleteDeleterReader")
-    public JpaCursorItemReader<FileSystemItem> dbFSIObsoleteDeleterReader() {
-        JpaCursorItemReader<FileSystemItem> jpaCursorItemReader = new JpaCursorItemReader<FileSystemItem>();
-        jpaCursorItemReader.setEntityManagerFactory(emFactory);
-        jpaCursorItemReader.setQueryString("SELECT p FROM FileSystemItem p where recordStatus = :recordStatus");
-        Map<String, Object> parameterValues = new HashMap<>();
-        parameterValues.put("recordStatus", RecordStatusEnum.ENABLED.getStatus());
-        jpaCursorItemReader.setParameterValues(parameterValues);
-        jpaCursorItemReader.setSaveState(true);
-        return jpaCursorItemReader;
+    public JdbcPagingItemReader<FileSystemItem> dbFSIObsoleteDeleterReader() {
+        JdbcPagingItemReader<FileSystemItem> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
+        jdbcPagingItemReader.setDataSource(dataSource);
+        jdbcPagingItemReader.setFetchSize(batchSize);
+        jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
+        jdbcPagingItemReader.setQueryProvider(dbFSIObsoleteDeleterReaderQueryProvider());
+        jdbcPagingItemReader.setSaveState(false);
+        return jdbcPagingItemReader;
+    }
+
+    public PostgresPagingQueryProvider dbFSIObsoleteDeleterReaderQueryProvider() {
+        PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
+        queryProvider.setSelectClause("SELECT *");
+        queryProvider.setFromClause("FROM el_file_system_item fsi");
+        queryProvider.setWhereClause("WHERE fsi.record_status = 2");
+        Map<String, Order> orderByKeys = new HashMap<>();
+        orderByKeys.put("id", Order.ASCENDING);
+        queryProvider.setSortKeys(orderByKeys);
+        return queryProvider;
     }
 
     @Bean("dbFMIObsoleteDeleterReader")
     public JdbcPagingItemReader<Long> dbFMIObsoleteDeleterReader() {
         JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
-        jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
+        jdbcPagingItemReader.setFetchSize(batchSize);
         jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(dbFMIObsoleteDeleterReaderPostgresQueryProvider());
         jdbcPagingItemReader.setSaveState(false);
@@ -191,7 +200,7 @@ public class JobConfiguration {
     public JdbcPagingItemReader<Long> dbStepUpdaterReader() {
         JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
-        jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
+        jdbcPagingItemReader.setFetchSize(batchSize);
         jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(getDbStepUpdaterPostgresQueryProvider());
         jdbcPagingItemReader.setSaveState(false);
@@ -214,7 +223,7 @@ public class JobConfiguration {
     public JdbcPagingItemReader<FileSystemItem> hashStorerReader() {
         JdbcPagingItemReader<FileSystemItem> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
-        jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
+        jdbcPagingItemReader.setFetchSize(batchSize);
         jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
         jdbcPagingItemReader.setQueryProvider(getPostgresHashQueryProvider());
         jdbcPagingItemReader.setSaveState(false);
@@ -227,7 +236,7 @@ public class JobConfiguration {
     public JdbcPagingItemReader<Long> metaInfoBuilderReader() {
         JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
-        jdbcPagingItemReader.setFetchSize(stepStepUpdaterBatchSize);
+        jdbcPagingItemReader.setFetchSize(batchSize);
         jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(getPostgresQueryProvider());
         jdbcPagingItemReader.setSaveState(false);
@@ -261,7 +270,7 @@ public class JobConfiguration {
     @Bean("threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         int processors = Runtime.getRuntime().availableProcessors() - 1;
-        log.info("\n\n\n====================\nYou have {} processors\n=====================\n\n\n", processors);
+        log.info("\n\n\n====================\nYou have {} processors available for processing\n=====================\n\n\n", processors);
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setMaxPoolSize(processors);
         taskExecutor.setCorePoolSize(processors);

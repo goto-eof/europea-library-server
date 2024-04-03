@@ -62,7 +62,7 @@ how it works.
 
 ## Technologies
 
-Java (JDK 21) • Spring Boot • Spring Batch • Spring JPA • Feign • Queryds • Hibernate • Liquibase • PostgreSQL
+Java • Spring Boot • Spring Batch • Spring JPA • Feign • Queryds • Hibernate • Liquibase • PostgreSQL
 • Docker • epublib • pdfbox
 
 ## External services

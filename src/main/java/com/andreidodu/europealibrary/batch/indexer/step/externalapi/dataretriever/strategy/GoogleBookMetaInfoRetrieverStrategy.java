@@ -113,7 +113,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     }
 
     private void updateModel(FileSystemItem fileSystemItem, GoogleBookResponseDTO googleBookResponse) {
-        GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo = googleBookResponse.getItems().getFirst().getVolumeInfo();
+        GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo = googleBookResponse.getItems().stream().findFirst().get().getVolumeInfo();
         FileMetaInfo fileMetaInfoOld = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoOld == null ? new FileMetaInfo() : fileMetaInfoOld;
         Optional.ofNullable(volumeInfo.getTitle()).ifPresent(fileMetaInfo::setTitle);

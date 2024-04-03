@@ -126,7 +126,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
 
     private String getFirst(List<String> list) {
         if (list != null && !list.isEmpty()) {
-            list.getFirst();
+            return list.stream().findFirst().get();
         }
         return null;
     }
