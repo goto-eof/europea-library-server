@@ -24,7 +24,7 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class FileHashStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-file-hash-updater.batch-size}")
     private Integer batchSize;
     private final JobRepository jobRepository;
     private final TaskExecutor threadPoolTaskExecutor;

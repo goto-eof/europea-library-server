@@ -65,6 +65,10 @@ com:
             # disables the strategy
             disable-pdf-metadata-extractor: false
             batch-size: 1000
+          step-file-hash-updater:
+            batch-size: 1000
+          step-meta-info-writer:
+            batch-size: 1000
           step-step-updater:
             batch-size: 1000
           step-fmi-obsolete-deleter:

@@ -23,7 +23,7 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class MetaInfoStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.batch-size}")
     private Integer batchSize;
 
     private final DataSource dataSource;
