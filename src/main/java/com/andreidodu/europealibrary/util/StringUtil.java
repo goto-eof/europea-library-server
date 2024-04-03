@@ -44,12 +44,12 @@ public class StringUtil {
         return str.toLowerCase();
     }
 
-    public static String substring(String str, int i) {
+    public static String substring(String str, int max_length) {
         if (str == null) {
             return null;
         }
-        if (str.length() > i) {
-            return str.substring(i);
+        if (str.length() > max_length) {
+            return str.substring(0, max_length);
         }
         return str;
     }
