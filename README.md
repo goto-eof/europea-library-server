@@ -82,8 +82,7 @@ Google Books API
   takes about 1 hour on a notebook (based on Ubuntu) with Intel i5 (4 core, 2.40GHz) equipped with an SSD. Because I
   need to index about 100.000 ebooks, I decided to rewrite the job by implementing a multi-thread job processor. On the
   same notebook I ran
-  the multi-thread job and the result is the following: about 30 minutes to index 8.850 files. All 4 cores are involved
-  to process data.
-  ![multi-threading](images/multi-threading.png)
+  the multi-thread job and the result is the following: about 30 minutes to index 8.850 files.
+  ![multi-threading](images/threads.png)
 - developed and tested on Linux.
 - if you have any suggestions or found a bug please contact me [here](https://andre-i.eu/#contactme)
