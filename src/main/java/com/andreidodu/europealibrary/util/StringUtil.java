@@ -36,4 +36,11 @@ public class StringUtil {
     public static List<String> cleanOrtrimToNull(List<String> list) {
         return list.stream().filter(item -> cleanOrtrimToNull(item) != null).map(StringUtil::clean).collect(Collectors.toList());
     }
+
+    public static String toLowerCase(String str) {
+        if (str == null) {
+            return null;
+        }
+        return str.toLowerCase();
+    }
 }

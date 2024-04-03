@@ -8,6 +8,7 @@ import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.FileUtil;
+import com.andreidodu.europealibrary.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -78,7 +79,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
                                 .ifPresent(fileSystemItem::setParent)
                 );
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
-        fileSystemItem.setExtension(this.fileUtil.getExtension(fileSystemItemDTO.getName()));
+        fileSystemItem.setExtension(StringUtil.toLowerCase(this.fileUtil.getExtension(fileSystemItemDTO.getName())));
         return fileSystemItem;
     }
 
