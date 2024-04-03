@@ -64,13 +64,13 @@ com:
             disable-epub-metadata-extractor: false
             # disables the strategy
             disable-pdf-metadata-extractor: false
-            batch-size: 1
+            batch-size: 1000
           step-step-updater:
-            batch-size: 100
+            batch-size: 1000
           step-fmi-obsolete-deleter:
-            batch-size: 100
+            batch-size: 1000
           step-fsi-obsolete-deleter:
-            batch-size: 100
+            batch-size: 1000
 
 batch-db:
   url: jdbc:postgresql://localhost:5439/db
@@ -85,3 +85,5 @@ google:
 logging:
   file:
     name: europea-library.log
+logging.level.org.hibernate.SQL: DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder: TRACE
