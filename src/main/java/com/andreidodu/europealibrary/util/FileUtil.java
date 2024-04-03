@@ -28,14 +28,13 @@ public class FileUtil {
         return this.fileToSha256(new File(filename));
     }
 
-    public String calculateParentName(String basePath) {
-        return new File(basePath).getName();
-    }
-
     public String calculateFileName(String basePath) {
-        return new File(basePath).getName();
+        return FilenameUtils.getName(basePath);
     }
 
+    public String calculateFileBaseName(String basePath) {
+        return FilenameUtils.getBaseName(basePath);
+    }
 
     public String calculateParentBasePath(String basePath) {
         return new File(basePath).getParentFile().getAbsolutePath();

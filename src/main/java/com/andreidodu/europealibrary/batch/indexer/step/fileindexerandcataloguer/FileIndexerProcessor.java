@@ -73,9 +73,9 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private FileSystemItem buildFileSystemItemFromScratch(FileDTO fileSystemItemDTO) {
         FileSystemItem fileSystemItem = this.fileSystemItemMapper.toModel(fileSystemItemDTO);
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
-        this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
+        this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateFileName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
                 .ifPresentOrElse(fileSystemItem::setParent,
-                        () -> this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateParentName(fileSystemItemDTO.getBasePath()), JobStepEnum.READY.getStepNumber())
+                        () -> this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateFileName(fileSystemItemDTO.getBasePath()), JobStepEnum.READY.getStepNumber())
                                 .ifPresent(fileSystemItem::setParent)
                 );
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());

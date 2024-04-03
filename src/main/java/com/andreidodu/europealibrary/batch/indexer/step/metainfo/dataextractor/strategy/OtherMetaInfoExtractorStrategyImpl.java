@@ -35,7 +35,7 @@ public class OtherMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStra
     public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
         FileMetaInfo oldFileMetaInfo = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = oldFileMetaInfo == null ? new FileMetaInfo() : oldFileMetaInfo;
-        fileMetaInfo.setTitle(fileUtil.calculateFileName(filename));
+        fileMetaInfo.setTitle(fileUtil.calculateFileBaseName(filename));
         return Optional.of(this.fileMetaInfoRepository.save(fileMetaInfo));
     }
 }
