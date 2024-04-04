@@ -30,13 +30,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "pdf-meta-info-extractor-strategy";
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-pdf-metadata-extractor}")
+    private boolean disablePDFMetadataExtractor;
 
     private final PdfUtil pdfUtil;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final BookInfoRepository bookInfoRepository;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
-    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-pdf-metadata-extractor}")
-    private boolean disablePDFMetadataExtractor;
+    private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
 
 
     @Override
@@ -60,7 +61,7 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
             return buildMetainfoFromFileMetainfo(filename, fileSystemItem);
         } catch (IOException e) {
             log.error("failed to load pdf metadata: {}", filename);
-            return Optional.of(buildMetainfoFromFileName(filename, fileSystemItem, FileExtractionStatusEnum.FAILED));
+            return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem);
         }
     }
 
@@ -68,13 +69,13 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
         File file = new File(filename);
         PDDocument pdf = Loader.loadPDF(file);
         PDDocumentInformation documentInformation = pdf.getDocumentInformation();
-        if (StringUtil.isEmpty(StringUtil.cleanOrtrimToNull(documentInformation.getTitle()))) {
+        if (StringUtil.isEmpty(StringUtil.cleanOrTrimToNull(documentInformation.getTitle()))) {
             log.warn("pdf metadata is empty: {}", filename);
             return Optional.of(buildMetainfoFromFileName(filename, fileSystemItem, FileExtractionStatusEnum.SUCCESS_EMPTY));
         }
         FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
-        fileMetaInfo.setTitle(StringUtil.cleanOrtrimToNull(documentInformation.getTitle()));
+        fileMetaInfo.setTitle(StringUtil.cleanOrTrimToNull(documentInformation.getTitle()));
         fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
         bookInfo.setFileMetaInfo(fileMetaInfo);
@@ -103,9 +104,9 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
 
     private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld) throws IOException {
         BookInfo bookInfo = bookInfoOld == null ? new BookInfo() : bookInfoOld;
-        bookInfo.setLanguage(StringUtil.cleanOrtrimToNull(pdDocument.getDocumentCatalog().getLanguage()));
+        bookInfo.setLanguage(StringUtil.cleanOrTrimToNull(pdDocument.getDocumentCatalog().getLanguage()));
         bookInfo.setNumberOfPages(pdDocument.getNumberOfPages());
-        bookInfo.setAuthors(StringUtil.cleanOrtrimToNull(pdDocument.getDocumentInformation().getAuthor()));
+        bookInfo.setAuthors(StringUtil.cleanOrTrimToNull(pdDocument.getDocumentInformation().getAuthor()));
         BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.pdfUtil.retrieveISBN(pdDocument);
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);

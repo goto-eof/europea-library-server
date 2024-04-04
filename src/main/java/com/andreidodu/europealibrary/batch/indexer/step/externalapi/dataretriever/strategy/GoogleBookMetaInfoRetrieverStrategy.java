@@ -3,17 +3,17 @@ package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriev
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.WebRetrievementStatusEnum;
+import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy.TagUtil;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.ApiResponseDTO;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
-import com.andreidodu.europealibrary.model.BookInfo;
-import com.andreidodu.europealibrary.model.Category;
-import com.andreidodu.europealibrary.model.FileMetaInfo;
-import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.StringUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,9 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final GoogleBooksClient googleBooksClient;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final CategoryUtil categoryUtil;
-
+    private final TagUtil tagUtil;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
@@ -63,8 +65,8 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         }
         BookInfo bookInfo = fileSystemItem.getFileMetaInfo().getBookInfo();
         List<Integer> successStatuses = List.of(WebRetrievementStatusEnum.SUCCESS.getStatus(), WebRetrievementStatusEnum.SUCCESS_EMPTY.getStatus());
-        Integer webRetrievementStatus = bookInfo.getWebRetrievementStatus();
-        return webRetrievementStatus == null || !successStatuses.contains(webRetrievementStatus);
+        Integer webRetrieveStatus = bookInfo.getWebRetrievementStatus();
+        return webRetrieveStatus == null || !successStatuses.contains(webRetrieveStatus);
     }
 
     private static boolean hasISBNOrTitleAuthorsOrPublisher(FileSystemItem fileSystemItem) {
@@ -88,7 +90,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     public ApiResponseDTO<FileMetaInfo> process(FileSystemItem fileSystemItem) {
         log.info("applying strategy: {}", getStrategyName());
         log.info("retrieving book information from google books....");
-        GoogleBookResponseDTO googleBookResponse = null;
+        GoogleBookResponseDTO googleBookResponse;
         try {
             googleBookResponse = retrieveGoogleBook(fileSystemItem);
         } catch (Exception e) {
@@ -143,15 +145,42 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
                         .map(categoryName -> StringUtil.clean(categoryName.substring(0, Math.min(categoryName.length(), 100))))
                         .collect(Collectors.toSet())
                         .stream()
-                        .map(categoryUtil::createCategoryEntity)
-                        .forEach(categoryEntity -> {
-                            List<Category> categoryEntityList = savedFileMetaInfo.getBookInfo().getCategoryList();
-                            if (!categoryEntityList.contains(categoryEntity)) {
-                                categoryEntityList.add(categoryEntity);
-                                this.fileMetaInfoRepository.save(savedFileMetaInfo);
-                            }
-                        })
+                        .peek(categoryName -> createAndAssociateTagsIdNecessary(categoryName, savedFileMetaInfo))
+                        .forEach(categoryName -> createAndAssociateCategoriesIfNecessary(categoryName, savedFileMetaInfo))
                 );
+    }
+
+    private void createAndAssociateCategoriesIfNecessary(String categoryName, FileMetaInfo savedFileMetaInfo) {
+        List<String> categories = StringUtil.splitString(categoryName);
+        if (!categories.isEmpty()) {
+            categories.forEach(categoryNameSplit -> createAndAssociateCategory(categoryNameSplit, savedFileMetaInfo));
+        }
+    }
+
+    private void createAndAssociateTagsIdNecessary(String categoryName, FileMetaInfo savedFileMetaInfo) {
+        List<String> tags = StringUtil.splitString(categoryName);
+        if (!tags.isEmpty()) {
+            tags.forEach(tagName -> createAndAssociateTag(categoryName, savedFileMetaInfo));
+        }
+    }
+
+    private void createAndAssociateCategory(String categoryName, FileMetaInfo savedFileMetaInfo) {
+        Category categoryEntity = categoryUtil.createCategoryEntity(categoryName);
+        this.entityManager.refresh(savedFileMetaInfo);
+        List<Category> categoryEntityList = savedFileMetaInfo.getBookInfo().getCategoryList();
+        if (!categoryEntityList.contains(categoryEntity)) {
+            categoryEntityList.add(categoryEntity);
+            this.fileMetaInfoRepository.save(savedFileMetaInfo);
+        }
+    }
+
+    private void createAndAssociateTag(String categoryName, FileMetaInfo fileMetaInfo) {
+        final Tag tag = tagUtil.createTagEntity(categoryName);
+        this.entityManager.refresh(fileMetaInfo);
+        if (!fileMetaInfo.getTagList().contains(tag)) {
+            fileMetaInfo.getTagList().add(tag);
+            this.fileMetaInfoRepository.save(fileMetaInfo);
+        }
     }
 
     private static boolean isEmptyResponse(GoogleBookResponseDTO googleBookResponse) {

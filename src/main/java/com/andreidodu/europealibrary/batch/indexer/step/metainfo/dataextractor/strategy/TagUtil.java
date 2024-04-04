@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.
 import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
+import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
@@ -29,7 +30,13 @@ public class TagUtil {
                     .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                     .getResultList().stream().findFirst()
                     .ifPresentOrElse(entityManager::persist
-                            , () -> entityManager.persist(createTagFromName(tagName)));
+                            , () -> {
+                                String trimed = StringUtil.cleanOrTrimToNull(tagName);
+                                if (trimed != null) {
+                                    trimed = trimed.toLowerCase();
+                                    entityManager.persist(createTagFromName(trimed));
+                                }
+                            });
         } catch (Exception e) {
             log.error("\n\n\n\nERROR: {}\n\n\n\n", e.getMessage());
         }

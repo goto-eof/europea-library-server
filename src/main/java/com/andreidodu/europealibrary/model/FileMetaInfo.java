@@ -34,7 +34,7 @@ public class FileMetaInfo extends ModelCommon {
     private BookInfo bookInfo;
 
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             uniqueConstraints = {@UniqueConstraint(columnNames = {"file_meta_info_id", "tag_id"})},
             name = "el_file_meta_info_tag",

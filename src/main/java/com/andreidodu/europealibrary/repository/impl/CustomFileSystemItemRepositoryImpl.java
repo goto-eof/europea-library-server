@@ -55,7 +55,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
     public List<FileSystemItem> retrieveChildrenByCategoryId(CursorRequestDTO cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParentId());
 
-        Long parentId = cursorRequestDTO.getParentId();
+        Long categoryId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
         int numberOfResults = cursorRequestDTO.getLimit() == null ? ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE : cursorRequestDTO.getLimit();
 
@@ -63,7 +63,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
         QCategory category = QCategory.category;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(category.id.eq(parentId));
+        booleanBuilder.and(category.id.eq(categoryId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         if (cursorId != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
@@ -86,7 +86,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
     public List<FileSystemItem> retrieveChildrenByTagId(CursorRequestDTO cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParentId());
 
-        Long parentId = cursorRequestDTO.getParentId();
+        Long tagId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
         int numberOfResults = cursorRequestDTO.getLimit() == null ? ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE : cursorRequestDTO.getLimit();
 
@@ -94,7 +94,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
         QTag tag = QTag.tag;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(tag.id.eq(parentId));
+        booleanBuilder.and(tag.id.eq(tagId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         if (cursorRequestDTO.getNextCursor() != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
@@ -107,7 +107,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
                 .from(fileSystemItem, tag)
-                .where(booleanBuilder.and(fileSystemItem.fileMetaInfo.tagList.contains(tag)).and(tag.id.eq(parentId)))
+                .where(booleanBuilder.and(fileSystemItem.fileMetaInfo.tagList.contains(tag)).and(tag.id.eq(tagId)))
                 .limit(numberOfResults + 1)
                 .orderBy(fileSystemItem.id.asc())
                 .fetch();

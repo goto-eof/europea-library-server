@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriev
 import com.andreidodu.europealibrary.model.Category;
 import com.andreidodu.europealibrary.repository.CategoryRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
+import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
@@ -29,7 +30,13 @@ public class CategoryUtil {
                     .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                     .getResultList().stream().findFirst()
                     .ifPresentOrElse(entityManager::persist
-                            , () -> entityManager.persist(createCategoryFromName(categoryName)));
+                            , () -> {
+                                String trimed = StringUtil.cleanOrTrimToNull(categoryName);
+                                if (trimed != null) {
+                                    trimed = trimed.toLowerCase();
+                                    entityManager.persist(createCategoryFromName(trimed));
+                                }
+                            });
 
         } catch (Exception e) {
             log.error("\n\n\n\nERROR: {}\n\n\n\n", e.getMessage());
