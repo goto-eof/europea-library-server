@@ -94,4 +94,12 @@ public class StringUtil {
                 .map(String::trim)
                 .collect(Collectors.toList());
     }
+
+    public static String removeHTML(String str) {
+        str = cleanOrTrimToNull(str);
+        if (str == null || str.isEmpty()) {
+            return null;
+        }
+        return str.replaceAll("<[^>]*>", "");
+    }
 }
