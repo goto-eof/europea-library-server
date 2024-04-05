@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.config.step;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterWriter;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
@@ -18,6 +19,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +60,7 @@ public class DbFsiObsoleteDeleterStepConfig {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
         queryProvider.setSelectClause("SELECT *");
         queryProvider.setFromClause("FROM el_file_system_item fsi");
-        queryProvider.setWhereClause("WHERE fsi.record_status = 2 OR (fsi.base_path NOT LIKE '" + ebookDirectory + "%')");
+        queryProvider.setWhereClause("WHERE fsi.record_status = 2 OR (fsi.base_path NOT LIKE '" + new File(ebookDirectory).getAbsolutePath() + "%')");
         Map<String, Order> orderByKeys = new HashMap<>();
         orderByKeys.put("id", Order.ASCENDING);
         queryProvider.setSortKeys(orderByKeys);
