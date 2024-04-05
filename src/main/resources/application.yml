@@ -89,5 +89,16 @@ google:
 logging:
   file:
     name: europea-library.log
-logging.level.org.hibernate.SQL: DEBUG
-logging.level.org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  level:
+    org:
+      hibernate:
+        type.descriptor.sql.BasicBinder: ERROR
+        SQL: ERROR
+      apache:
+        pdfbox: OFF
+    com:
+      andreidodu: ERROR
+    nl:
+      siegmann:
+        epublib: OFF
+
