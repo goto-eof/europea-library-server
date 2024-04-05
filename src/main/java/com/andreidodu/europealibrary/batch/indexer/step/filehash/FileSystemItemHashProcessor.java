@@ -23,6 +23,7 @@ public class FileSystemItemHashProcessor implements ItemProcessor<FileSystemItem
     public FileSystemItem process(FileSystemItem fileSystemItem) {
         calculateAndUpdateHashAndMetaInfoIdIfNecessary(fileSystemItem);
         log.info("updated hash for {} record: {}", 1, fileSystemItem.getName());
+        this.fileSystemItemRepository.flush();
         return null;
     }
 

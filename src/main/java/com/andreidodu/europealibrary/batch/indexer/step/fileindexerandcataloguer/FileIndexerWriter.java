@@ -32,6 +32,7 @@ public class FileIndexerWriter implements ItemWriter<FileSystemItem> {
         session.setJdbcBatchSize(1);
         log.info("Saving {} elements", chunk.getItems().size());
         this.fileSystemItemRepository.saveAll(chunk.getItems());
+        this.fileSystemItemRepository.flush();
     }
 
 }

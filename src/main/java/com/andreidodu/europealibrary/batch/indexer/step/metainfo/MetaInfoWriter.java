@@ -33,5 +33,6 @@ public class MetaInfoWriter implements ItemWriter<FileSystemItem> {
         session.setJdbcBatchSize(batchSize);
         fileSystemItemRepository.saveAll(chunk.getItems());
         log.info("saved {} records", chunk.getItems().size());
+        fileSystemItemRepository.flush();
     }
 }
