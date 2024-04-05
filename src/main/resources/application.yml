@@ -96,6 +96,7 @@ logging:
         SQL: ERROR
       apache:
         pdfbox: OFF
+        fontbox: OFF
     com:
       andreidodu: ERROR
     nl:
