@@ -27,9 +27,14 @@ public class DbStepUpdaterStepConfig {
     private Integer batchSize;
 
     private final DataSource dataSource;
+    private final JobRepository jobRepository;
+    private final TaskExecutor threadPoolTaskExecutor;
+    private final DbStepUpdaterProcessor processor;
+    private final DbStepUpdaterWriter dbStepUpdaterWriter;
+    private final HibernateTransactionManager transactionManager;
 
     @Bean("dbJobStepUpdaterStep")
-    public Step dbJobStepUpdaterStep(JobRepository jobRepository, TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<Long> dbStepUpdaterReader, DbStepUpdaterProcessor processor, DbStepUpdaterWriter dbStepUpdaterWriter, HibernateTransactionManager transactionManager) {
+    public Step dbJobStepUpdaterStep( JdbcPagingItemReader<Long> dbStepUpdaterReader) {
         return new StepBuilder("dbJobStepUpdaterStep", jobRepository)
                 .<Long, FileSystemItem>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
