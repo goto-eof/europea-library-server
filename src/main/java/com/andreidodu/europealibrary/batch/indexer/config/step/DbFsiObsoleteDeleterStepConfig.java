@@ -26,8 +26,8 @@ import java.util.Map;
 public class DbFsiObsoleteDeleterStepConfig {
     @Value("${com.andreidodu.europea-library.job.indexer.step-fsi-obsolete-deleter.batch-size}")
     private Integer stepFsiObsoleteDeleterBatchSize;
-    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
-    private Integer batchSize;
+    @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
+    private String ebookDirectory;
 
     private final DataSource dataSource;
 
@@ -47,7 +47,7 @@ public class DbFsiObsoleteDeleterStepConfig {
     public JdbcPagingItemReader<FileSystemItem> dbFSIObsoleteDeleterReader() {
         JdbcPagingItemReader<FileSystemItem> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
-        jdbcPagingItemReader.setFetchSize(batchSize);
+        jdbcPagingItemReader.setFetchSize(stepFsiObsoleteDeleterBatchSize);
         jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
         jdbcPagingItemReader.setQueryProvider(dbFSIObsoleteDeleterReaderQueryProvider());
         jdbcPagingItemReader.setSaveState(false);
@@ -58,7 +58,7 @@ public class DbFsiObsoleteDeleterStepConfig {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
         queryProvider.setSelectClause("SELECT *");
         queryProvider.setFromClause("FROM el_file_system_item fsi");
-        queryProvider.setWhereClause("WHERE fsi.record_status = 2");
+        queryProvider.setWhereClause("WHERE fsi.record_status = 2 OR (fsi.base_path NOT LIKE '" + ebookDirectory + "%')");
         Map<String, Order> orderByKeys = new HashMap<>();
         orderByKeys.put("id", Order.ASCENDING);
         queryProvider.setSortKeys(orderByKeys);

@@ -26,6 +26,9 @@ import java.util.Map;
 public class FileHashStepConfig {
     @Value("${com.andreidodu.europea-library.job.indexer.step-file-hash-updater.batch-size}")
     private Integer batchSize;
+    @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
+    private String ebookDirectory;
+
     private final JobRepository jobRepository;
     private final TaskExecutor threadPoolTaskExecutor;
     private final JdbcPagingItemReader<FileSystemItem> hashStorerReader;
@@ -61,7 +64,7 @@ public class FileHashStepConfig {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
         queryProvider.setSelectClause("SELECT *");
         queryProvider.setFromClause("FROM el_file_system_item");
-        queryProvider.setWhereClause("WHERE record_status = 1");
+        queryProvider.setWhereClause("WHERE record_status = 1 and base_path like '" + ebookDirectory + "%'");
         Map<String, Order> orderByKeys = new HashMap<>();
         orderByKeys.put("id", Order.ASCENDING);
         queryProvider.setSortKeys(orderByKeys);

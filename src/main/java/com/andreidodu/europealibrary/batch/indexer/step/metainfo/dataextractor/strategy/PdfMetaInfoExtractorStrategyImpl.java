@@ -69,13 +69,13 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
         File file = new File(filename);
         PDDocument pdf = Loader.loadPDF(file);
         PDDocumentInformation documentInformation = pdf.getDocumentInformation();
-        if (StringUtil.isEmpty(StringUtil.cleanOrTrimToNull(documentInformation.getTitle()))) {
+        if (StringUtil.isEmpty(StringUtil.cleanAndTrimToNull(documentInformation.getTitle()))) {
             log.warn("pdf metadata is empty: {}", filename);
             return Optional.of(buildMetainfoFromFileName(filename, fileSystemItem, FileExtractionStatusEnum.SUCCESS_EMPTY));
         }
         FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
-        fileMetaInfo.setTitle(StringUtil.cleanOrTrimToNull(documentInformation.getTitle()));
+        fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNull(documentInformation.getTitle()));
         fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
         bookInfo.setFileMetaInfo(fileMetaInfo);
@@ -104,9 +104,9 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
 
     private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld) throws IOException {
         BookInfo bookInfo = bookInfoOld == null ? new BookInfo() : bookInfoOld;
-        bookInfo.setLanguage(StringUtil.cleanOrTrimToNull(pdDocument.getDocumentCatalog().getLanguage()));
+        bookInfo.setLanguage(StringUtil.cleanAndTrimToNull(pdDocument.getDocumentCatalog().getLanguage()));
         bookInfo.setNumberOfPages(pdDocument.getNumberOfPages());
-        bookInfo.setAuthors(StringUtil.cleanOrTrimToNull(pdDocument.getDocumentInformation().getAuthor()));
+        bookInfo.setAuthors(StringUtil.cleanAndTrimToNull(pdDocument.getDocumentInformation().getAuthor()));
         BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.pdfUtil.retrieveISBN(pdDocument);
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);

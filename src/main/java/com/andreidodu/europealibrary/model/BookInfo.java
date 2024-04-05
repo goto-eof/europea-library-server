@@ -64,7 +64,7 @@ public class BookInfo extends ModelCommon {
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
     private FileMetaInfo fileMetaInfo;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             uniqueConstraints = {@UniqueConstraint(columnNames = {"book_info_id", "category_id"})},
             name = "el_book_info_category",
@@ -73,4 +73,10 @@ public class BookInfo extends ModelCommon {
     )
     private List<Category> categoryList;
 
+    @Override
+    public String toString() {
+        return "BookInfo{" +
+                "id=" + id +
+                '}';
+    }
 }

@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.strategy;
 
+import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.WebRetrievementStatusEnum;
@@ -10,6 +11,7 @@ import com.andreidodu.europealibrary.dto.ApiResponseDTO;
 import com.andreidodu.europealibrary.dto.GoogleBookResponseDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.*;
+import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.persistence.EntityManager;
@@ -17,11 +19,11 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nl.siegmann.epublib.domain.Metadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,11 +45,14 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final CategoryUtil categoryUtil;
     private final TagUtil tagUtil;
+    private final StepUtil stepUtil;
     @PersistenceContext
     private EntityManager entityManager;
 
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
+
+    private final BookInfoRepository bookInfoRepository;
 
     @Override
     public String getStrategyName() {
@@ -127,8 +132,9 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
 
         BookInfo oldBookInfo = fileMetaInfo.getBookInfo();
         BookInfo bookInfo = oldBookInfo == null ? new BookInfo() : oldBookInfo;
+        BookInfo finalBookInfo = bookInfo;
         Optional.ofNullable(volumeInfo.getAuthors())
-                .ifPresent(authors -> bookInfo.setAuthors(String.join(",", authors)));
+                .ifPresent(authors -> finalBookInfo.setAuthors(String.join(",", authors)));
         Optional.ofNullable(volumeInfo.getLanguage()).ifPresent(bookInfo::setLanguage);
         Optional.ofNullable(volumeInfo.getPublisher()).ifPresent(bookInfo::setPublisher);
         bookInfo.setAverageRating(volumeInfo.getAverageRating());
@@ -138,49 +144,45 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         Optional.ofNullable(volumeInfo.getImageLinks())
                 .flatMap(imageLinks -> Optional.ofNullable(imageLinks.getThumbnail()))
                 .ifPresent(bookInfo::setImageUrl);
+
         FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
-        Optional.ofNullable(volumeInfo.getCategories())
-                .ifPresent(categoryList -> categoryList.stream()
-                        .filter(categoryName -> !StringUtil.clean(categoryName.trim()).isEmpty())
-                        .map(categoryName -> StringUtil.clean(categoryName.substring(0, Math.min(categoryName.length(), 100))))
-                        .collect(Collectors.toSet())
-                        .stream()
-                        .peek(categoryName -> createAndAssociateTagsIdNecessary(categoryName, savedFileMetaInfo))
-                        .forEach(categoryName -> createAndAssociateCategoriesIfNecessary(categoryName, savedFileMetaInfo))
-                );
+
+
+        Set<String> categoryNames = Optional.ofNullable(volumeInfo.getCategories())
+                .map(this.stepUtil::explodeInUniqueItems)
+                .orElse(new HashSet<>());
+
+        savedFileMetaInfo = this.createAndAssociateTags(categoryNames, savedFileMetaInfo);
+        bookInfo = savedFileMetaInfo.getBookInfo();
+        bookInfo = this.createAndAssociateCategoriesIfNecessary(categoryNames, bookInfo);
+        savedFileMetaInfo = this.fileMetaInfoRepository.save(savedFileMetaInfo);
+//        this.bookInfoRepository.saveAndFlush(bookInfo);
+//        this.fileMetaInfoRepository.saveAndFlush(savedFileMetaInfo);
+
     }
 
-    private void createAndAssociateCategoriesIfNecessary(String categoryName, FileMetaInfo savedFileMetaInfo) {
-        List<String> categories = StringUtil.splitString(categoryName);
-        if (!categories.isEmpty()) {
-            categories.forEach(categoryNameSplit -> createAndAssociateCategory(categoryNameSplit, savedFileMetaInfo));
+
+    private FileMetaInfo createAndAssociateTags(Set<String> tagsSet, FileMetaInfo savedFileMetaInfo) {
+        try {
+            List<String> tags = new ArrayList<>(tagsSet);
+            Set<Tag> explodedTags = this.stepUtil.createOrLoadItems(tags);
+            savedFileMetaInfo = this.stepUtil.associateTags(savedFileMetaInfo, explodedTags);
+        } catch (Exception e) {
+            log.error("something went wrong with tag creation/association: {}", e.getMessage());
         }
+        return savedFileMetaInfo;
     }
 
-    private void createAndAssociateTagsIdNecessary(String categoryName, FileMetaInfo savedFileMetaInfo) {
-        List<String> tags = StringUtil.splitString(categoryName);
-        if (!tags.isEmpty()) {
-            tags.forEach(tagName -> createAndAssociateTag(categoryName, savedFileMetaInfo));
+    private BookInfo createAndAssociateCategoriesIfNecessary(Set<String> categoriesSet, BookInfo bookInfo) {
+        try {
+            List<String> categories = new ArrayList<>(categoriesSet);
+            Set<Category> explodedTags = this.stepUtil.createOrLoadCategories(categories);
+            bookInfo = this.stepUtil.associateCategories(bookInfo, explodedTags);
+            return bookInfo;
+        } catch (Exception e) {
+            log.error("something went wrong with tag creation/association: {}", e.getMessage());
         }
-    }
-
-    private void createAndAssociateCategory(String categoryName, FileMetaInfo savedFileMetaInfo) {
-        Category categoryEntity = categoryUtil.createCategoryEntity(categoryName);
-        this.entityManager.refresh(savedFileMetaInfo);
-        List<Category> categoryEntityList = savedFileMetaInfo.getBookInfo().getCategoryList();
-        if (!categoryEntityList.contains(categoryEntity)) {
-            categoryEntityList.add(categoryEntity);
-            this.fileMetaInfoRepository.save(savedFileMetaInfo);
-        }
-    }
-
-    private void createAndAssociateTag(String categoryName, FileMetaInfo fileMetaInfo) {
-        final Tag tag = tagUtil.createTagEntity(categoryName);
-        this.entityManager.refresh(fileMetaInfo);
-        if (!fileMetaInfo.getTagList().contains(tag)) {
-            fileMetaInfo.getTagList().add(tag);
-            this.fileMetaInfoRepository.save(fileMetaInfo);
-        }
+        return bookInfo;
     }
 
     private static boolean isEmptyResponse(GoogleBookResponseDTO googleBookResponse) {

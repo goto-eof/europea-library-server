@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.util.StringUtil;
@@ -18,9 +19,17 @@ import java.util.Optional;
 public class DataExtractorStrategyUtil {
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.do-not-extract-metadata-from-file-extensions}")
     List<String> doNotProcessFileExtensions;
+    @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
+    private String ebookDirectory;
 
     public boolean wasNotAlreadyProcessed(FileSystemItem fileSystemItem) {
-        if (fileSystemItem == null || fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
+        if (fileSystemItem == null) {
+            throw new ApplicationException("Invalid state: fileSystemItem is null, but it should exists here");
+        }
+        if (!fileSystemItem.getBasePath().startsWith(ebookDirectory)) {
+            return false;
+        }
+        if (fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
             return true;
         }
         Integer fileExtractionStatus = fileSystemItem.getFileMetaInfo().getBookInfo().getFileExtractionStatus();

@@ -69,11 +69,17 @@ com:
             batch-size: 1000
           step-meta-info-writer:
             batch-size: 1000
+          step-ext-meta-info-writer:
+            batch-size: 1000
           step-step-updater:
             batch-size: 1000
           step-fmi-obsolete-deleter:
             batch-size: 1000
           step-fsi-obsolete-deleter:
+            batch-size: 1000
+          step-tag-obsolete-deleter:
+            batch-size: 1000
+          step-category-obsolete-deleter:
             batch-size: 1000
 
 batch-db:

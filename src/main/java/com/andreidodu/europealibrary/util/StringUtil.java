@@ -22,18 +22,18 @@ public class StringUtil {
         return null;
     }
 
-    public static String cleanOrTrimToNull(String str) {
+    public static String cleanAndTrimToNull(String str) {
         return Optional.ofNullable(str).map(string -> {
                     if (string.trim().isEmpty()) {
                         return null;
                     }
-                    return clean(string);
+                    return clean(string).trim();
                 }
         ).orElse(null);
     }
 
-    public static List<String> cleanOrTrimToNull(List<String> list) {
-        return list.stream().filter(item -> cleanOrTrimToNull(item) != null).map(StringUtil::clean).collect(Collectors.toList());
+    public static List<String> cleanAndTrimToNull(List<String> list) {
+        return list.stream().filter(item -> cleanAndTrimToNull(item) != null).map(StringUtil::clean).collect(Collectors.toList());
     }
 
     public static String toLowerCase(String str) {
@@ -53,13 +53,19 @@ public class StringUtil {
         return str;
     }
 
+    public static List<String> splitString(List<String> list) {
+        return new ArrayList<>(list.stream().flatMap(str -> splitString(str).stream())
+                .collect(Collectors.toSet()));
+
+    }
+
     public static List<String> splitString(String tagName) {
-        final String trimmed = cleanOrTrimToNull(tagName);
+        final String trimmed = cleanAndTrimToNull(tagName);
         if (trimmed == null || trimmed.isEmpty()) {
             return new ArrayList<>();
         }
         List<String> result = new ArrayList<>();
-        result.add(tagName);
+        result.add(trimmed);
         List<String> separators = List.of("/", "\\", ",", ";", " - ");
         for (String separator : separators) {
             result = splitArraysStrings(result, separator);
@@ -75,7 +81,7 @@ public class StringUtil {
         }
         List<String> result = new ArrayList<>();
         for (String str : array) {
-            str = cleanOrTrimToNull(str);
+            str = cleanAndTrimToNull(str);
             if (str == null || str.isEmpty()) {
                 continue;
             }
@@ -96,7 +102,7 @@ public class StringUtil {
     }
 
     public static String removeHTML(String str) {
-        str = cleanOrTrimToNull(str);
+        str = cleanAndTrimToNull(str);
         if (str == null || str.isEmpty()) {
             return null;
         }

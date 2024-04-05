@@ -31,7 +31,7 @@ public class CategoryUtil {
                     .getResultList().stream().findFirst()
                     .ifPresentOrElse(entityManager::persist
                             , () -> {
-                                String trimed = StringUtil.cleanOrTrimToNull(categoryName);
+                                String trimed = StringUtil.cleanAndTrimToNull(categoryName);
                                 if (trimed != null) {
                                     trimed = trimed.toLowerCase();
                                     entityManager.persist(createCategoryFromName(trimed));

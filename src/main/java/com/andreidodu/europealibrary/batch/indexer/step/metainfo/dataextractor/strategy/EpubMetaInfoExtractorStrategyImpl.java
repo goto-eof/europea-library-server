@@ -1,8 +1,10 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
+import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
@@ -19,8 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,6 +42,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
     @PersistenceContext
     private EntityManager entityManager;
+    private final StepUtil stepUtil;
 
     @Override
     public String getStrategyName() {
@@ -96,14 +98,14 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                 .ifPresent(language ->
                         bookInfo.setLanguage(StringUtil.clean(language.substring(0, Math.min(language.length(), 10)))));
         bookInfo.setNumberOfPages(book.getContents().size());
-        final List<String> authors = StringUtil.cleanOrTrimToNull(metadata.getAuthors().stream().map(auth -> auth.getFirstname() + " " + auth.getLastname()).collect(Collectors.toList()));
+        final List<String> authors = StringUtil.cleanAndTrimToNull(metadata.getAuthors().stream().map(auth -> auth.getFirstname() + " " + auth.getLastname()).collect(Collectors.toList()));
         if (!authors.isEmpty()) {
             bookInfo.setAuthors(String.join(",", authors));
         }
         BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.epubUtil.extractISBN(book);
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
-        final List<String> publishers = StringUtil.cleanOrTrimToNull(metadata.getPublishers());
+        final List<String> publishers = StringUtil.cleanAndTrimToNull(metadata.getPublishers());
         if (!publishers.isEmpty()) {
             bookInfo.setPublisher(String.join(",", publishers));
         }
@@ -112,37 +114,23 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         fileMetaInfo.setBookInfo(this.bookInfoRepository.save(bookInfo));
         FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
-        return Optional.ofNullable(metadata.getSubjects())
-                .map(ragNameList -> ragNameList.stream()
-                        .filter(tagName -> !StringUtil.clean(tagName.trim()).isEmpty())
-                        .map(tagName -> StringUtil.clean(tagName.substring(0, Math.min(tagName.length(), 100))))
-                        .collect(Collectors.toSet())
-                        .stream()
-                        .map(tagName -> explodeAddAndAssociateTags(tagName, savedFileMetaInfo))
-                        .findFirst()
-                        .orElse(savedFileMetaInfo)
-                ).orElse(savedFileMetaInfo);
+
+        savedFileMetaInfo = createAndAssociateTags(metadata, savedFileMetaInfo);
+
+        return savedFileMetaInfo;
     }
 
-    private FileMetaInfo explodeAddAndAssociateTags(String tagName, FileMetaInfo savedFileMetaInfo) {
-        List<String> tags = StringUtil.splitString(tagName);
-        if (!tags.isEmpty()) {
-            for (String tag : tags) {
-                savedFileMetaInfo = createAndAssociateTag(tag, savedFileMetaInfo);
-            }
+    private FileMetaInfo createAndAssociateTags(Metadata metadata, FileMetaInfo savedFileMetaInfo) {
+        try {
+            List<String> items = new ArrayList<>(this.stepUtil.explodeInUniqueItems(metadata.getSubjects()));
+            Set<Tag> explodedTags = this.stepUtil.createOrLoadItems(items);
+            savedFileMetaInfo = this.stepUtil.associateTags(savedFileMetaInfo, explodedTags);
+        } catch (Exception e) {
+            log.error("something went wrong with tag creation/association: {}", e.getMessage());
         }
         return savedFileMetaInfo;
     }
 
-    private FileMetaInfo createAndAssociateTag(String tagNameSplit, FileMetaInfo savedFileMetaInfo) {
-        Tag tagEntity = tagUtil.createTagEntity(tagNameSplit);
-        List<Tag> tagEntityList = savedFileMetaInfo.getTagList();
-        if (!tagEntityList.contains(tagEntity)) {
-            tagEntityList.add(tagEntity);
-            return this.fileMetaInfoRepository.save(savedFileMetaInfo);
-        }
-        return savedFileMetaInfo;
-    }
 
     private String getFirst(List<String> list) {
         if (list != null && !list.isEmpty()) {

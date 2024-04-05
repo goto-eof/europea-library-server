@@ -1,9 +1,10 @@
 package com.andreidodu.europealibrary.batch.indexer.config.step;
 
-import com.andreidodu.europealibrary.batch.indexer.step.metainfo.MetaInfoProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.metainfo.MetaInfoWriter;
-import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.batch.indexer.step.categorydeleter.DbCategoryObsoleteDeleterProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.categorydeleter.DbCategoryObsoleteDeleterWriter;
+import com.andreidodu.europealibrary.model.Category;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -20,51 +21,51 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class MetaInfoStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.batch-size}")
+public class DbCategoryObsoleteDeleterStepConfig {
+    @Value("${com.andreidodu.europea-library.job.indexer.step-category-obsolete-deleter.batch-size}")
     private Integer batchSize;
 
     private final DataSource dataSource;
-    private final MetaInfoProcessor processor;
-    private final MetaInfoWriter metaInfoWriter;
+    private final JobRepository jobRepository;
+    private final DbCategoryObsoleteDeleterProcessor processor;
+    private final DbCategoryObsoleteDeleterWriter fileItemWriter;
     private final HibernateTransactionManager transactionManager;
     private final TaskExecutor threadPoolTaskExecutor;
-    private final JobRepository jobRepository;
 
-    @Bean("metaInfoBuilderStep")
-    public Step metaInfoBuilderStep(JdbcPagingItemReader<Long> metaInfoBuilderReader) {
-        return new StepBuilder("metaInfoBuilderStep", jobRepository)
-                .<Long, FileSystemItem>chunk(batchSize, transactionManager)
+    @Bean("dbCategoryObsoleteDeleterStep")
+    public Step dbCategoryObsoleteDeleterStep(JdbcPagingItemReader<Long> dbCategoryObsoleteDeleterReader) {
+        return new StepBuilder("dbCategoryObsoleteDeleterStep", jobRepository)
+                .<Long, Category>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
-                .reader(metaInfoBuilderReader)
+                .reader(dbCategoryObsoleteDeleterReader)
                 .processor(processor)
-                .writer(metaInfoWriter)
+                .writer(fileItemWriter)
                 .build();
     }
 
-    @Bean("metaInfoBuilderReader")
-    public JdbcPagingItemReader<Long> metaInfoBuilderReader() {
+    @Bean("dbCategoryObsoleteDeleterReader")
+    public JdbcPagingItemReader<Long> dbCategoryObsoleteDeleterReader() {
         JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
         jdbcPagingItemReader.setFetchSize(batchSize);
         jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
-        jdbcPagingItemReader.setQueryProvider(getPostgresQueryProvider());
+        jdbcPagingItemReader.setQueryProvider(dbCategoryObsoleteDeleterReaderPostgresQueryProvider());
         jdbcPagingItemReader.setSaveState(false);
         return jdbcPagingItemReader;
     }
 
-    public PostgresPagingQueryProvider getPostgresQueryProvider() {
+    public PostgresPagingQueryProvider dbCategoryObsoleteDeleterReaderPostgresQueryProvider() {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
-        queryProvider.setSelectClause("SELECT distinct id");
-        queryProvider.setFromClause("FROM el_file_system_item");
-        queryProvider.setWhereClause("WHERE record_status = 1");
+        queryProvider.setSelectClause("SELECT distinct c.id");
+        queryProvider.setFromClause("FROM el_category c");
+        queryProvider.setWhereClause("where c.id not in (select distinct bic.category_id from el_book_info_category bic)");
         Map<String, Order> orderByKeys = new HashMap<>();
         orderByKeys.put("id", Order.ASCENDING);
         queryProvider.setSortKeys(orderByKeys);
         return queryProvider;
     }
-
 }

@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.batch.indexer.config.step;
 
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.ExternalMetaInfoProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.ExternalMetaInfoWriter;
+import com.andreidodu.europealibrary.exception.SkipStepException;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
@@ -16,7 +17,7 @@ import org.springframework.orm.hibernate5.HibernateTransactionManager;
 @Configuration
 @RequiredArgsConstructor
 public class ExternalMetaInfoStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
+    @Value("${com.andreidodu.europea-library.job.indexer.step-ext-meta-info-writer.batch-size}")
     private Integer batchSize;
 
     private final JobRepository jobRepository;
