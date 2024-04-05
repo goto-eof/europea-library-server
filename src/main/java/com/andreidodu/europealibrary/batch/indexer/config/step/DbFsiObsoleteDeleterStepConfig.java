@@ -60,7 +60,7 @@ public class DbFsiObsoleteDeleterStepConfig {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
         queryProvider.setSelectClause("SELECT *");
         queryProvider.setFromClause("FROM el_file_system_item fsi");
-        queryProvider.setWhereClause("WHERE fsi.record_status = 2 OR (fsi.base_path NOT LIKE '" + new File(ebookDirectory).getAbsolutePath() + "%')");
+        queryProvider.setWhereClause("WHERE fsi.record_status = 2 OR (fsi.base_path NOT LIKE '" + new File(ebookDirectory).getParent() + "%')");
         Map<String, Order> orderByKeys = new HashMap<>();
         orderByKeys.put("id", Order.ASCENDING);
         queryProvider.setSortKeys(orderByKeys);
