@@ -127,20 +127,21 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     private FileMetaInfo explodeAddAndAssociateTags(String tagName, FileMetaInfo savedFileMetaInfo) {
         List<String> tags = StringUtil.splitString(tagName);
         if (!tags.isEmpty()) {
-            tags.forEach(tagNameSplit -> createAndAssociateTag(tagNameSplit, savedFileMetaInfo));
+            for (String tag : tags) {
+                savedFileMetaInfo = createAndAssociateTag(tag, savedFileMetaInfo);
+            }
         }
-        this.entityManager.refresh(savedFileMetaInfo);
         return savedFileMetaInfo;
     }
 
-    private void createAndAssociateTag(String tagNameSplit, FileMetaInfo savedFileMetaInfo) {
+    private FileMetaInfo createAndAssociateTag(String tagNameSplit, FileMetaInfo savedFileMetaInfo) {
         Tag tagEntity = tagUtil.createTagEntity(tagNameSplit);
-        this.entityManager.refresh(savedFileMetaInfo);
         List<Tag> tagEntityList = savedFileMetaInfo.getTagList();
         if (!tagEntityList.contains(tagEntity)) {
             tagEntityList.add(tagEntity);
-            this.fileMetaInfoRepository.save(savedFileMetaInfo);
+            return this.fileMetaInfoRepository.save(savedFileMetaInfo);
         }
+        return savedFileMetaInfo;
     }
 
     private String getFirst(List<String> list) {
