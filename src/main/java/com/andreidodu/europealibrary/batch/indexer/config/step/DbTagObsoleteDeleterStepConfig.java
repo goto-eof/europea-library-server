@@ -31,8 +31,6 @@ public class DbTagObsoleteDeleterStepConfig {
     private Integer batchSize;
 
     private final DataSource dataSource;
-
-
     private final JobRepository jobRepository;
     private final DbTagObsoleteDeleterProcessor processor;
     private final DbTagObsoleteDeleterWriter fileItemWriter;
