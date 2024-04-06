@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -51,7 +52,19 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private FileSystemItem reprocessOldFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
+        updateParentIdIfNull(fileSystemItem);
         return fileSystemItem;
+    }
+
+    private void updateParentIdIfNull(FileSystemItem fileSystemItem) {
+        Optional<FileSystemItem> parentOptional = Optional.ofNullable(fileSystemItem.getParent());
+        if (parentOptional.isEmpty()) {
+            List<Integer> validSteps = List.of(JobStepEnum.INSERTED.getStepNumber(), JobStepEnum.READY.getStepNumber());
+            List<FileSystemItem> parents = this.getFileSystemItemByPathNameAndJobStepInList(fileUtil.calculateParentBasePath(fileSystemItem.getBasePath()), fileUtil.calculateFileName(fileSystemItem.getBasePath()), validSteps);
+            if (!parents.isEmpty()) {
+                fileSystemItem.setParent(parents.stream().findFirst().get());
+            }
+        }
     }
 
     private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
@@ -85,6 +98,10 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
 
     private Optional<FileSystemItem> getFileSystemItemByPathNameAndJobStep(String basePath, String name, int jobStep) {
         return this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(basePath, name, jobStep);
+    }
+
+    private List<FileSystemItem> getFileSystemItemByPathNameAndJobStepInList(String basePath, String name, List<Integer> jobStepList) {
+        return this.fileSystemItemRepository.findByBasePathAndNameAndJobStepIn(basePath, name, jobStepList);
     }
 
 }

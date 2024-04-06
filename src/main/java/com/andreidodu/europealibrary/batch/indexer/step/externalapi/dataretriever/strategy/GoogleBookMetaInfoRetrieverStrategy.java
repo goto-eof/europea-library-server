@@ -124,7 +124,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo = googleBookResponse.getItems().stream().findFirst().get().getVolumeInfo();
         FileMetaInfo fileMetaInfoOld = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoOld == null ? new FileMetaInfo() : fileMetaInfoOld;
-        Optional.ofNullable(volumeInfo.getTitle()).ifPresent(fileMetaInfo::setTitle);
+        Optional.ofNullable(volumeInfo.getTitle()).ifPresent(title -> fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(title, DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH)));
         Optional.ofNullable(volumeInfo.getDescription()).ifPresent(description -> {
             String descriptionNew = description.substring(0, Math.min(description.length(), DataPropertiesConst.FILE_META_INFO_DESCRIPTION_MAX_LENGTH));
             fileMetaInfo.setDescription(descriptionNew);
@@ -135,8 +135,10 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         BookInfo finalBookInfo = bookInfo;
         Optional.ofNullable(volumeInfo.getAuthors())
                 .ifPresent(authors -> finalBookInfo.setAuthors(String.join(",", authors)));
-        Optional.ofNullable(volumeInfo.getLanguage()).ifPresent(bookInfo::setLanguage);
-        Optional.ofNullable(volumeInfo.getPublisher()).ifPresent(bookInfo::setPublisher);
+        Optional.ofNullable(StringUtil.cleanAndTrimToNullLowerCaseSubstring(volumeInfo.getLanguage(), DataPropertiesConst.BOOK_INFO_LANGUAGE_MAX_LENGTH))
+                .ifPresent(bookInfo::setLanguage);
+        Optional.ofNullable(StringUtil.cleanAndTrimToNullSubstring(volumeInfo.getPublisher(), DataPropertiesConst.BOOK_INFO_PUBLISHER_MAX_LENGTH))
+                .ifPresent(bookInfo::setPublisher);
         bookInfo.setAverageRating(volumeInfo.getAverageRating());
         bookInfo.setRatingsCount(volumeInfo.getRatingsCount());
         bookInfo.setIsbn10(extractValue(volumeInfo.getIndustryIdentifiers(), IDENTIFIER_TYPE_ISBN_10));
@@ -156,8 +158,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         bookInfo = savedFileMetaInfo.getBookInfo();
         bookInfo = this.createAndAssociateCategoriesIfNecessary(categoryNames, bookInfo);
         savedFileMetaInfo = this.fileMetaInfoRepository.save(savedFileMetaInfo);
-//        this.bookInfoRepository.saveAndFlush(bookInfo);
-//        this.fileMetaInfoRepository.saveAndFlush(savedFileMetaInfo);
 
     }
 

@@ -32,8 +32,52 @@ public class StringUtil {
         ).orElse(null);
     }
 
+    public static String cleanAndTrimToNullSubstring(String str, int maxLength) {
+        return Optional.ofNullable(str).map(string -> {
+                    final String trimmed = cleanAndTrimToNull(str);
+                    if (trimmed == null) {
+                        return null;
+                    }
+                    if (trimmed.length() > maxLength) {
+                        return trimmed.substring(0, maxLength);
+                    }
+                    return trimmed;
+                }
+        ).orElse(null);
+    }
+
+    public static String cleanAndTrimToNullLowerCase(String str) {
+        return Optional.ofNullable(str).map(string -> {
+                    final String trimmed = cleanAndTrimToNull(str);
+                    if (trimmed == null) {
+                        return null;
+                    }
+                    return trimmed.toLowerCase();
+                }
+        ).orElse(null);
+    }
+
+
+    public static String cleanAndTrimToNullLowerCaseSubstring(String str, int maxLength) {
+        return Optional.ofNullable(str).map(string -> {
+                    final String trimmed = cleanAndTrimToNullLowerCase(str);
+                    if (trimmed == null) {
+                        return null;
+                    }
+                    if (trimmed.length() > maxLength) {
+                        return trimmed.substring(0, maxLength);
+                    }
+                    return trimmed;
+                }
+        ).orElse(null);
+    }
+
     public static List<String> cleanAndTrimToNull(List<String> list) {
-        return list.stream().filter(item -> cleanAndTrimToNull(item) != null).map(StringUtil::clean).collect(Collectors.toList());
+        return list.stream()
+                .filter(item -> cleanAndTrimToNull(item) != null)
+                .map(StringUtil::clean)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public static String toLowerCase(String str) {
@@ -56,7 +100,6 @@ public class StringUtil {
     public static List<String> splitString(List<String> list) {
         return new ArrayList<>(list.stream().flatMap(str -> splitString(str).stream())
                 .collect(Collectors.toSet()));
-
     }
 
     public static List<String> splitString(String tagName) {

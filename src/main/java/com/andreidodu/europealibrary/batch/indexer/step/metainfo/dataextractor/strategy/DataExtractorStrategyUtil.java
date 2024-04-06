@@ -1,26 +1,35 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
+import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Component
 @Transactional
+@RequiredArgsConstructor
 public class DataExtractorStrategyUtil {
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.do-not-extract-metadata-from-file-extensions}")
     List<String> doNotProcessFileExtensions;
     @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
     private String ebookDirectory;
+
+    private final StepUtil stepUtil;
 
     public boolean wasNotAlreadyProcessed(FileSystemItem fileSystemItem) {
         if (fileSystemItem == null) {
@@ -57,6 +66,17 @@ public class DataExtractorStrategyUtil {
                     bookInfo.setIsbn10(StringUtil.clean(isbn10));
                     log.info("ISBN-10 found: {}", isbn10);
                 });
+    }
+
+    public FileMetaInfo createAndAssociateTags(List<String> subjects, FileMetaInfo savedFileMetaInfo) {
+        try {
+            List<String> items = new ArrayList<>(this.stepUtil.explodeInUniqueItems(subjects));
+            Set<Tag> explodedTags = this.stepUtil.createOrLoadItems(items);
+            savedFileMetaInfo = this.stepUtil.associateTags(savedFileMetaInfo, explodedTags);
+        } catch (Exception e) {
+            log.error("something went wrong with tag creation/association: {}", e.getMessage());
+        }
+        return savedFileMetaInfo;
     }
 
 }

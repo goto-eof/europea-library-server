@@ -1,12 +1,14 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
+import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
+import com.andreidodu.europealibrary.util.FileUtil;
 import com.andreidodu.europealibrary.util.PdfUtil;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.transaction.Transactional;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -38,7 +42,7 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
     private final BookInfoRepository bookInfoRepository;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
-
+    private final FileUtil fileUtil;
 
     @Override
     public String getStrategyName() {
@@ -47,10 +51,12 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
 
     @Override
     public boolean accept(String filename, FileSystemItem fileSystemItem) {
-        return dataExtractorStrategyUtil.isFileExtensionInWhiteList(pdfUtil.getPdfFileExtension()) &&
+        final boolean result = dataExtractorStrategyUtil.isFileExtensionInWhiteList(pdfUtil.getPdfFileExtension()) &&
                 !disablePDFMetadataExtractor &&
                 pdfUtil.isPdf(filename) &&
                 dataExtractorStrategyUtil.wasNotAlreadyProcessed(fileSystemItem);
+
+        return result;
     }
 
 
@@ -69,44 +75,35 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
         File file = new File(filename);
         PDDocument pdf = Loader.loadPDF(file);
         PDDocumentInformation documentInformation = pdf.getDocumentInformation();
-        if (StringUtil.isEmpty(StringUtil.cleanAndTrimToNull(documentInformation.getTitle()))) {
-            log.warn("pdf metadata is empty: {}", filename);
-            return Optional.of(buildMetainfoFromFileName(filename, fileSystemItem, FileExtractionStatusEnum.SUCCESS_EMPTY));
-        }
+
         FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
-        fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNull(documentInformation.getTitle()));
-        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+
+        final String title = StringUtil.cleanAndTrimToNullSubstring(documentInformation.getTitle(), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH);
+        Optional.ofNullable(title)
+                .ifPresentOrElse(fileMetaInfo::setTitle,
+                        () -> fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(fileUtil.calculateFileBaseName(filename), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH)));
+
+        final FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
         bookInfo.setFileMetaInfo(fileMetaInfo);
         log.info("PDF METADATA extracted: {}", fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         this.bookInfoRepository.save(bookInfo);
-        return Optional.of(fileMetaInfo);
-    }
 
-    private FileMetaInfo buildMetainfoFromFileName(String filename, FileSystemItem fileSystemItem, FileExtractionStatusEnum fileExtractionStatusEnum) {
-        FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
-        FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
-        fileMetaInfo.setTitle(filename);
-        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
-        BookInfo bookInfo = buildBookInfo(fileMetaInfo);
-        bookInfo.setFileMetaInfo(fileMetaInfo);
-        bookInfo.setFileExtractionStatus(fileExtractionStatusEnum.getStatus());
-        bookInfoRepository.save(bookInfo);
-        return fileMetaInfo;
-    }
-
-    private BookInfo buildBookInfo(FileMetaInfo fileMetaInfo) {
-        BookInfo bookInfoOld = fileMetaInfo.getBookInfo();
-        return bookInfoOld == null ? new BookInfo() : bookInfoOld;
+        final String keywordsStringTrimmed = StringUtil.cleanAndTrimToNull(documentInformation.getKeywords());
+        return Optional.of(Optional.ofNullable(keywordsStringTrimmed).map((keywordsString) -> {
+            List<String> keywords = new ArrayList<>();
+            keywords.add(keywordsStringTrimmed);
+            return dataExtractorStrategyUtil.createAndAssociateTags(keywords, savedFileMetaInfo);
+        }).orElse(savedFileMetaInfo));
     }
 
     private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld) throws IOException {
         BookInfo bookInfo = bookInfoOld == null ? new BookInfo() : bookInfoOld;
-        bookInfo.setLanguage(StringUtil.cleanAndTrimToNull(pdDocument.getDocumentCatalog().getLanguage()));
+        bookInfo.setLanguage(StringUtil.cleanAndTrimToNullLowerCaseSubstring(pdDocument.getDocumentCatalog().getLanguage(), DataPropertiesConst.BOOK_INFO_LANGUAGE_MAX_LENGTH));
         bookInfo.setNumberOfPages(pdDocument.getNumberOfPages());
-        bookInfo.setAuthors(StringUtil.cleanAndTrimToNull(pdDocument.getDocumentInformation().getAuthor()));
+        bookInfo.setAuthors(StringUtil.cleanAndTrimToNullSubstring(pdDocument.getDocumentInformation().getAuthor(), DataPropertiesConst.BOOK_INFO_PUBLISHER_MAX_LENGTH));
         BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.pdfUtil.retrieveISBN(pdDocument);
         dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
         dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);

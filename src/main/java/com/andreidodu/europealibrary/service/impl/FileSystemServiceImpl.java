@@ -47,7 +47,7 @@ public class FileSystemServiceImpl implements FileSystemService {
     }
 
     private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
-        return this.fileSystemItemRepository.findByLowestId(JobStepEnum.READY.getStepNumber())
+        return this.fileSystemItemRepository.findByLowestBasePath(JobStepEnum.READY.getStepNumber())
                 .map(item -> this.manageCaseReadDirectoryIdProvided(item.getId()))
                 .orElseThrow(() -> new WorkInProgressException("Job in progress. Please retry in few minutes"));
     }
