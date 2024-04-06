@@ -37,7 +37,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
 
     @Override
     public FileSystemItem process(final File file) {
-        log.info("Processing file: {}", file.getAbsoluteFile());
+        log.debug("Processing file: {}", file.getAbsoluteFile());
         // if job was stopped prematurely, then I have already a record on DB
         Optional<FileSystemItem> fileSystemIteminInsertedOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.INSERTED.getStepNumber());
         if (fileSystemIteminInsertedOptional.isPresent()) {
@@ -75,7 +75,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private FileSystemItem buildFileSystemItemFromScratch(File file) {
         try {
             FileDTO fileDTO = fileMapper.toDTO(file);
-            log.info("building: " + fileDTO);
+            log.debug("building: " + fileDTO);
             return buildFileSystemItemFromScratch(fileDTO);
         } catch (IOException e) {
             log.error("Failed to process file: {}", file.getAbsoluteFile());

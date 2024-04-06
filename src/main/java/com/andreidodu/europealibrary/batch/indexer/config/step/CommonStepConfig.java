@@ -11,7 +11,7 @@ public class CommonStepConfig {
     @Bean("threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         int processors = Runtime.getRuntime().availableProcessors() - 1;
-        log.info("\n\n\n====================\nYou have {} processors available for processing\n=====================\n\n\n", processors);
+        log.debug("\n\n\n====================\nYou have {} processors available for processing\n=====================\n\n\n", processors);
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setMaxPoolSize(processors);
         taskExecutor.setCorePoolSize(processors);

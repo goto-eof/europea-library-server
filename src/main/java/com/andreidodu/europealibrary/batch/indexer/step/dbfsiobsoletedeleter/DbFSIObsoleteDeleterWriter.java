@@ -19,6 +19,6 @@ public class DbFSIObsoleteDeleterWriter implements ItemWriter<FileSystemItem> {
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
         this.fileSystemItemRepository.deleteAllInBatch(chunk.getItems().stream().map(fsi -> (FileSystemItem) fsi).collect(Collectors.toList()));
-        log.info("deleted {} records", chunk.getItems().size());
+        log.debug("deleted {} records", chunk.getItems().size());
     }
 }

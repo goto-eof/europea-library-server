@@ -40,7 +40,7 @@ public class MetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
     private FileMetaInfo buildMetaInfoFromEbookIfNecessary(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
         String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        log.info("checking for meta-info for file {}...", fullPath);
+        log.debug("checking for meta-info for file {}...", fullPath);
         return this.metaInfoExtractorStrategyList
                 .stream()
                 .filter(strategy -> strategy.accept(fullPath, fileSystemItem))

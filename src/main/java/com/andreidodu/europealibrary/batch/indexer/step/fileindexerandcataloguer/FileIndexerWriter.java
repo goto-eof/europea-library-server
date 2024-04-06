@@ -30,7 +30,7 @@ public class FileIndexerWriter implements ItemWriter<FileSystemItem> {
         Session session = entityManager.unwrap(Session.class);
         /*setting to one because children need to be associated to an existing parent*/
         session.setJdbcBatchSize(1);
-        log.info("Saving {} elements", chunk.getItems().size());
+        log.debug("Saving {} elements", chunk.getItems().size());
         this.fileSystemItemRepository.saveAll(chunk.getItems());
         this.fileSystemItemRepository.flush();
     }

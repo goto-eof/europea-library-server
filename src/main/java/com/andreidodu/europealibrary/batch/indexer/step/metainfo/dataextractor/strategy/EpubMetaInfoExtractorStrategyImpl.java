@@ -60,26 +60,26 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
 
     @Override
     public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
-        log.info("applying strategy: {}", getStrategyName());
+        log.debug("applying strategy: {}", getStrategyName());
         FileMetaInfo fileMetaInfo = fileSystemItem.getFileMetaInfo();
         try {
             return epubUtil.retrieveBook(filename)
                     .map(book -> {
                         if (book.getMetadata().getFirstTitle().trim().isEmpty()) {
-                            log.info("metadata not found for: {}", filename);
+                            log.debug("metadata not found for: {}", filename);
                             return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem).get();
                         }
-                        log.info("metadata found for: {}", filename);
+                        log.debug("metadata found for: {}", filename);
                         return manageCaseBookTitleNotEmpty(book, filename, fileMetaInfo);
                     });
         } catch (Exception e) {
-            log.info("invalid file: {} ({})", filename, e.getMessage());
+            log.error("invalid file: {} ({})", filename, e.getMessage());
             return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem);
         }
     }
 
     private FileMetaInfo manageCaseBookTitleNotEmpty(Book book, String fullPath, FileMetaInfo existingFileMetaInfo) {
-        log.info("gathering information from ebook {}", fullPath);
+        log.debug("gathering information from ebook {}", fullPath);
         FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
 
         Metadata metadata = book.getMetadata();

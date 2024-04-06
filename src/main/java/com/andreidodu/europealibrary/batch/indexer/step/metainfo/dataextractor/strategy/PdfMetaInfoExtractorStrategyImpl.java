@@ -62,7 +62,7 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
 
     @Override
     public Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem) {
-        log.info("applying strategy: {}", getStrategyName());
+        log.debug("applying strategy: {}", getStrategyName());
         try {
             return buildMetainfoFromFileMetainfo(filename, fileSystemItem);
         } catch (IOException e) {
@@ -87,7 +87,7 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
         final FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
         BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
         bookInfo.setFileMetaInfo(fileMetaInfo);
-        log.info("PDF METADATA extracted: {}", fileMetaInfo);
+        log.debug("PDF METADATA extracted: {}", fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         this.bookInfoRepository.save(bookInfo);
 

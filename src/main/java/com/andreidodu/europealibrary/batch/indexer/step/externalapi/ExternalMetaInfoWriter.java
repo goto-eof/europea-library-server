@@ -21,7 +21,7 @@ public class ExternalMetaInfoWriter implements ItemWriter<FileSystemItem> {
         if (!chunk.getItems().isEmpty()) {
             this.fileSystemItemRepository.saveAll(chunk.getItems());
             this.fileMetaInfoRepository.flush();
-            log.info("saved {} records", chunk.getItems().size());
+            log.debug("saved {} records", chunk.getItems().size());
         }
     }
 }

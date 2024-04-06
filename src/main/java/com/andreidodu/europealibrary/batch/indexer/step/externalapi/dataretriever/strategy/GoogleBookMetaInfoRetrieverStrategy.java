@@ -93,8 +93,8 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
 
     @Override
     public ApiResponseDTO<FileMetaInfo> process(FileSystemItem fileSystemItem) {
-        log.info("applying strategy: {}", getStrategyName());
-        log.info("retrieving book information from google books....");
+        log.debug("applying strategy: {}", getStrategyName());
+        log.debug("retrieving book information from google books....");
         GoogleBookResponseDTO googleBookResponse;
         try {
             googleBookResponse = retrieveGoogleBook(fileSystemItem);
@@ -105,13 +105,13 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             return apiResponseDTO;
         }
         if (isEmptyResponse(googleBookResponse)) {
-            log.info("book information not found for {}", fileSystemItem);
+            log.debug("book information not found for {}", fileSystemItem);
             fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS_EMPTY.getStatus());
             ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
             apiResponseDTO.setStatus(ApiStatusEnum.SUCCESS_EMPTY_RESPONSE);
             return apiResponseDTO;
         }
-        log.info("book information retrieved: {}", googleBookResponse);
+        log.debug("book information retrieved: {}", googleBookResponse);
         updateModel(fileSystemItem, googleBookResponse);
         fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS.getStatus());
         ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();

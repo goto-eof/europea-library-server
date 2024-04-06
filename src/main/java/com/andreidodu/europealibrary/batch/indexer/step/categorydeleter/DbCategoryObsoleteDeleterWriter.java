@@ -19,6 +19,6 @@ public class DbCategoryObsoleteDeleterWriter implements ItemWriter<Category> {
     @Override
     public void write(Chunk<? extends Category> chunk) {
         this.categoryRepository.deleteAllInBatch(chunk.getItems().stream().map(category -> (Category) category).collect(Collectors.toList()));
-        log.info("deleted {} Tag records", chunk.getItems().size());
+        log.debug("deleted {} Tag records", chunk.getItems().size());
     }
 }

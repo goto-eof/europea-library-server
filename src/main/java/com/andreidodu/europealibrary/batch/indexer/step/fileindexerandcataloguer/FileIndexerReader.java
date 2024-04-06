@@ -35,7 +35,7 @@ public class FileIndexerReader implements ItemStreamReader<File> {
 
     @PostConstruct
     public void postConstruct() {
-        log.info("ebooks directory: " + ebookDirectory);
+        log.debug("ebooks directory: " + ebookDirectory);
         directories.add(Path.of(ebookDirectory));
     }
 
@@ -48,12 +48,12 @@ public class FileIndexerReader implements ItemStreamReader<File> {
                 Arrays.stream(Objects.requireNonNull(file.listFiles()))
                         .peek(fileItem -> {
                             if (!fileExtensionsToIgnore.isEmpty() && fileItem.isFile() && fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase())) {
-                                log.info("ignoring file: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
+                                log.debug("ignoring file: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
                             }
                         })
                         .peek(fileItem -> {
                             if (!fileExtensionsToAllow.isEmpty() && fileItem.isFile() && fileExtensionsToAllow.contains(fileUtil.getExtension(file.getName()).toLowerCase())) {
-                                log.info("the following file will be processed: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
+                                log.debug("the following file will be processed: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
                             }
                         })
                         .filter(fileItem -> fileExtensionsToIgnore.isEmpty() || fileItem.isDirectory() || !fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
@@ -65,7 +65,7 @@ public class FileIndexerReader implements ItemStreamReader<File> {
                             iterator.previous();
                         });
             }
-            log.info("found: " + file.getAbsolutePath() + "/" + file.getName());
+            log.debug("found: " + file.getAbsolutePath() + "/" + file.getName());
             return file;
         }
         return null;

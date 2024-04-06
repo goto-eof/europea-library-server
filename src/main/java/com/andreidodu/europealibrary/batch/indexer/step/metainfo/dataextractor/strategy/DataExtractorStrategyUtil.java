@@ -56,7 +56,7 @@ public class DataExtractorStrategyUtil {
         bookCodes.getIsbn13()
                 .ifPresent(isbn -> {
                     bookInfo.setIsbn13(StringUtil.clean(isbn));
-                    log.info("ISBN-13 found: {}", isbn);
+                    log.debug("ISBN-13 found: {}", isbn);
                 });
     }
 
@@ -64,7 +64,7 @@ public class DataExtractorStrategyUtil {
         bookCodes.getIsbn10()
                 .ifPresent(isbn10 -> {
                     bookInfo.setIsbn10(StringUtil.clean(isbn10));
-                    log.info("ISBN-10 found: {}", isbn10);
+                    log.debug("ISBN-10 found: {}", isbn10);
                 });
     }
 
