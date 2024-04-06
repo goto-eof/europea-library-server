@@ -49,6 +49,9 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
     }
 
     private Optional<FileMetaInfo> buildMetaInfoFromWebIfNecessary(Long fileSystemItemId) {
+        if (doNotCallApiIsTrue()) {
+            return Optional.empty();
+        }
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
         return metaInfoRetrieverStrategyList.stream()
                 .filter(strategy -> strategy.accept(fileSystemItem))
