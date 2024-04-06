@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Book;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,7 +39,7 @@ public class StepUtil {
     }
 
     private Tag createOrLoadTagEntity(String tagName) {
-        return tagUtil.createTagEntity(tagName);
+        return tagUtil.loadOrCreateTagEntity(tagName);
     }
 
 

@@ -20,7 +20,7 @@ public class TagUtil {
 
     @Retryable(retryFor = {DataIntegrityViolationException.class, NullPointerException.class}, maxAttemptsExpression = "1000000" )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Tag createTagEntity(String tagName) {
+    public Tag loadOrCreateTagEntity(String tagName) {
         Optional<Tag> tagOptional = this.tagRepository.findByNameIgnoreCase(tagName);
         Tag tag;
         if (tagOptional.isEmpty()) {

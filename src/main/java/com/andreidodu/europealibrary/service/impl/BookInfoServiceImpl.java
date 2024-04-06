@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.service.impl;
 
+import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy.TagUtil;
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
-import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,6 +27,7 @@ public class BookInfoServiceImpl implements BookInfoService {
     private final FileMetaInfoRepository repository;
     private final FileMetaInfoBookMapper fileMetaInfoBookMapper;
     private final FileSystemItemRepository fileSystemItemRepository;
+    private final TagUtil tagUtil;
 
     @Override
     public FileMetaInfoBookDTO retrieveById(Long id) {
@@ -37,6 +38,10 @@ public class BookInfoServiceImpl implements BookInfoService {
     @Override
     public FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto) {
         FileMetaInfo model = this.fileMetaInfoBookMapper.toModel(dto);
+        model.setTagList(dto.getTagList()
+                .stream()
+                .map(tagDTO -> this.tagUtil.loadOrCreateTagEntity(tagDTO.getName()))
+                .collect(Collectors.toList()));
         List<FileSystemItem> fileSystemItemList = this.fileSystemItemRepository.findAllById(dto.getFileSystemItemIdList());
         fileSystemItemList.forEach(fileSystemItem -> fileSystemItem.setFileMetaInfo(model));
         model.setFileSystemItemList(fileSystemItemList);
@@ -50,6 +55,10 @@ public class BookInfoServiceImpl implements BookInfoService {
         validateUpdateInput(id, dto);
         FileMetaInfo model = checkFileMetaInfoExistence(id);
         this.fileMetaInfoBookMapper.map(model, dto);
+        model.setTagList(dto.getTagList()
+                .stream()
+                .map(tagDTO -> this.tagUtil.loadOrCreateTagEntity(tagDTO.getName()))
+                .collect(Collectors.toList()));
         List<FileSystemItem> fileSystemItemList = this.fileSystemItemRepository.findAllById(dto.getFileSystemItemIdList());
         model.setFileSystemItemList(fileSystemItemList);
         FileMetaInfo newModel = this.repository.save(model);
@@ -58,13 +67,14 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
         if (id == null || !id.equals(dto.getId())) {
-            throw new ApplicationException("Invalid ID");
+            throw new ApplicationException("IDs does not match");
         }
     }
 
     @Override
     public OperationStatusDTO delete(Long id) {
         return this.repository.findById(id).map(model -> {
+                    this.fileSystemItemRepository.deleteAllInBatch(model.getFileSystemItemList());
                     this.repository.delete(model);
                     return new OperationStatusDTO(true, "deleted");
                 })
