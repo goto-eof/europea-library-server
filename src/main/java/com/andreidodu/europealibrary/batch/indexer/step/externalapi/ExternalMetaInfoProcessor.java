@@ -35,6 +35,9 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
 
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
+        if (doNotCallApiIsTrue()) {
+            return null;
+        }
         return buildMetaInfoFromWebIfNecessary(fileSystemItemId)
                 .map(fileMetaInfo -> {
                     FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
