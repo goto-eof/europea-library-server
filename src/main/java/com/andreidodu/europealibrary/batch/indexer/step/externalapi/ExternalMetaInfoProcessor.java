@@ -3,7 +3,6 @@ package com.andreidodu.europealibrary.batch.indexer.step.externalapi;
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.dto.ApiResponseDTO;
-import com.andreidodu.europealibrary.exception.SkipStepException;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
