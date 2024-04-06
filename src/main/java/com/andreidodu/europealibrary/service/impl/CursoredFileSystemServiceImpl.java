@@ -17,6 +17,7 @@ import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
@@ -111,6 +112,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     }
 
     @Override
+    @Cacheable(cacheNames = {"extensions"})
     public List<FileExtensionDTO> getAllExtensions() {
         return this.fileExtensionMapper.toDTO(this.fileSystemItemRepository.retrieveExtensionsInfo());
     }
