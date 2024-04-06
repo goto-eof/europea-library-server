@@ -44,7 +44,6 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
                 .from(category)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
-                .orderBy(category.id.asc())
                 .fetch();
 
     }

@@ -41,7 +41,7 @@ public class CustomTagRepositoryImpl implements CustomTagRepository {
             numberOfResults = ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE;
         }
 
-        return new JPAQuery<FileSystemItem>(entityManager)
+        return new JPAQuery<Tag>(entityManager)
                 .select(tag)
                 .from(tag)
                 .where(booleanBuilder)

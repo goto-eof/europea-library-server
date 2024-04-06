@@ -25,8 +25,7 @@ public class Tag extends ModelCommon implements Identificable {
     @Column(name = "name", length = 100)
     private String name;
 
-    @ManyToMany(mappedBy = "tagList")
-    @Fetch(FetchMode.JOIN)
+    @ManyToMany(mappedBy = "tagList", fetch = FetchType.LAZY)
     private List<FileMetaInfo> fileMetaInfoList = new ArrayList<>();
 
     @Override
