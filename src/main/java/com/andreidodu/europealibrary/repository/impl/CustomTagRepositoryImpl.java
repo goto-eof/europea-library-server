@@ -46,7 +46,6 @@ public class CustomTagRepositoryImpl implements CustomTagRepository {
                 .from(tag)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
-                .orderBy(tag.id.asc())
                 .fetch();
 
     }
