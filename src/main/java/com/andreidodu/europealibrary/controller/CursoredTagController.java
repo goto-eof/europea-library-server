@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @Service
 @RestController
 @RequestMapping("/api/v1/tag")
-@CrossOrigin(origins = "${com.andreidodu.europea-library.client.url}")
 @RequiredArgsConstructor
 public class CursoredTagController {
     private final TagService tagService;

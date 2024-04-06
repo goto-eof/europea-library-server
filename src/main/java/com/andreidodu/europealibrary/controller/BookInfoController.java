@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @Service
 @RestController
 @RequestMapping("/api/v1/bookInfo")
-@CrossOrigin(origins = "${com.andreidodu.europea-library.client.url}")
 @RequiredArgsConstructor
 public class BookInfoController {
     final private BookInfoService bookInfoService;

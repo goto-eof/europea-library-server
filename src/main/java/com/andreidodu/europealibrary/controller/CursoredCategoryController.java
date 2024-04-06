@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @Service
 @RestController
 @RequestMapping("/api/v1/category")
-@CrossOrigin(origins = "${com.andreidodu.europea-library.client.url}")
 @RequiredArgsConstructor
 public class CursoredCategoryController {
     private final CategoryService categoryService;

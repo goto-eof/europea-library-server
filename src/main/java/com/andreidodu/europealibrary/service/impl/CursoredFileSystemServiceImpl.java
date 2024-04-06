@@ -3,8 +3,10 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.CategoryMapper;
+import com.andreidodu.europealibrary.mapper.FileExtensionMapper;
 import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.mapper.TagMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
@@ -15,8 +17,12 @@ import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +34,7 @@ import java.util.stream.Collectors;
 public class CursoredFileSystemServiceImpl extends CursoredServiceCommon implements CursoredFileSystemService {
     private final FileSystemItemRepository fileSystemItemRepository;
     private final FileSystemItemMapper fileSystemItemMapper;
+    private final FileExtensionMapper fileExtensionMapper;
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final TagRepository tagRepository;
@@ -49,7 +56,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     public CursoredCategoryDTO retrieveByCategoryId(CursorRequestDTO cursorRequestDTO) {
         Optional.ofNullable(cursorRequestDTO.getParentId())
                 .orElseThrow(() -> new EntityNotFoundException("Invalid category id"));
-        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCategoryId(cursorRequestDTO);
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredCategoryId(cursorRequestDTO);
         CursoredCategoryDTO cursoredCategoryDTO = new CursoredCategoryDTO();
         List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredCategoryDTO.setChildrenList(childrenList.stream()
@@ -65,7 +72,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     public CursoredTagDTO retrieveByTagId(CursorRequestDTO cursorRequestDTO) {
         Optional.ofNullable(cursorRequestDTO.getParentId())
                 .orElseThrow(() -> new EntityNotFoundException("Invalid tag id"));
-        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByTagId(cursorRequestDTO);
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredTagId(cursorRequestDTO);
         CursoredTagDTO cursoredTagDTO = new CursoredTagDTO();
         List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredTagDTO.setChildrenList(childrenList.stream()
@@ -101,5 +108,50 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     private FileSystemItem checkFileSystemItemExistence(Long id) {
         return this.fileSystemItemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+    }
+
+    @Override
+    public List<FileExtensionDTO> getAllExtensions() {
+        return this.fileExtensionMapper.toDTO(this.fileSystemItemRepository.retrieveExtensionsInfo());
+    }
+
+    @Override
+    public CursoredFileExtensionDTO retrieveByFileExtension(CursorTypeRequestDTO cursorTypeRequestDTO) {
+        Optional.ofNullable(cursorTypeRequestDTO.getExtension())
+                .orElseThrow(() -> new EntityNotFoundException("Invalid file extension"));
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredFileExtension(cursorTypeRequestDTO);
+        CursoredFileExtensionDTO cursoredFileExtensionDTO = new CursoredFileExtensionDTO();
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        cursoredFileExtensionDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+                .ifPresent(cursoredFileExtensionDTO::setNextCursor);
+        cursoredFileExtensionDTO.setExtension(cursorTypeRequestDTO.getExtension());
+        return cursoredFileExtensionDTO;
+    }
+
+    @Override
+    public DownloadDTO retrieveResourceForDownload(Long fileSystemId) {
+        return this.fileSystemItemRepository.findById(fileSystemId)
+                .map(fileSystemItem -> {
+                    try {
+                        File file = new File(fileSystemItem.getBasePath() + "/" + fileSystemItem.getName());
+                        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+                        DownloadDTO downloadDTO = new DownloadDTO();
+                        downloadDTO.setInputStreamResource(resource);
+                        downloadDTO.setFileSize(file.length());
+                        return downloadDTO;
+                    } catch (IOException e) {
+                        throw new ApplicationException("Unable to retrieve file");
+                    }
+                }).orElseThrow();
+    }
+
+    @Override
+    public FileSystemItemDTO get(Long fileSystemItemId) {
+        return this.fileSystemItemRepository.findById(fileSystemItemId)
+                .map(this.fileSystemItemMapper::toDTO)
+                .orElseThrow(() -> new ApplicationException("Item not found"));
     }
 }

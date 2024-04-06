@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/job")
-@CrossOrigin(origins = "${com.andreidodu.europea-library.client.url}")
 @RequiredArgsConstructor
 public class JobRunnerController {
     final private JobRunnerService jobRunnerService;

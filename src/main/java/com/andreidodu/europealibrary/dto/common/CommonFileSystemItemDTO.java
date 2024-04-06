@@ -12,12 +12,13 @@ import java.util.List;
 public class CommonFileSystemItemDTO extends CommonDTO {
     private String name;
     private Long size;
-    private String basePath;
+    // private String basePath;
     private LocalDateTime fileCreateDate;
     private LocalDateTime fileUpdateDate;
     private Boolean isDirectory;
     private FileSystemItemDTO parent;
     private Integer jobStep;
     private Integer jobStatus;
+    private String extension;
     private List<FileSystemItemDTO> childrenList;
 }
