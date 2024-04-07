@@ -72,7 +72,7 @@ com:
           step-meta-info-writer:
             batch-size: 1000
           step-ext-meta-info-writer:
-            batch-size: 1000
+            batch-size: 1
           step-step-updater:
             batch-size: 1000
           step-fmi-obsolete-deleter:

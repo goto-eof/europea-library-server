@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.batch.indexer.step.externalapi;
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.dto.ApiResponseDTO;
+import com.andreidodu.europealibrary.exception.SkipStepException;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
@@ -34,39 +35,40 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
 
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
-        if (doNotCallApiIsTrue()) {
-            return null;
-        }
-        return buildMetaInfoFromWebIfNecessary(fileSystemItemId)
-                .map(fileMetaInfo -> {
-                    FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
-                    fileSystemItem.setFileMetaInfoId(fileMetaInfo.getId());
-                    putThreadOnSleep();
-                    return fileSystemItem;
-                })
-                .orElse(null);
+        FileMetaInfo fileMetaInfo = buildMetaInfoFromWebIfNecessary(fileSystemItemId);
+        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
+        fileSystemItem.setFileMetaInfoId(fileMetaInfo.getId());
+        log.debug("external meta-info retrieved: {}", fileSystemItem.getName());
+        putThreadOnSleep();
+        return fileSystemItem;
     }
 
-    private Optional<FileMetaInfo> buildMetaInfoFromWebIfNecessary(Long fileSystemItemId) {
-        if (doNotCallApiIsTrue()) {
-            return Optional.empty();
-        }
+    private FileMetaInfo buildMetaInfoFromWebIfNecessary(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
         return metaInfoRetrieverStrategyList.stream()
                 .filter(strategy -> strategy.accept(fileSystemItem))
                 .findFirst()
-                .map(strategy -> {
-                    if (doNotCallApiIsTrue()) {
-                        return null;
-                    }
-                    ApiResponseDTO<FileMetaInfo> result = strategy.process(fileSystemItem);
-                    if (result.getStatus() == ApiStatusEnum.FATAL_ERROR) {
-                        this.stepExecution.getExecutionContext().put(DO_NOT_CALL_WEB_API, true);
-                        return result.getEntity();
-                    }
-                    return result.getEntity();
-                });
+                .map(metaInfoRetrieverStrategy -> metaInfoRetrieverStrategy.process(fileSystemItem))
+                .filter(result -> List.of(ApiStatusEnum.SUCCESS, ApiStatusEnum.SUCCESS_EMPTY_RESPONSE).contains(result.getStatus()))
+                .map(ApiResponseDTO::getEntity)
+                .orElseThrow(() -> new SkipStepException("step was skipped because google books api returned an error"));
+
     }
+
+
+//    private Optional<FileMetaInfo> buildMetaInfoFromWebIfNecessary(Long fileSystemItemId) {
+//        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
+//        return metaInfoRetrieverStrategyList.stream()
+//                .filter(strategy -> strategy.accept(fileSystemItem))
+//                .findFirst()
+//                .map(strategy -> {
+//                    ApiResponseDTO<FileMetaInfo> result = strategy.process(fileSystemItem);
+//                    if (result.getStatus() == ApiStatusEnum.FATAL_ERROR) {
+//                        throw new SkipStepException("step was skipped because google books api returned an error");
+//                    }
+//                    return result.getEntity();
+//                });
+//}
 
 
     private boolean doNotCallApiIsTrue() {

@@ -75,6 +75,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     }
 
     private static boolean hasISBNOrTitleAuthorsOrPublisher(FileSystemItem fileSystemItem) {
+        log.debug("checking if satisfies conditions: {}", fileSystemItem);
         return fileSystemItem != null &&
                 fileSystemItem.getFileMetaInfo() != null &&
                 fileSystemItem.getFileMetaInfo().getBookInfo() != null &&
