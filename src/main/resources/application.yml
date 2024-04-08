@@ -17,17 +17,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+      # current_session_context_class: org.springframework.orm.hibernate6.SpringSessionContext
     properties:
-      hibernate:
-        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
-        format_sql: true
-        default_schema: public
-        generate_statistics: true
-        highlight_sql: true
-        order_inserts: true
-        jdbc:
-          batch_size: 1
-    show-sql: true
+    # hibernate:
+    # format_sql: true
+    # show_sql: true
+    # default_schema: public
+    # generate_statistics: true
+    # highlight_sql: true
+    # order_inserts: true
+    # order_updates: true
+    # current_session_context_class: org.springframework.orm.hibernate6.SpringSessionContext
+    # jdbc:
+    #batch_size: 50
+    #batch_versioned_data: true
+    #show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     change-log: classpath:/database/db.changelog.xml
@@ -66,23 +70,25 @@ com:
             disable-epub-metadata-extractor: false
             # disables the strategy
             disable-pdf-metadata-extractor: false
-            batch-size: 1
+            batch-size: 5000
+          step-parent-associator-step:
+            batch-size: 5000
           step-file-hash-updater:
-            batch-size: 1000
+            batch-size: 5000
           step-meta-info-writer:
-            batch-size: 1000
+            batch-size: 5000
           step-ext-meta-info-writer:
             batch-size: 1
           step-step-updater:
-            batch-size: 1000
+            batch-size: 5000
           step-fmi-obsolete-deleter:
-            batch-size: 1000
+            batch-size: 5000
           step-fsi-obsolete-deleter:
-            batch-size: 1000
+            batch-size: 5000
           step-tag-obsolete-deleter:
-            batch-size: 1000
+            batch-size: 5000
           step-category-obsolete-deleter:
-            batch-size: 1000
+            batch-size: 5000
 
 batch-db:
   url: jdbc:postgresql://localhost:5439/db
@@ -94,20 +100,27 @@ google:
     query-url: https://www.googleapis.com/books/v1/volumes
     api_key:
 
+
+
+
+
 logging:
   file:
-    name: europea-library.log
-  level:
-    org:
-      hibernate:
-        type.descriptor.sql.BasicBinder: ERROR
-        SQL: ERROR
-      apache:
-        pdfbox: OFF
-        fontbox: OFF
-    com:
-      andreidodu: ERROR
-    nl:
-      siegmann:
-        epublib: OFF
+    name: /home/andrei/Desktop/europea-library.log
+    #level:
+    #org:
+    #apache:
+    #pdfbox: OFF
+    #fontbox: OFF
+    #com:
+    #andreidodu: ERROR
+    #nl:
+    #siegmann:
+    #epublib: OFF
 
+#logging.level.org.hibernate: ERROR #info
+#logging.level.org.hibernate.SQL: ERROR #debug
+#logging.level.org.hibernate.orm.jdbc.bind: ERROR # trace
+#logging.level.org.hibernate.stat: ERROR # debug
+#logging.level.org.hibernate.SQL_SLOW: ERROR # info
+#logging.level.org.hibernate.cache: ERROR #debug

@@ -11,12 +11,15 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -30,11 +33,13 @@ public class DbFsiObsoleteDeleterStepConfig {
     private Integer stepFsiObsoleteDeleterBatchSize;
     @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
     private String ebookDirectory;
-
+    @Autowired
+    @Qualifier("threadPoolTaskExecutor")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     private final DataSource dataSource;
 
     @Bean("dbFSIObsoleteDeleterStep")
-    public Step dbFSIObsoleteDeleterStep(TaskExecutor threadPoolTaskExecutor, JdbcPagingItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    public Step dbFSIObsoleteDeleterStep(JdbcPagingItemReader<FileSystemItem> dbFSIObsoleteDeleterReader, JobRepository jobRepository, DbFSIObsoleteDeleterProcessor processor, DbFSIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
         return new StepBuilder("dbFSIObsoleteDeleterStep", jobRepository)
                 .<FileSystemItem, FileSystemItem>chunk(stepFsiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)

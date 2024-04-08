@@ -21,7 +21,8 @@ import java.util.List;
 public class FileSystemItem extends ModelCommon implements Identificable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "el_file_system_item_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "el_file_system_item_seq", sequenceName = "el_file_system_item_seq", allocationSize = 50)
     private Long id;
 
     @Column(nullable = false, length = 512)
@@ -46,8 +47,11 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     private Boolean isDirectory;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "parent_id", updatable = false, insertable = false)
     private FileSystemItem parent;
+
+    @Column(name = "parent_id")
+    private Long parentId;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<FileSystemItem> childrenList;
@@ -61,7 +65,6 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     private String extension;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Fetch(FetchMode.JOIN)
     @JoinColumn(name = "file_meta_info_id", insertable = false, updatable = false)
     private FileMetaInfo fileMetaInfo;
 

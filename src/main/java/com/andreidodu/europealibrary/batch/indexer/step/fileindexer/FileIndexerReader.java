@@ -1,7 +1,6 @@
-package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer;
+package com.andreidodu.europealibrary.batch.indexer.step.fileindexer;
 
 import com.andreidodu.europealibrary.util.FileUtil;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -10,9 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Slf4j
 @Component
@@ -29,22 +29,15 @@ public class FileIndexerReader implements ItemStreamReader<File> {
     private List<String> fileExtensionsToAllow;
 
     private final FileUtil fileUtil;
-    ListIterator<Path> iterator;
-    List<Path> directories = new ArrayList<>();
-
-
-    @PostConstruct
-    public void postConstruct() {
-        log.debug("ebooks directory: " + ebookDirectory);
-        directories.add(Path.of(ebookDirectory));
-    }
+    BlockingQueue<Path> directories = new LinkedBlockingQueue<>();
 
     @Override
-    public File read() {
-        if (iterator.hasNext()) {
-            Path path = this.iterator.next();
+    public File read() throws InterruptedException {
+        if (!directories.isEmpty()) {
+            Path path = directories.take();
             File file = path.toFile();
             if (file.isDirectory()) {
+                log.debug("processing directory {}", file.getAbsolutePath());
                 Arrays.stream(Objects.requireNonNull(file.listFiles()))
                         .peek(fileItem -> {
                             if (!fileExtensionsToIgnore.isEmpty() && fileItem.isFile() && fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase())) {
@@ -61,8 +54,8 @@ public class FileIndexerReader implements ItemStreamReader<File> {
                         .sorted(sortByIsDirectoryAndName())
                         .map(File::toPath)
                         .forEach(pathItem -> {
-                            iterator.add(pathItem);
-                            iterator.previous();
+                            directories.add(pathItem);
+                            log.debug("added child {}", pathItem.toFile().getAbsolutePath());
                         });
             }
             log.debug("found: " + file.getAbsolutePath() + "/" + file.getName());
@@ -81,15 +74,8 @@ public class FileIndexerReader implements ItemStreamReader<File> {
 
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-        this.iterator = directories.listIterator();
+        log.debug("ebooks directory: " + ebookDirectory);
+        directories.add(Path.of(ebookDirectory));
     }
 
-    @Override
-    public void update(ExecutionContext executionContext) throws ItemStreamException {
-        ItemStreamReader.super.update(executionContext);
-    }
-
-    @Override
-    public void close() throws ItemStreamException {
-    }
 }

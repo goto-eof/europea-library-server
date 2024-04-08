@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -35,7 +36,9 @@ public class DbTagObsoleteDeleterStepConfig {
     private final DbTagObsoleteDeleterProcessor processor;
     private final DbTagObsoleteDeleterWriter fileItemWriter;
     private final HibernateTransactionManager transactionManager;
-    private final TaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    @Qualifier("threadPoolTaskExecutor")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Bean("dbTagObsoleteDeleterStep")
     public Step dbTagObsoleteDeleterStep(JdbcPagingItemReader<Long> dbTagObsoleteDeleterReader) {

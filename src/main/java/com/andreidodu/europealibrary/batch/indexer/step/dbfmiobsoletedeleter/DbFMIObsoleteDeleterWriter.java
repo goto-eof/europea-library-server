@@ -23,7 +23,9 @@ public class DbFMIObsoleteDeleterWriter implements ItemWriter<FileMetaInfo> {
     public void write(Chunk<? extends FileMetaInfo> chunk) {
         List<FileMetaInfo> fileMetaInfoList = chunk.getItems().stream().map(fmi -> (FileMetaInfo) fmi).collect(Collectors.toList());
         this.bookInfoRepository.deleteAllInBatch(fileMetaInfoList.stream().map(FileMetaInfo::getBookInfo).collect(Collectors.toList()));
+        this.bookInfoRepository.flush();
         this.repository.deleteAllInBatch(fileMetaInfoList);
+        this.repository.flush();
         log.debug("deleted {} FileMetaInfo records", chunk.getItems().size());
     }
 }

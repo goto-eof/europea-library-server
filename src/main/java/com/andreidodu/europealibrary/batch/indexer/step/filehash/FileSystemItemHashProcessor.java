@@ -15,54 +15,49 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FileSystemItemHashProcessor implements ItemProcessor<FileSystemItem, FileSystemItem> {
+public class FileSystemItemHashProcessor implements ItemProcessor<Long, FileSystemItem> {
     private final FileUtil fileUtil;
     private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
-    public FileSystemItem process(FileSystemItem fileSystemItem) {
-        calculateAndUpdateHashAndMetaInfoIdIfNecessary(fileSystemItem);
-        log.debug("updated hash for {} record: {}", 1, fileSystemItem.getName());
-        this.fileSystemItemRepository.flush();
-        return null;
+    public FileSystemItem process(Long fileSystemItemId) {
+        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
+        fileSystemItem = calculateAndUpdateHashAndMetaInfoIdIfNecessary(fileSystemItem);
+        return fileSystemItem;
     }
 
-    private void calculateAndUpdateHashAndMetaInfoIdIfNecessary(FileSystemItem fileSystemItem) {
+    private FileSystemItem calculateAndUpdateHashAndMetaInfoIdIfNecessary(FileSystemItem fileSystemItem) {
         if (fileSystemItem.getIsDirectory()) {
-            return;
+            return fileSystemItem;
         }
         if (StringUtil.isNotEmpty(fileSystemItem.getSha256())) {
-            return;
+            return fileSystemItem;
         }
+
+        return associateMetaInfoEntityIfFound(fileSystemItem);
+    }
+
+
+    private FileSystemItem associateMetaInfoEntityIfFound(FileSystemItem fileSystemItem) {
         final String fileFullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        String sha256 = this.fileUtil.fileNameToHash(fileFullPath)
-                .orElse(null);
-        associateMetaInfoEntityIfFound(fileSystemItem, sha256);
+        if (fileSystemItem.getSha256() == null) {
+            fileSystemItem.setSha256(this.fileUtil.fileNameToHash(fileFullPath)
+                    .orElse(null));
+        }
+
+        associateMetaInfoIfExists(fileSystemItem);
+
+        return fileSystemItem;
     }
 
-    private void associateMetaInfoEntityIfFound(FileSystemItem fileSystemItem, String sha256) {
-        if (fileSystemItem.getIsDirectory()) {
-            return;
-        }
-        if (StringUtil.isEmpty(sha256)) {
-            return;
-        }
-        associateMetaInfoByHashIfFound(fileSystemItem.getId(), sha256);
-    }
-
-    private void associateMetaInfoByHashIfFound(Long fileSystemItemId, String sha256) {
-        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
-        Optional.ofNullable(fileSystemItem.getSha256())
-                .flatMap(hash -> this.fileSystemItemRepository.findBySha256(hash)
-                        .stream()
-                        .filter(fsi -> fsi.getFileMetaInfo() != null)
-                        .findFirst().flatMap(fsi -> Optional.ofNullable(fileSystemItem.getFileMetaInfo())
-                                .map(FileMetaInfo::getId)))
-                .ifPresentOrElse(fileMetaInfoId ->
-                        this.fileSystemItemRepository.updateFileMetaInfoId(fileSystemItem.getId(), fileMetaInfoId), () -> {
-                    fileSystemItem.setSha256(sha256);
-                    this.fileSystemItemRepository.save(fileSystemItem);
-                });
+    private void associateMetaInfoIfExists(FileSystemItem fileSystemItem) {
+        this.fileSystemItemRepository.findBySha256(fileSystemItem.getSha256())
+                .stream()
+                .filter(fsi -> fsi.getFileMetaInfo() != null)
+                .findFirst()
+                .flatMap(fsi -> Optional.ofNullable(fileSystemItem.getFileMetaInfo())
+                        .map(FileMetaInfo::getId))
+                .ifPresent(fileMetaInfoId -> this.fileSystemItemRepository.updateFileMetaInfoId(fileSystemItem.getId(), fileMetaInfoId));
     }
 
 

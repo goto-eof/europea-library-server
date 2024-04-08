@@ -15,13 +15,12 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "el_file_meta_info")
-//@SequenceGenerator(name = "EL_FILE_META_INFO_ID", sequenceName = "EL_FILE_META_INFO_ID", allocationSize = 1)
 @EntityListeners(AuditingEntityListener.class)
 public class FileMetaInfo extends ModelCommon {
     @Id
     @Column(nullable = false, updatable = false)
-    //@GeneratedValue(generator = "EL_FILE_META_INFO_ID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "el_file_meta_info_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "el_file_meta_info_seq", sequenceName = "el_file_meta_info_seq", allocationSize = 50)
     private Long id;
 
     @Column(length = 512)
@@ -44,7 +43,6 @@ public class FileMetaInfo extends ModelCommon {
     private List<Tag> tagList = new ArrayList<>();
 
     @OneToMany(mappedBy = "fileMetaInfo")
-    @Fetch(FetchMode.JOIN)
     private List<FileSystemItem> fileSystemItemList;
 
 

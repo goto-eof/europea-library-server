@@ -24,11 +24,14 @@ public class JobFlowConfig {
     private final Step dbFSIObsoleteDeleterStep;
     private final Step dbFMIObsoleteDeleterStep;
     private final Step dbJobStepUpdaterStep;
+    private final Step finalizationStep;
+    private final Step parentAssociatorStep;
 
     @Bean("indexerJob")
     public Job indexerJob() {
         return new JobBuilder("indexerJob", jobRepository)
                 .start(fileIndexerAndCataloguerStep)
+                .on(ExitStatus.COMPLETED.getExitCode()).to(parentAssociatorStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(fileSystemItemHashStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(metaInfoBuilderStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(externalMetaInfoBuilderStep)
@@ -38,6 +41,7 @@ public class JobFlowConfig {
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbTagObsoleteDeleterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbCategoryObsoleteDeleterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbJobStepUpdaterStep)
+                .on(ExitStatus.COMPLETED.getExitCode()).to(finalizationStep)
                 .end()
                 .build();
     }

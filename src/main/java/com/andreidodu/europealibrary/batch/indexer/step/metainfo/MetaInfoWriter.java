@@ -24,13 +24,9 @@ public class MetaInfoWriter implements ItemWriter<FileSystemItem> {
     private Integer batchSize;
 
     private final FileSystemItemRepository fileSystemItemRepository;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {
-        Session session = entityManager.unwrap(Session.class);
-        session.setJdbcBatchSize(batchSize);
         fileSystemItemRepository.saveAll(chunk.getItems());
         log.debug("saved {} records", chunk.getItems().size());
         fileSystemItemRepository.flush();

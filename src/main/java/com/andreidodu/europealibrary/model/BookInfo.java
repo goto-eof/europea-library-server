@@ -15,7 +15,8 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class BookInfo extends ModelCommon {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "el_book_info_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "el_book_info_seq", sequenceName = "el_book_info_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "image_url", length = 500)

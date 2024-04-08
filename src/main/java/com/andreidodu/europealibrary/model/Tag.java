@@ -19,7 +19,8 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class Tag extends ModelCommon implements Identificable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "el_tag_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "el_tag_seq", sequenceName = "el_tag_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "name", length = 100)

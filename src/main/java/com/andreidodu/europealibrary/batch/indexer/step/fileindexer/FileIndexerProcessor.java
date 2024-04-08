@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.fileindexerandcataloguer;
+package com.andreidodu.europealibrary.batch.indexer.step.fileindexer;
 
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.RecordStatusEnum;
@@ -52,20 +52,19 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private FileSystemItem reprocessOldFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
-        updateParentIdIfNull(fileSystemItem);
         return fileSystemItem;
     }
 
-    private void updateParentIdIfNull(FileSystemItem fileSystemItem) {
-        Optional<FileSystemItem> parentOptional = Optional.ofNullable(fileSystemItem.getParent());
-        if (parentOptional.isEmpty()) {
-            List<Integer> validSteps = List.of(JobStepEnum.INSERTED.getStepNumber(), JobStepEnum.READY.getStepNumber());
-            List<FileSystemItem> parents = this.getFileSystemItemByPathNameAndJobStepInList(fileUtil.calculateParentBasePath(fileSystemItem.getBasePath()), fileUtil.calculateFileName(fileSystemItem.getBasePath()), validSteps);
-            if (!parents.isEmpty()) {
-                fileSystemItem.setParent(parents.stream().findFirst().get());
-            }
-        }
-    }
+//    private void updateParentIdIfNull(FileSystemItem fileSystemItem) {
+//        Optional<FileSystemItem> parentOptional = Optional.ofNullable(fileSystemItem.getParent());
+//        if (parentOptional.isEmpty()) {
+//            List<Integer> validSteps = List.of(JobStepEnum.INSERTED.getStepNumber(), JobStepEnum.READY.getStepNumber());
+//            List<FileSystemItem> parents = this.getFileSystemItemByPathNameAndJobStepInList(fileUtil.calculateParentBasePath(fileSystemItem.getBasePath()), fileUtil.calculateFileName(fileSystemItem.getBasePath()), validSteps);
+//            if (!parents.isEmpty()) {
+//                fileSystemItem.setParent(parents.stream().findFirst().get());
+//            }
+//        }
+//    }
 
     private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
@@ -86,11 +85,11 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private FileSystemItem buildFileSystemItemFromScratch(FileDTO fileSystemItemDTO) {
         FileSystemItem fileSystemItem = this.fileSystemItemMapper.toModel(fileSystemItemDTO);
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
-        this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateFileName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
-                .ifPresentOrElse(fileSystemItem::setParent,
-                        () -> this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateFileName(fileSystemItemDTO.getBasePath()), JobStepEnum.READY.getStepNumber())
-                                .ifPresent(fileSystemItem::setParent)
-                );
+//        this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateFileName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
+//                .ifPresentOrElse(fileSystemItem::setParent,
+//                        () -> this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateFileName(fileSystemItemDTO.getBasePath()), JobStepEnum.READY.getStepNumber())
+//                                .ifPresent(fileSystemItem::setParent)
+//                );
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         fileSystemItem.setExtension(StringUtil.toLowerCase(this.fileUtil.getExtension(fileSystemItemDTO.getName())));
         return fileSystemItem;
@@ -100,8 +99,8 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         return this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(basePath, name, jobStep);
     }
 
-    private List<FileSystemItem> getFileSystemItemByPathNameAndJobStepInList(String basePath, String name, List<Integer> jobStepList) {
-        return this.fileSystemItemRepository.findByBasePathAndNameAndJobStepIn(basePath, name, jobStepList);
-    }
+//    private List<FileSystemItem> getFileSystemItemByPathNameAndJobStepInList(String basePath, String name, List<Integer> jobStepList) {
+//        return this.fileSystemItemRepository.findByBasePathAndNameAndJobStepIn(basePath, name, jobStepList);
+//    }
 
 }

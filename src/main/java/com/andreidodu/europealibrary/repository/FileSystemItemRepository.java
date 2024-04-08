@@ -22,4 +22,7 @@ public interface FileSystemItemRepository extends TransactionalRepository<FileSy
     void updateFileMetaInfoId(@Param(value = "fileSystemItemId") Long fileSystemItemId, @Param(value = "fileMetaInfoId") Long fileMetaInfoId);
 
     List<FileSystemItem> findByBasePathAndNameAndJobStepIn(String basePath, String name, List<Integer> jobStepList);
+
+    @Query(value = "select fsi.id from FileSystemItem fsi where fsi.basePath = :basePath and fsi.name = :name and fsi.jobStep = :jobStep")
+    Optional<Long> findIdByBasePathAndNameAndJobStep(String basePath, String name, int jobStep);
 }

@@ -10,12 +10,15 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -30,17 +33,18 @@ public class FileHashStepConfig {
     private String ebookDirectory;
 
     private final JobRepository jobRepository;
-    private final TaskExecutor threadPoolTaskExecutor;
-    private final JdbcPagingItemReader<FileSystemItem> hashStorerReader;
+    @Autowired
+    @Qualifier("threadPoolTaskExecutor")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     private final FileSystemItemHashProcessor processor;
     private final FileSystemItemHashWriter writer;
     private final HibernateTransactionManager transactionManager;
     private final DataSource dataSource;
 
     @Bean("fileSystemItemHashStep")
-    public Step fileSystemItemHashStep() {
+    public Step fileSystemItemHashStep( JdbcPagingItemReader<Long> hashStorerReader) {
         return new StepBuilder("fileSystemItemHashStep", jobRepository)
-                .<FileSystemItem, FileSystemItem>chunk(batchSize, transactionManager)
+                .<Long, FileSystemItem>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(hashStorerReader)
@@ -50,11 +54,11 @@ public class FileHashStepConfig {
     }
 
     @Bean("hashStorerReader")
-    public JdbcPagingItemReader<FileSystemItem> hashStorerReader() {
-        JdbcPagingItemReader<FileSystemItem> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
+    public JdbcPagingItemReader<Long> hashStorerReader() {
+        JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
         jdbcPagingItemReader.setFetchSize(batchSize);
-        jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
+        jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(getPostgresHashQueryProvider());
         jdbcPagingItemReader.setSaveState(false);
         return jdbcPagingItemReader;
@@ -62,7 +66,7 @@ public class FileHashStepConfig {
 
     public PostgresPagingQueryProvider getPostgresHashQueryProvider() {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
-        queryProvider.setSelectClause("SELECT *");
+        queryProvider.setSelectClause("SELECT id");
         queryProvider.setFromClause("FROM el_file_system_item");
         queryProvider.setWhereClause("WHERE record_status = 1 and base_path like '" + ebookDirectory + "%'");
         Map<String, Order> orderByKeys = new HashMap<>();

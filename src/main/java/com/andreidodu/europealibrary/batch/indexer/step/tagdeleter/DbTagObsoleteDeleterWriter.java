@@ -19,6 +19,7 @@ public class DbTagObsoleteDeleterWriter implements ItemWriter<Tag> {
     @Override
     public void write(Chunk<? extends Tag> chunk) {
         this.repository.deleteAllInBatch(chunk.getItems().stream().map(tag -> (Tag) tag).collect(Collectors.toList()));
+        this.repository.flush();
         log.debug("deleted {} Tag records", chunk.getItems().size());
     }
 }

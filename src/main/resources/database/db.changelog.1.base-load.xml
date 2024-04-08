@@ -4,8 +4,20 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
-    <changeSet id="2024-03-31-001" author="Andrei Dodu">
-        <createSequence sequenceName="EL_FILE_META_INFO_ID" startValue="1000"/>
+    <changeSet id="2024-04-08-001" author="Andrei Dodu">
+        <createSequence sequenceName="el_file_system_item_seq" cycle="false" startValue="1" incrementBy="50"
+                        cacheSize="50"/>
+        <createSequence sequenceName="el_book_info_seq" cycle="false" startValue="1" incrementBy="50" cacheSize="50"/>
+        <createSequence sequenceName="el_category_seq" cycle="false" startValue="1" incrementBy="50" cacheSize="50"/>
+        <createSequence sequenceName="el_file_meta_info_seq" cycle="false" startValue="1" incrementBy="50"
+                        cacheSize="50"/>
+        <createSequence sequenceName="el_tag_seq" cycle="false" startValue="1" incrementBy="50" cacheSize="50"/>
+
+        <!--        <alterSequence sequenceName="el_file_system_item_seq" incrementBy="50"/>
+                <alterSequence sequenceName="el_book_info_seq" incrementBy="50"/>
+                <alterSequence sequenceName="el_category_seq" incrementBy="50"/>
+                <alterSequence sequenceName="el_file_meta_info_seq" incrementBy="50"/>
+                <alterSequence sequenceName="el_tag_seq" incrementBy="50"/>-->
     </changeSet>
 
     <changeSet id="2024-03-13-001" author="Andrei Dodu">
@@ -62,12 +74,12 @@
             <column name="version" type="INT"/>
         </createTable>
 
-<!--        <addForeignKeyConstraint baseColumnNames="parent_id"-->
-<!--                                 baseTableName="${tablePrefix}file_system_item"-->
-<!--                                 constraintName="fk_fs_item_parent"-->
-<!--                                 referencedColumnNames="id"-->
-<!--                                 referencedTableName="${tablePrefix}file_system_item"-->
-<!--                                 validate="true"/>-->
+        <!--        <addForeignKeyConstraint baseColumnNames="parent_id"-->
+        <!--                                 baseTableName="${tablePrefix}file_system_item"-->
+        <!--                                 constraintName="fk_fs_item_parent"-->
+        <!--                                 referencedColumnNames="id"-->
+        <!--                                 referencedTableName="${tablePrefix}file_system_item"-->
+        <!--                                 validate="true"/>-->
 
 
         <addUniqueConstraint
@@ -126,7 +138,7 @@
         </createTable>
 
         <createTable tableName="${tablePrefix}file_meta_info_tag">
-            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+            <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tag_file_meta_info"/>
             </column>
             <column name="file_meta_info_id" type="bigint">

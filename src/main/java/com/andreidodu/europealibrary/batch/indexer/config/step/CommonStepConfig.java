@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Slf4j
@@ -16,7 +17,8 @@ public class CommonStepConfig {
     @Value("${com.andreidodu.europea-library.max-pool-size}")
     private Integer maxPoolSize;
 
-    @Bean("threadPoolTaskExecutor")
+    @Primary
+    @Bean(name = "threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         int corePoolSize = Runtime.getRuntime().availableProcessors() - 1;
         int maxPoolSize = corePoolSize * 2;

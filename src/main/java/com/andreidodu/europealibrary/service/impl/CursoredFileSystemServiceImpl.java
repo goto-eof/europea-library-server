@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
+import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
@@ -112,7 +113,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     }
 
     @Override
-    @Cacheable(cacheNames = {"extensions"})
+    @Cacheable(cacheNames = {CacheConst.CACHE_NAME_EXTENSIONS})
     public List<FileExtensionDTO> getAllExtensions() {
         return this.fileExtensionMapper.toDTO(this.fileSystemItemRepository.retrieveExtensionsInfo());
     }
