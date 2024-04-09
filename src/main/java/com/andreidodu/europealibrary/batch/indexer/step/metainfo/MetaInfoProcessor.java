@@ -22,14 +22,13 @@ public class MetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
-        FileSystemItem fileSystemItemUpdated = metaInfoRetriever.buildMetaInfoFromEbookIfNecessary(fileSystemItem)
+        return metaInfoRetriever.buildMetaInfoFromEbookIfNecessary(fileSystemItem)
                 .map(fileMetaInfo -> {
                     this.entityManager.detach(fileSystemItem);
                     fileSystemItem.setFileMetaInfoId(fileMetaInfo.getId());
                     return fileSystemItem;
                 })
                 .orElse(null);
-        return fileSystemItemUpdated;
     }
 
 
