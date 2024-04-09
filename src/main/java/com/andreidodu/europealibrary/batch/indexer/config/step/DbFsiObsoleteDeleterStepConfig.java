@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.batch.indexer.config.step;
 
 import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfsiobsoletedeleter.DbFSIObsoleteDeleterWriter;
-import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -42,9 +40,9 @@ public class DbFsiObsoleteDeleterStepConfig {
     private final HibernateTransactionManager transactionManager;
 
     @Bean("dbFSIObsoleteDeleterStep")
-    public Step dbFSIObsoleteDeleterStep(JdbcPagingItemReader<FileSystemItem> dbFSIObsoleteDeleterReader) {
+    public Step dbFSIObsoleteDeleterStep(JdbcPagingItemReader<Long> dbFSIObsoleteDeleterReader) {
         return new StepBuilder("dbFSIObsoleteDeleterStep", jobRepository)
-                .<FileSystemItem, FileSystemItem>chunk(stepFsiObsoleteDeleterBatchSize, transactionManager)
+                .<Long, Long>chunk(stepFsiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(dbFSIObsoleteDeleterReader)
@@ -54,11 +52,11 @@ public class DbFsiObsoleteDeleterStepConfig {
     }
 
     @Bean("dbFSIObsoleteDeleterReader")
-    public JdbcPagingItemReader<FileSystemItem> dbFSIObsoleteDeleterReader() {
-        JdbcPagingItemReader<FileSystemItem> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
+    public JdbcPagingItemReader<Long> dbFSIObsoleteDeleterReader() {
+        JdbcPagingItemReader<Long> jdbcPagingItemReader = (new JdbcPagingItemReader<>());
         jdbcPagingItemReader.setDataSource(dataSource);
         jdbcPagingItemReader.setFetchSize(stepFsiObsoleteDeleterBatchSize);
-        jdbcPagingItemReader.setRowMapper(new BeanPropertyRowMapper<>(FileSystemItem.class));
+        jdbcPagingItemReader.setRowMapper((rs, rowNum) -> rs.getObject(1, Long.class));
         jdbcPagingItemReader.setQueryProvider(dbFSIObsoleteDeleterReaderQueryProvider());
         jdbcPagingItemReader.setSaveState(false);
         return jdbcPagingItemReader;
@@ -66,7 +64,7 @@ public class DbFsiObsoleteDeleterStepConfig {
 
     public PostgresPagingQueryProvider dbFSIObsoleteDeleterReaderQueryProvider() {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
-        queryProvider.setSelectClause("SELECT *");
+        queryProvider.setSelectClause("SELECT fsi.id");
         queryProvider.setFromClause("FROM el_file_system_item fsi");
         queryProvider.setWhereClause("WHERE fsi.record_status = 2 OR (fsi.base_path NOT LIKE '" + new File(ebookDirectory).getParent() + "%')");
         Map<String, Order> orderByKeys = new HashMap<>();

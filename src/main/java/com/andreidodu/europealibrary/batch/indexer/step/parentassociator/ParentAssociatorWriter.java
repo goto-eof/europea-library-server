@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@Deprecated
 @RequiredArgsConstructor
 public class ParentAssociatorWriter implements ItemWriter<FileSystemItem> {
     final private FileSystemItemRepository fileSystemItemRepository;

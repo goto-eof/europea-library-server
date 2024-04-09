@@ -34,7 +34,7 @@ public class FileIndexerStepConfig {
         return new StepBuilder("indexDirectoriesAndFiles", jobRepository)
                 .<File, FileSystemItem>chunk(stepIndexerBatchSize, transactionManager)
                 .allowStartIfComplete(true)
-                // .taskExecutor(threadPoolTaskExecutor)
+                .taskExecutor(threadPoolTaskExecutor)
                 .reader(fileIndexerReader)
                 .processor(processor)
                 .writer(writer)

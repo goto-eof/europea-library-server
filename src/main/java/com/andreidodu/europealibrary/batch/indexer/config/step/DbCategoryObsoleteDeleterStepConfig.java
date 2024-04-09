@@ -42,7 +42,7 @@ public class DbCategoryObsoleteDeleterStepConfig {
     @Bean("dbCategoryObsoleteDeleterStep")
     public Step dbCategoryObsoleteDeleterStep(JdbcPagingItemReader<Long> dbCategoryObsoleteDeleterReader) {
         return new StepBuilder("dbCategoryObsoleteDeleterStep", jobRepository)
-                .<Long, Category>chunk(batchSize, transactionManager)
+                .<Long, Long>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(dbCategoryObsoleteDeleterReader)

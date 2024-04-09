@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -21,18 +20,24 @@ public class ParentAssociatorProcessor implements ItemProcessor<Long, FileSystem
     final private FileSystemItemRepository fileSystemItemRepository;
     final private FileUtil fileUtil;
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
-        recalculateParent(fileSystemItem);
-        return fileSystemItem;
+        this.entityManager.detach(fileSystemItem);
+        if (recalculateParent(fileSystemItem)) {
+            return fileSystemItem;
+        }
+        return null;
     }
 
-    private void recalculateParent(FileSystemItem fileSystemItem) {
-        this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItem.getBasePath()), fileUtil.calculateFileName(fileSystemItem.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
-                .ifPresentOrElse(fileSystemItem::setParentId, () -> fileSystemItem.setParent(null));
+    private boolean recalculateParent(FileSystemItem fileSystemItem) {
+        return this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItem.getBasePath()), fileUtil.calculateFileName(fileSystemItem.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
+                .map(parentId -> {
+                    fileSystemItem.setParentId(parentId);
+                    return true;
+                }).orElse(false);
     }
 
     private Optional<Long> getFileSystemItemByPathNameAndJobStep(String basePath, String name, int jobStep) {

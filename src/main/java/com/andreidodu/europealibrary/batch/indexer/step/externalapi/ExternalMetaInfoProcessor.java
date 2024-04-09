@@ -7,6 +7,8 @@ import com.andreidodu.europealibrary.exception.SkipStepException;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -22,19 +24,21 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
 
     final private List<MetaInfoRetrieverStrategy> metaInfoRetrieverStrategyList;
     final private FileSystemItemRepository fileSystemItemRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
-        FileMetaInfo fileMetaInfo = buildMetaInfoFromWebIfNecessary(fileSystemItemId);
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
+        FileMetaInfo fileMetaInfo = buildMetaInfoFromWebIfNecessary(fileSystemItem);
+        this.entityManager.detach(fileSystemItem);
         fileSystemItem.setFileMetaInfoId(fileMetaInfo.getId());
         log.debug("external meta-info retrieved: {}", fileSystemItem.getName());
         putThreadOnSleep();
         return fileSystemItem;
     }
 
-    private FileMetaInfo buildMetaInfoFromWebIfNecessary(Long fileSystemItemId) {
-        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
+    private FileMetaInfo buildMetaInfoFromWebIfNecessary(FileSystemItem fileSystemItem) {
         return metaInfoRetrieverStrategyList.stream()
                 .filter(strategy -> strategy.accept(fileSystemItem))
                 .findFirst()

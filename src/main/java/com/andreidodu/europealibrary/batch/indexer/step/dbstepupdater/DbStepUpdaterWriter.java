@@ -1,7 +1,5 @@
 package com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater;
 
-import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
-import com.andreidodu.europealibrary.batch.indexer.enums.RecordStatusEnum;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Deprecated
 @RequiredArgsConstructor
 public class DbStepUpdaterWriter implements ItemWriter<FileSystemItem> {
     private final FileSystemItemRepository fileSystemItemRepository;

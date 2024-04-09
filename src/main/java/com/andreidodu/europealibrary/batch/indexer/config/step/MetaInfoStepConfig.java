@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.config.step;
 
+import com.andreidodu.europealibrary.batch.indexer.step.metainfo.MetaInfoBulkWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.MetaInfoProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.metainfo.MetaInfoWriter;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
@@ -30,7 +30,7 @@ public class MetaInfoStepConfig {
 
     private final DataSource dataSource;
     private final MetaInfoProcessor processor;
-    private final MetaInfoWriter metaInfoWriter;
+    private final MetaInfoBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -45,7 +45,7 @@ public class MetaInfoStepConfig {
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(metaInfoBuilderReader)
                 .processor(processor)
-                .writer(metaInfoWriter)
+                .writer(writer)
                 .build();
     }
 

@@ -9,6 +9,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.ZoneOffset;
@@ -36,7 +37,10 @@ public class FileIndexerBulkWriter implements ItemWriter<FileSystemItem> {
 
     private void bulkInsertItems(List<FileSystemItem> items) throws SQLException {
         List<FileSystemItem> inserts = items.stream().filter(item -> item.getId() == null).toList();
-        try (PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(BULK_INSERT_TEMPLATE)) {
+        Connection connection = dataSource.getConnection();
+        connection.setAutoCommit(false);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(BULK_INSERT_TEMPLATE)) {
+
             for (FileSystemItem item : inserts) {
                 preparedStatement.setString(1, item.getName());
                 preparedStatement.setString(2, item.getBasePath());
@@ -85,6 +89,8 @@ public class FileIndexerBulkWriter implements ItemWriter<FileSystemItem> {
                 preparedStatement.clearParameters();
             }
             preparedStatement.executeBatch();
+            connection.commit();
+            connection.close();
         }
     }
 

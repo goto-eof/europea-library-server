@@ -1,16 +1,15 @@
 package com.andreidodu.europealibrary.batch.indexer.step.filehash;
 
-import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.FileUtil;
 import com.andreidodu.europealibrary.util.StringUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -18,47 +17,42 @@ import java.util.Optional;
 public class FileSystemItemHashProcessor implements ItemProcessor<Long, FileSystemItem> {
     private final FileUtil fileUtil;
     private final FileSystemItemRepository fileSystemItemRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
-        fileSystemItem = calculateAndUpdateHashAndMetaInfoIdIfNecessary(fileSystemItem);
-        return fileSystemItem;
+        this.entityManager.detach(fileSystemItem);
+        if (isCalculateAndUpdateHashAndMetaInfoIdIfNecessary(fileSystemItem)) {
+            return fileSystemItem;
+        }
+        return null;
     }
 
-    private FileSystemItem calculateAndUpdateHashAndMetaInfoIdIfNecessary(FileSystemItem fileSystemItem) {
+    private boolean isCalculateAndUpdateHashAndMetaInfoIdIfNecessary(FileSystemItem fileSystemItem) {
         if (fileSystemItem.getIsDirectory()) {
-            return fileSystemItem;
+            return false;
         }
+
+
         if (StringUtil.isNotEmpty(fileSystemItem.getSha256())) {
-            return fileSystemItem;
+            return true;
         }
 
-        return associateMetaInfoEntityIfFound(fileSystemItem);
+
+        return isCalculateSha256(fileSystemItem);
+
+
     }
 
-
-    private FileSystemItem associateMetaInfoEntityIfFound(FileSystemItem fileSystemItem) {
+    private boolean isCalculateSha256(FileSystemItem fileSystemItem) {
         final String fileFullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        if (fileSystemItem.getSha256() == null) {
-            fileSystemItem.setSha256(this.fileUtil.fileNameToHash(fileFullPath)
-                    .orElse(null));
-        }
-
-        associateMetaInfoIfExists(fileSystemItem);
-
-        return fileSystemItem;
+        return this.fileUtil.fileNameToHash(fileFullPath).map(sha256 -> {
+                    fileSystemItem.setSha256(sha256);
+                    return true;
+                })
+                .orElse(false);
     }
-
-    private void associateMetaInfoIfExists(FileSystemItem fileSystemItem) {
-        this.fileSystemItemRepository.findBySha256(fileSystemItem.getSha256())
-                .stream()
-                .filter(fsi -> fsi.getFileMetaInfo() != null)
-                .findFirst()
-                .flatMap(fsi -> Optional.ofNullable(fileSystemItem.getFileMetaInfo())
-                        .map(FileMetaInfo::getId))
-                .ifPresent(fileMetaInfoId -> this.fileSystemItemRepository.updateFileMetaInfoId(fileSystemItem.getId(), fileMetaInfoId));
-    }
-
 
 }

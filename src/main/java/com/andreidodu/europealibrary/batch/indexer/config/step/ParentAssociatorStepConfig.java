@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.config.step;
 
+import com.andreidodu.europealibrary.batch.indexer.step.parentassociator.ParentAssociatorBulkWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.parentassociator.ParentAssociatorProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.parentassociator.ParentAssociatorWriter;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
@@ -30,7 +30,7 @@ public class ParentAssociatorStepConfig {
 
     private final JobRepository jobRepository;
     private final ParentAssociatorProcessor processor;
-    private final ParentAssociatorWriter parentAssociatorWriter;
+    private final ParentAssociatorBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -45,7 +45,7 @@ public class ParentAssociatorStepConfig {
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(parentAssociatorReader)
                 .processor(processor)
-                .writer(parentAssociatorWriter)
+                .writer(writer)
                 .build();
     }
 

@@ -1,8 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.config.step;
 
+import com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater.DbStepUpdaterBulkWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater.DbStepUpdaterProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.dbstepupdater.DbStepUpdaterWriter;
-import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
@@ -34,18 +33,18 @@ public class DbStepUpdaterStepConfig {
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     private final DbStepUpdaterProcessor processor;
-    private final DbStepUpdaterWriter dbStepUpdaterWriter;
+    private final DbStepUpdaterBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
 
     @Bean("dbJobStepUpdaterStep")
     public Step dbJobStepUpdaterStep( JdbcPagingItemReader<Long> dbStepUpdaterReader) {
         return new StepBuilder("dbJobStepUpdaterStep", jobRepository)
-                .<Long, FileSystemItem>chunk(batchSize, transactionManager)
+                .<Long, Long>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(dbStepUpdaterReader)
                 .processor(processor)
-                .writer(dbStepUpdaterWriter)
+                .writer(writer)
                 .build();
     }
 

@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.config.step;
 
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.ExternalMetaInfoProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.externalapi.ExternalMetaInfoWriter;
+import com.andreidodu.europealibrary.batch.indexer.step.metainfo.MetaInfoBulkWriter;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
@@ -28,7 +28,7 @@ public class ExternalMetaInfoStepConfig {
     private final JobRepository jobRepository;
     private final JdbcPagingItemReader<Long> metaInfoBuilderReader;
     private final ExternalMetaInfoProcessor processor;
-    private final ExternalMetaInfoWriter metaInfoWriter;
+    private final MetaInfoBulkWriter metaInfoWriter;
     private final HibernateTransactionManager transactionManager;
     private final ExternalMetaInfoStepListener externalMetaInfoStepListener;
     private final DataSource dataSource;

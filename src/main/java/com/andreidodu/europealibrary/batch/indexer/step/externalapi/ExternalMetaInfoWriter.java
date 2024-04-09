@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Deprecated
 @RequiredArgsConstructor
 public class ExternalMetaInfoWriter implements ItemWriter<FileSystemItem> {
     private final FileMetaInfoRepository fileMetaInfoRepository;

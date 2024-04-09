@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.config.step;
 
+import com.andreidodu.europealibrary.batch.indexer.step.filehash.FileSystemItemHashBulkWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.filehash.FileSystemItemHashProcessor;
-import com.andreidodu.europealibrary.batch.indexer.step.filehash.FileSystemItemHashWriter;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
@@ -35,12 +35,12 @@ public class FileHashStepConfig {
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     private final FileSystemItemHashProcessor processor;
-    private final FileSystemItemHashWriter writer;
+    private final FileSystemItemHashBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
     private final DataSource dataSource;
 
     @Bean("fileSystemItemHashStep")
-    public Step fileSystemItemHashStep( JdbcPagingItemReader<Long> hashStorerReader) {
+    public Step fileSystemItemHashStep(JdbcPagingItemReader<Long> hashStorerReader) {
         return new StepBuilder("fileSystemItemHashStep", jobRepository)
                 .<Long, FileSystemItem>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)

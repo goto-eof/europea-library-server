@@ -42,7 +42,7 @@ public class DbFmiObsoleteDeleterStepConfig {
     @Bean("dbFMIObsoleteDeleterStep")
     public Step dbFMIObsoleteDeleterStep(JdbcPagingItemReader<Long> dbFMIObsoleteDeleterReader) {
         return new StepBuilder("dbFMIObsoleteDeleterStep", jobRepository)
-                .<Long, FileMetaInfo>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
+                .<Long, Long>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)
                 .taskExecutor(threadPoolTaskExecutor)
                 .reader(dbFMIObsoleteDeleterReader)

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Deprecated
 @Component
 @RequiredArgsConstructor
 public class FileSystemItemHashWriter implements ItemWriter<FileSystemItem> {
