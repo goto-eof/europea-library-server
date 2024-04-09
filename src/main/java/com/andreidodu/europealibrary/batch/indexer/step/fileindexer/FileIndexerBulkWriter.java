@@ -82,6 +82,7 @@ public class FileIndexerBulkWriter implements ItemWriter<FileSystemItem> {
                 }
                 preparedStatement.setInt(14, 0);
                 preparedStatement.addBatch();
+                preparedStatement.clearParameters();
             }
             preparedStatement.executeBatch();
         }
