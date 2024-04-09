@@ -147,7 +147,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     }
 
     private Optional<String> extractPublishedDate(List<Date> dates) {
-        return dates.stream().filter(date -> date.getEvent() == null).map(date -> date.getValue()).findFirst();
+        return dates.stream().filter(date -> date.getEvent() == null).map(Date::getValue).findFirst();
     }
 
     private String getFirst(List<String> list) {
