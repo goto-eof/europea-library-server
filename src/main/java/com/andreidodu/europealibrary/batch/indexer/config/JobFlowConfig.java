@@ -14,9 +14,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class JobFlowConfig {
+
+    private final JobRepository jobRepository;
     private final Step dbTagObsoleteDeleterStep;
     private final Step dbCategoryObsoleteDeleterStep;
-    private final JobRepository jobRepository;
     private final Step fileSystemItemHashStep;
     private final Step metaInfoBuilderStep;
     private final Step externalMetaInfoBuilderStep;
