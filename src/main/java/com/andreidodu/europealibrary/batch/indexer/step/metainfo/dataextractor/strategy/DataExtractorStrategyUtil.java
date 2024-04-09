@@ -42,7 +42,7 @@ public class DataExtractorStrategyUtil {
             return true;
         }
         Integer fileExtractionStatus = fileSystemItem.getFileMetaInfo().getBookInfo().getFileExtractionStatus();
-        List<Integer> statusesToIgnore = List.of(FileExtractionStatusEnum.SUCCESS.getStatus(), FileExtractionStatusEnum.SUCCESS_EMPTY.getStatus(), FileExtractionStatusEnum.FAILED.getStatus());
+        List<Integer> statusesToIgnore = List.of(FileExtractionStatusEnum.SUCCESS.getStatus(), FileExtractionStatusEnum.SUCCESS_EMPTY.getStatus());
         return fileExtractionStatus == null || !statusesToIgnore.contains(fileExtractionStatus);
 
     }

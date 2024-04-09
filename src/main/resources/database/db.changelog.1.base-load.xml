@@ -5,24 +5,22 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
     <changeSet id="2024-04-08-001" author="Andrei Dodu">
-        <createSequence sequenceName="el_file_system_item_seq" cycle="false" startValue="1" incrementBy="50"
+        <createSequence sequenceName="${tablePrefix}file_system_item_seq" cycle="false" startValue="1" incrementBy="50"
                         cacheSize="50"/>
-        <createSequence sequenceName="el_book_info_seq" cycle="false" startValue="1" incrementBy="50" cacheSize="50"/>
-        <createSequence sequenceName="el_category_seq" cycle="false" startValue="1" incrementBy="50" cacheSize="50"/>
-        <createSequence sequenceName="el_file_meta_info_seq" cycle="false" startValue="1" incrementBy="50"
+        <createSequence sequenceName="${tablePrefix}book_info_seq" cycle="false" startValue="1" incrementBy="50"
                         cacheSize="50"/>
-        <createSequence sequenceName="el_tag_seq" cycle="false" startValue="1" incrementBy="50" cacheSize="50"/>
-
-        <!--        <alterSequence sequenceName="el_file_system_item_seq" incrementBy="50"/>
-                <alterSequence sequenceName="el_book_info_seq" incrementBy="50"/>
-                <alterSequence sequenceName="el_category_seq" incrementBy="50"/>
-                <alterSequence sequenceName="el_file_meta_info_seq" incrementBy="50"/>
-                <alterSequence sequenceName="el_tag_seq" incrementBy="50"/>-->
+        <createSequence sequenceName="${tablePrefix}category_seq" cycle="false" startValue="1" incrementBy="50"
+                        cacheSize="50"/>
+        <createSequence sequenceName="${tablePrefix}file_meta_info_seq" cycle="false" startValue="1" incrementBy="50"
+                        cacheSize="50"/>
+        <createSequence sequenceName="${tablePrefix}tag_seq" cycle="false" startValue="1" incrementBy="50"
+                        cacheSize="50"/>
     </changeSet>
 
     <changeSet id="2024-03-13-001" author="Andrei Dodu">
         <createTable tableName="${tablePrefix}file_meta_info">
-            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}file_meta_info_seq">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_file_meta_info"/>
             </column>
             <column name="title" type="VARCHAR(512)">
@@ -37,7 +35,8 @@
 
 
         <createTable tableName="${tablePrefix}file_system_item">
-            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}file_system_item_seq">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_file_system_item"/>
             </column>
             <column name="name" type="VARCHAR(512)">
@@ -89,7 +88,8 @@
                 validate="true"/>
 
         <createTable tableName="${tablePrefix}book_info">
-            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}book_info_seq">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_book_info"/>
             </column>
             <column name="file_meta_info_id" type="bigint">
@@ -126,7 +126,8 @@
                 validate="true"/>
 
         <createTable tableName="${tablePrefix}tag">
-            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}tag_seq">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tag"/>
             </column>
             <column name="name" type="VARCHAR(100)">
@@ -161,7 +162,8 @@
     </changeSet>
     <changeSet id="2024-03-22-001" author="Andrei Dodu">
         <createTable tableName="${tablePrefix}category">
-            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}category_seq">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_category"/>
             </column>
             <column name="name" type="VARCHAR(100)">
@@ -173,7 +175,7 @@
         </createTable>
 
         <createTable tableName="${tablePrefix}book_info_category">
-            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+            <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_category_book_info"/>
             </column>
             <column name="book_info_id" type="bigint">

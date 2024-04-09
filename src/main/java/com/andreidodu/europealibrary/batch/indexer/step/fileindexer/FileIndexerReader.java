@@ -4,15 +4,19 @@ import com.andreidodu.europealibrary.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.*;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Slf4j
 @Component
@@ -29,39 +33,41 @@ public class FileIndexerReader implements ItemStreamReader<File> {
     private List<String> fileExtensionsToAllow;
 
     private final FileUtil fileUtil;
-    BlockingQueue<Path> directories = new LinkedBlockingQueue<>();
+    private final static ConcurrentLinkedQueue<File> directories = new ConcurrentLinkedQueue<>();
 
     @Override
-    public File read() throws InterruptedException {
+    public File read() {
         if (!directories.isEmpty()) {
-            Path path = directories.take();
-            File file = path.toFile();
-            if (file.isDirectory()) {
-                log.debug("processing directory {}", file.getAbsolutePath());
-                Arrays.stream(Objects.requireNonNull(file.listFiles()))
-                        .peek(fileItem -> {
-                            if (!fileExtensionsToIgnore.isEmpty() && fileItem.isFile() && fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase())) {
-                                log.debug("ignoring file: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
-                            }
-                        })
-                        .peek(fileItem -> {
-                            if (!fileExtensionsToAllow.isEmpty() && fileItem.isFile() && fileExtensionsToAllow.contains(fileUtil.getExtension(file.getName()).toLowerCase())) {
-                                log.debug("the following file will be processed: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
-                            }
-                        })
-                        .filter(fileItem -> fileExtensionsToIgnore.isEmpty() || fileItem.isDirectory() || !fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
-                        .filter(fileItem -> fileExtensionsToAllow.isEmpty() || fileItem.isDirectory() || fileExtensionsToAllow.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
-                        .sorted(sortByIsDirectoryAndName())
-                        .map(File::toPath)
-                        .forEach(pathItem -> {
-                            directories.add(pathItem);
-                            log.debug("added child {}", pathItem.toFile().getAbsolutePath());
-                        });
-            }
-            log.debug("found: " + file.getAbsolutePath() + "/" + file.getName());
+            File file = directories.poll();
+            log.debug("processed: " + file.getAbsolutePath() + "/" + file.getName());
             return file;
         }
+        log.debug("file is null!");
         return null;
+    }
+
+    private void loadDirectoryIfNecessary(File file) {
+        if (file.isDirectory()) {
+            log.debug("processing directory {}", file.getAbsolutePath());
+            List<File> files = Arrays.stream(Objects.requireNonNull(file.listFiles()))
+                    .peek(fileItem -> {
+                        if (!fileExtensionsToIgnore.isEmpty() && fileItem.isFile() && fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase())) {
+                            log.debug("ignoring file: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
+                        }
+                    })
+                    .peek(fileItem -> {
+                        if (!fileExtensionsToAllow.isEmpty() && fileItem.isFile() && fileExtensionsToAllow.contains(fileUtil.getExtension(file.getName()).toLowerCase())) {
+                            log.debug("the following file will be processed: {}", fileItem.getAbsolutePath() + "/" + fileItem.getName());
+                        }
+                    })
+                    .filter(fileItem -> fileExtensionsToIgnore.isEmpty() || fileItem.isDirectory() || !fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
+                    .filter(fileItem -> fileExtensionsToAllow.isEmpty() || fileItem.isDirectory() || fileExtensionsToAllow.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
+                    .sorted(sortByIsDirectoryAndName())
+                    .toList();
+            directories.addAll(files);
+            files.forEach(this::loadDirectoryIfNecessary);
+            log.debug("added {} children", files.size());
+        }
     }
 
     private static Comparator<File> sortByIsDirectoryAndName() {
@@ -75,7 +81,9 @@ public class FileIndexerReader implements ItemStreamReader<File> {
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         log.debug("ebooks directory: " + ebookDirectory);
-        directories.add(Path.of(ebookDirectory));
+        directories.add(Path.of(ebookDirectory).toFile());
+        loadDirectoryIfNecessary(Objects.requireNonNull(directories.poll()));
+
     }
 
 }

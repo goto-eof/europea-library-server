@@ -33,6 +33,7 @@ public class CommonStepConfig {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(corePoolSize);
         taskExecutor.setMaxPoolSize(maxPoolSize);
+        taskExecutor.setQueueCapacity(corePoolSize + maxPoolSize);
         taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         taskExecutor.afterPropertiesSet();
         return taskExecutor;

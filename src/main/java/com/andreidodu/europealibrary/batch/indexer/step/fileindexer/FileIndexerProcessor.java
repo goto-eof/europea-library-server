@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -29,6 +28,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private boolean forceLoadMetaInfoFromWeb;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.override-meta-info}")
     private boolean overrideMetaInfo;
+
     final private FileMapper fileMapper;
     final private FileUtil fileUtil;
     final private FileSystemItemMapper fileSystemItemMapper;
@@ -55,17 +55,6 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         return fileSystemItem;
     }
 
-//    private void updateParentIdIfNull(FileSystemItem fileSystemItem) {
-//        Optional<FileSystemItem> parentOptional = Optional.ofNullable(fileSystemItem.getParent());
-//        if (parentOptional.isEmpty()) {
-//            List<Integer> validSteps = List.of(JobStepEnum.INSERTED.getStepNumber(), JobStepEnum.READY.getStepNumber());
-//            List<FileSystemItem> parents = this.getFileSystemItemByPathNameAndJobStepInList(fileUtil.calculateParentBasePath(fileSystemItem.getBasePath()), fileUtil.calculateFileName(fileSystemItem.getBasePath()), validSteps);
-//            if (!parents.isEmpty()) {
-//                fileSystemItem.setParent(parents.stream().findFirst().get());
-//            }
-//        }
-//    }
-
     private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         return fileSystemItem;
@@ -85,11 +74,6 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private FileSystemItem buildFileSystemItemFromScratch(FileDTO fileSystemItemDTO) {
         FileSystemItem fileSystemItem = this.fileSystemItemMapper.toModel(fileSystemItemDTO);
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
-//        this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateFileName(fileSystemItemDTO.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
-//                .ifPresentOrElse(fileSystemItem::setParent,
-//                        () -> this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItemDTO.getBasePath()), fileUtil.calculateFileName(fileSystemItemDTO.getBasePath()), JobStepEnum.READY.getStepNumber())
-//                                .ifPresent(fileSystemItem::setParent)
-//                );
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         fileSystemItem.setExtension(StringUtil.toLowerCase(this.fileUtil.getExtension(fileSystemItemDTO.getName())));
         return fileSystemItem;
@@ -98,9 +82,5 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private Optional<FileSystemItem> getFileSystemItemByPathNameAndJobStep(String basePath, String name, int jobStep) {
         return this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(basePath, name, jobStep);
     }
-
-//    private List<FileSystemItem> getFileSystemItemByPathNameAndJobStepInList(String basePath, String name, List<Integer> jobStepList) {
-//        return this.fileSystemItemRepository.findByBasePathAndNameAndJobStepIn(basePath, name, jobStepList);
-//    }
 
 }

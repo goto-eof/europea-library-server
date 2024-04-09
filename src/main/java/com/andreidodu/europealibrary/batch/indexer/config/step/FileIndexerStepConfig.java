@@ -1,15 +1,13 @@
 package com.andreidodu.europealibrary.batch.indexer.config.step;
 
+import com.andreidodu.europealibrary.batch.indexer.step.fileindexer.FileIndexerBulkWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexer.FileIndexerProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.fileindexer.FileIndexerReader;
-import com.andreidodu.europealibrary.batch.indexer.step.fileindexer.FileIndexerWriter;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,19 +24,17 @@ public class FileIndexerStepConfig {
 
     private final FileIndexerProcessor processor;
     private final FileIndexerReader fileIndexerReader;
-    private final FileIndexerWriter writer;
+    private final FileIndexerBulkWriter writer;
     private final JobRepository jobRepository;
     private final HibernateTransactionManager transactionManager;
-    @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Bean("fileIndexerAndCataloguerStep")
     public Step fileIndexerAndCataloguerStep() {
         return new StepBuilder("indexDirectoriesAndFiles", jobRepository)
                 .<File, FileSystemItem>chunk(stepIndexerBatchSize, transactionManager)
                 .allowStartIfComplete(true)
-                .taskExecutor(threadPoolTaskExecutor)
+                // .taskExecutor(threadPoolTaskExecutor)
                 .reader(fileIndexerReader)
                 .processor(processor)
                 .writer(writer)
