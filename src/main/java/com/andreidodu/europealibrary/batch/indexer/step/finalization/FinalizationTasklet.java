@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.batch.indexer.step.finalstep;
+package com.andreidodu.europealibrary.batch.indexer.step.finalization;
 
 import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;

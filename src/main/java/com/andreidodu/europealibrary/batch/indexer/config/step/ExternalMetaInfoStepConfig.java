@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.batch.indexer.config.step;
 
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.ExternalMetaInfoProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.ExternalMetaInfoWriter;
-import com.andreidodu.europealibrary.exception.SkipStepException;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;

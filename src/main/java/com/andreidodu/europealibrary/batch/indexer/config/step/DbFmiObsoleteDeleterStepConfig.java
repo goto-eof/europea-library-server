@@ -32,12 +32,16 @@ public class DbFmiObsoleteDeleterStepConfig {
     private Integer stepFmiObsoleteDeleterBatchSize;
 
     private final DataSource dataSource;
+    private final JobRepository jobRepository;
+    private final DbFMIObsoleteDeleterProcessor processor;
+    private final DbFMIObsoleteDeleterWriter fileItemWriter;
+    private final HibernateTransactionManager transactionManager;
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Bean("dbFMIObsoleteDeleterStep")
-    public Step dbFMIObsoleteDeleterStep(JdbcPagingItemReader<Long> dbFMIObsoleteDeleterReader, JobRepository jobRepository, DbFMIObsoleteDeleterProcessor processor, DbFMIObsoleteDeleterWriter fileItemWriter, HibernateTransactionManager transactionManager) {
+    public Step dbFMIObsoleteDeleterStep(JdbcPagingItemReader<Long> dbFMIObsoleteDeleterReader) {
         return new StepBuilder("dbFMIObsoleteDeleterStep", jobRepository)
                 .<Long, FileMetaInfo>chunk(stepFmiObsoleteDeleterBatchSize, transactionManager)
                 .allowStartIfComplete(true)

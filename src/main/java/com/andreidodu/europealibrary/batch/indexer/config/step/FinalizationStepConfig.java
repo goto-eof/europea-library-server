@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.config.step;
 
-import com.andreidodu.europealibrary.batch.indexer.step.finalstep.FinalizationTasklet;
+import com.andreidodu.europealibrary.batch.indexer.step.finalization.FinalizationTasklet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
