@@ -11,7 +11,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class CommonStepConfig {
 
-
     @Value("${com.andreidodu.europea-library.core-pool-size}")
     private Integer corePoolSize;
     @Value("${com.andreidodu.europea-library.max-pool-size}")
