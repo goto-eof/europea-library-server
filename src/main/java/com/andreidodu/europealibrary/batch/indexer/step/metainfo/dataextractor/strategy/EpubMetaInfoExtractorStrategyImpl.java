@@ -39,6 +39,8 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     private final TagUtil tagUtil;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
+    private boolean disableIsbExtractor;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
     @PersistenceContext
     private EntityManager entityManager;
@@ -112,9 +114,11 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                         bookInfo.setIsbn10(isbn);
                     }
                 }, () -> {
-                    BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.epubUtil.extractISBN(book);
-                    dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
-                    dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
+                    if (!disableIsbExtractor) {
+                        BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.epubUtil.extractISBN(book);
+                        dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
+                        dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
+                    }
                 });
 
 

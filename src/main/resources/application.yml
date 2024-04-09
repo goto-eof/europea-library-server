@@ -78,6 +78,7 @@ com:
           step-meta-info-writer:
             batch-size: 5000
           step-ext-meta-info-writer:
+            disable-isbn-extractor: false
             batch-size: 1
           step-step-updater:
             batch-size: 5000

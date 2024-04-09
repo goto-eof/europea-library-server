@@ -36,6 +36,8 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
     final private static String STRATEGY_NAME = "pdf-meta-info-extractor-strategy";
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-pdf-metadata-extractor}")
     private boolean disablePDFMetadataExtractor;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
+    private boolean disableIsbExtractor;
 
     private final PdfUtil pdfUtil;
     private final FileMetaInfoRepository fileMetaInfoRepository;
@@ -104,9 +106,11 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
         bookInfo.setLanguage(StringUtil.cleanAndTrimToNullLowerCaseSubstring(pdDocument.getDocumentCatalog().getLanguage(), DataPropertiesConst.BOOK_INFO_LANGUAGE_MAX_LENGTH));
         bookInfo.setNumberOfPages(pdDocument.getNumberOfPages());
         bookInfo.setAuthors(StringUtil.cleanAndTrimToNullSubstring(pdDocument.getDocumentInformation().getAuthor(), DataPropertiesConst.BOOK_INFO_PUBLISHER_MAX_LENGTH));
-        BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.pdfUtil.retrieveISBN(pdDocument);
-        dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
-        dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
+        if (!disableIsbExtractor) {
+            BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.pdfUtil.retrieveISBN(pdDocument);
+            dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
+            dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
+        }
         return bookInfo;
     }
 
