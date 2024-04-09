@@ -35,6 +35,7 @@ public class MetaInfoStepConfig {
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
     private final JobRepository jobRepository;
 
     @Bean("metaInfoBuilderStep")

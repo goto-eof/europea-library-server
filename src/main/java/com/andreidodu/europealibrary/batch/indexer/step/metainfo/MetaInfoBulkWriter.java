@@ -24,9 +24,6 @@ public class MetaInfoBulkWriter implements ItemWriter<FileSystemItem> {
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) throws SQLException {
-        if (chunk.getItems().isEmpty()) {
-            return;
-        }
         updateItems((List<FileSystemItem>) chunk.getItems());
     }
 

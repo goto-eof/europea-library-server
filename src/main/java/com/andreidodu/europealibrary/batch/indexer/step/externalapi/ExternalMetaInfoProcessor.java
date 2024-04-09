@@ -6,6 +6,7 @@ import com.andreidodu.europealibrary.dto.ApiResponseDTO;
 import com.andreidodu.europealibrary.exception.SkipStepException;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
+import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -24,6 +25,7 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
 
     final private List<MetaInfoRetrieverStrategy> metaInfoRetrieverStrategyList;
     final private FileSystemItemRepository fileSystemItemRepository;
+    final private FileMetaInfoRepository fileMetaInfoRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -31,6 +33,7 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
     public FileSystemItem process(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
         FileMetaInfo fileMetaInfo = buildMetaInfoFromWebIfNecessary(fileSystemItem);
+        this.fileMetaInfoRepository.save(fileMetaInfo);
         this.entityManager.detach(fileSystemItem);
         fileSystemItem.setFileMetaInfoId(fileMetaInfo.getId());
         log.debug("external meta-info retrieved: {}", fileSystemItem.getName());

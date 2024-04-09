@@ -73,6 +73,8 @@
             <column name="version" type="INT"/>
         </createTable>
 
+
+
         <!--        <addForeignKeyConstraint baseColumnNames="parent_id"-->
         <!--                                 baseTableName="${tablePrefix}file_system_item"-->
         <!--                                 constraintName="fk_fs_item_parent"-->
@@ -86,6 +88,11 @@
                 constraintName="unq_base_path_name"
                 tableName="${tablePrefix}file_system_item"
                 validate="true"/>
+
+        <createIndex indexName="file_system_item_sha256_idx" tableName="${tablePrefix}file_system_item">
+            <column name="sha256"/>
+        </createIndex>
+
 
         <createTable tableName="${tablePrefix}book_info">
             <column autoIncrement="${autoIncrement}" name="id" type="BIGINT"

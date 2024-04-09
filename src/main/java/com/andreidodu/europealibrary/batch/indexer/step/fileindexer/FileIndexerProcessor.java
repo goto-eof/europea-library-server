@@ -9,15 +9,18 @@ import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.FileUtil;
 import com.andreidodu.europealibrary.util.StringUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -33,32 +36,36 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     final private FileUtil fileUtil;
     final private FileSystemItemMapper fileSystemItemMapper;
     final private FileSystemItemRepository fileSystemItemRepository;
-
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
+    @Transactional(transactionManager = "transactionManager")
     public FileSystemItem process(final File file) {
         log.debug("Processing file: {}", file.getAbsoluteFile());
         // if job was stopped prematurely, then I have already a record on DB
-        Optional<FileSystemItem> fileSystemIteminInsertedOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.INSERTED.getStepNumber());
-        if (fileSystemIteminInsertedOptional.isPresent()) {
-            return recoverExistingFileSystemItem(fileSystemIteminInsertedOptional.get());
-        }
-        Optional<FileSystemItem> fileSystemItemInReadyOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), JobStepEnum.READY.getStepNumber());
-        return fileSystemItemInReadyOptional.map(/*case when file is in the same directory*/this::reprocessOldFileSystemItem)
+//        Optional<FileSystemItem> fileSystemIteminInsertedOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), );
+//        if (fileSystemIteminInsertedOptional.isPresent()) {
+//            return recoverExistingFileSystemItem(fileSystemIteminInsertedOptional.get());
+//        }
+        List<FileSystemItem> fileSystemItemInReadyOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), List.of(JobStepEnum.INSERTED.getStepNumber(), JobStepEnum.READY.getStepNumber()));
+        return fileSystemItemInReadyOptional.stream().findFirst().map(/*case when file is in the same directory*/this::reprocessOldFileSystemItem)
                 .orElseGet(() -> /*case when file is new*/ buildFileSystemItemFromScratch(file));
 
     }
 
     private FileSystemItem reprocessOldFileSystemItem(FileSystemItem fileSystemItem) {
+        this.entityManager.detach(fileSystemItem);
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         return fileSystemItem;
     }
 
-    private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
-        fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
-        return fileSystemItem;
-    }
+//    private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
+//        this.entityManager.detach(fileSystemItem);
+//        fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
+//        return fileSystemItem;
+//    }
 
     private FileSystemItem buildFileSystemItemFromScratch(File file) {
         try {
@@ -79,8 +86,8 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         return fileSystemItem;
     }
 
-    private Optional<FileSystemItem> getFileSystemItemByPathNameAndJobStep(String basePath, String name, int jobStep) {
-        return this.fileSystemItemRepository.findByBasePathAndNameAndJobStep(basePath, name, jobStep);
+    private List<FileSystemItem> getFileSystemItemByPathNameAndJobStep(String basePath, String name, List<Integer> jobSteps) {
+        return this.fileSystemItemRepository.findByBasePathAndNameAndJobStepIn(basePath, name, jobSteps);
     }
 
 }
