@@ -99,7 +99,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
 
 
     private CursoredFileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {
-        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findByLowestBasePath(JobStepEnum.READY.getStepNumber())
+        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findByNoParent(JobStepEnum.READY.getStepNumber())
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
         CursorRequestDTO cursorRequestDTO = new CursorRequestDTO();
         cursorRequestDTO.setParentId(fileSystemItem.getId());

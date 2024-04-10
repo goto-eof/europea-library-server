@@ -62,7 +62,7 @@ public class FileIndexerReader implements ItemStreamReader<File> {
                     })
                     .filter(fileItem -> fileExtensionsToIgnore.isEmpty() || fileItem.isDirectory() || !fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
                     .filter(fileItem -> fileExtensionsToAllow.isEmpty() || fileItem.isDirectory() || fileExtensionsToAllow.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
-                    .sorted(sortByIsDirectoryAndName())
+                    // .sorted(sortByIsDirectoryAndName())
                     .toList();
             directories.addAll(files);
             files.forEach(this::loadDirectoryIfNecessary);
