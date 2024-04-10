@@ -81,9 +81,9 @@ public class FileIndexerReader implements ItemStreamReader<File> {
     @Override
     public void open(ExecutionContext executionContext) throws ItemStreamException {
         log.debug("ebooks directory: " + ebookDirectory);
-        directories.add(Path.of(ebookDirectory).toFile());
-        loadDirectoryIfNecessary(Objects.requireNonNull(directories.poll()));
-
+        File file = Path.of(ebookDirectory).toFile();
+        loadDirectoryIfNecessary(Objects.requireNonNull(file));
+        directories.add(file);
     }
 
 }
