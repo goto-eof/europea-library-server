@@ -76,9 +76,9 @@ com:
           step-file-hash-updater:
             batch-size: 5000
           step-meta-info-writer:
+            disable-isbn-extractor: false
             batch-size: 5000
           step-ext-meta-info-writer:
-            disable-isbn-extractor: false
             batch-size: 1
           step-step-updater:
             batch-size: 5000
