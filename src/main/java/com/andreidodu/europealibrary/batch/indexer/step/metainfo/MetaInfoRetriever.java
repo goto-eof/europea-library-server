@@ -24,13 +24,14 @@ public class MetaInfoRetriever {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Optional<FileMetaInfo> buildMetaInfoFromEbookIfNecessary(FileSystemItem fileSystemItem) {
-        Optional<FileMetaInfo> fileMetaInfoByHash = isAssociateMetaInfoIfExists(fileSystemItem);
+        String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
+
+        log.debug("checking for meta-info for file {}...", fullPath);
+        Optional<FileMetaInfo> fileMetaInfoByHash = retrieveMetaInfoByHash(fileSystemItem);
         if (fileMetaInfoByHash.isPresent()) {
             return fileMetaInfoByHash;
         }
 
-        String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        log.debug("checking for meta-info for file {}...", fullPath);
         return this.metaInfoExtractorStrategyList
                 .stream()
                 .filter(strategy -> strategy.accept(fullPath, fileSystemItem))
@@ -41,11 +42,11 @@ public class MetaInfoRetriever {
 
     }
 
-    private Optional<FileMetaInfo> isAssociateMetaInfoIfExists(FileSystemItem fileSystemItem) {
-        return this.fileSystemItemRepository.findBySha256(fileSystemItem.getSha256())
+    private Optional<FileMetaInfo> retrieveMetaInfoByHash(FileSystemItem fileSystemItem) {
+        return this.fileSystemItemRepository.findBySha256Like(fileSystemItem.getSha256())
                 .stream()
-                .filter(fsi -> fsi.getFileMetaInfo() != null)
+                .filter(fsi -> fsi.getFileMetaInfoId() != null)
                 .findFirst()
-                .flatMap(fsi -> Optional.ofNullable(fileSystemItem.getFileMetaInfo()));
+                .flatMap(fsi -> Optional.ofNullable(fsi.getFileMetaInfo()));
     }
 }
