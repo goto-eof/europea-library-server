@@ -108,16 +108,16 @@ google:
 logging:
   file:
     name: /home/andrei/Desktop/europea-library.log
-    #level:
-    #org:
-    #apache:
-    #pdfbox: OFF
-    #fontbox: OFF
-    #com:
-    #andreidodu: ERROR
-    #nl:
-    #siegmann:
-    #epublib: OFF
+  level:
+    com:
+      andreidodu: ERROR
+    org:
+      apache:
+        pdfbox: OFF
+        fontbox: OFF
+    nl:
+      siegmann:
+        epublib: OFF
 
 #logging.level.org.hibernate: ERROR #info
 #logging.level.org.hibernate.SQL: ERROR #debug

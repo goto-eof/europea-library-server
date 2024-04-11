@@ -30,7 +30,7 @@ public class EpubUtil {
             EpubReader epubReader = new EpubReader();
             return Optional.of(epubReader.readEpub(new FileInputStream(filename)));
         } catch (IOException e) {
-            log.error("failed to read epub: {}", filename);
+            log.debug("failed to read epub: {}", filename);
             throw new ApplicationException("failed to read the ebook", e);
         }
     }

@@ -65,7 +65,7 @@ public class MetaInfoStepConfig {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
         queryProvider.setSelectClause("SELECT distinct id");
         queryProvider.setFromClause("FROM el_file_system_item");
-        queryProvider.setWhereClause("WHERE record_status = 1");
+        queryProvider.setWhereClause("WHERE record_status = 1 and (is_directory is null or is_directory = false) and file_meta_info_id is null");
         Map<String, Order> orderByKeys = new HashMap<>();
         orderByKeys.put("id", Order.ASCENDING);
         queryProvider.setSortKeys(orderByKeys);
