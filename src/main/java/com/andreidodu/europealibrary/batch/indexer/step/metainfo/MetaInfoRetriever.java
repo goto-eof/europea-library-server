@@ -29,9 +29,10 @@ public class MetaInfoRetriever {
         log.debug("checking for meta-info for file {}...", fullPath);
         Optional<FileMetaInfo> fileMetaInfoByHash = retrieveMetaInfoByHash(fileSystemItem);
         if (fileMetaInfoByHash.isPresent()) {
+            log.debug("found meta info by hash");
             return fileMetaInfoByHash;
         }
-
+        log.debug("generating new file meta info");
         return this.metaInfoExtractorStrategyList
                 .stream()
                 .filter(strategy -> strategy.accept(fullPath, fileSystemItem))
