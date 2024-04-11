@@ -8,12 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.File;
@@ -28,9 +26,7 @@ public class FileIndexerStepConfig {
     private final FileIndexerReader fileIndexerReader;
     private final FileIndexerBulkWriter writer;
     private final JobRepository jobRepository;
-    @Autowired
-    @Qualifier("resourcelessTransactionManager")
-    private ResourcelessTransactionManager transactionManager;
+    private final HibernateTransactionManager transactionManager;
     private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Bean("fileIndexerAndCataloguerStep")

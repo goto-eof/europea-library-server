@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +39,6 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     private EntityManager entityManager;
 
     @Override
-    @Transactional(transactionManager = "transactionManager")
     public FileSystemItem process(final File file) {
         log.debug("Processing file: {}", file.getAbsoluteFile());
         List<FileSystemItem> fileSystemItemInReadyOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), List.of(JobStepEnum.INSERTED.getStepNumber(), JobStepEnum.READY.getStepNumber()));
