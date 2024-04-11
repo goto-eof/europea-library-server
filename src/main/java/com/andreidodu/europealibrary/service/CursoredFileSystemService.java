@@ -20,4 +20,6 @@ public interface CursoredFileSystemService {
     DownloadDTO retrieveResourceForDownload(Long fileSystemId);
 
     FileSystemItemDTO get(Long fileSystemItemId);
+
+    SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> search(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
 }

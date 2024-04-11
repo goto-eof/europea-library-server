@@ -63,4 +63,9 @@ public class CursoredFileController {
                 .body(download.getInputStreamResource());
     }
 
+    @PostMapping("/cursored/search")
+    public ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(@RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.search(searchFileSystemItemRequestDTO));
+    }
+
 }

@@ -1,535 +1,567 @@
 {
-  "info": {
-    "_postman_id": "ade8f16c-cc92-42d1-8ef9-d532effe7e06",
-    "name": "Europea Library",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "3791908",
-    "_collection_link": "https://universal-astronaut-464565.postman.co/workspace/Mine~d5302425-80bd-4eda-8155-f0f59819963b/collection/3791908-ade8f16c-cc92-42d1-8ef9-d532effe7e06?action=share&source=collection_link&creator=3791908"
-  },
-  "item": [
-    {
-      "name": "book info",
-      "item": [
-        {
-          "name": "createBookInfo",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"Ciao\",\n    \"description\": \"Ciao mondo!\",\n    \"imageUrl\": \"http://image.com\",\n    \"authors\": \"Mario Rossi\",\n    \"note\": \"note\",\n    \"sbn\": \"123456789\",\n    \"isbn\": \"1234567890123\",\n    \"publisher\": \"McGrawHill\",\n    \"year\": 2002,\n    \"tagList\": [\n        {\n            \"name\": \"ciao mondo\"\n        },\n        {\n            \"name\": \"mondo\"\n        }\n    ],\n    \"fileSystemItemIdList\":[29558]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v1/bookInfo",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "bookInfo"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "updateBookInfo",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"createdDate\": \"2024-03-15T19:35:30.816573769\",\n    \"lastModifiedDate\": \"2020-03-15T19:35:30.816573769\",\n    \"title\": \"Ciao mondo ciao mondo crudele\",                      \n    \"id\": 273,\n    \"description\": \"Ciao mondo crudele!\",\n    \"tagList\": [\n        {\n            \"name\": \"ciao mondo super crudele ciao\"\n        },\n        {\n            \"name\": \"mondo ciao mondo\"\n        }\n    ],\n    \"imageUrl\": \"http://image.com\",\n    \"authors\": \"Mario Rossi\",\n    \"note\": \"note\",\n    \"sbn\": \"123456789\",\n    \"isbn\": \"1234567890123\",\n    \"publisher\": \"McGrawHill\",\n    \"year\": 2002,\n       \"fileSystemItemIdList\":[4,5,6]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v1/bookInfo/id/273",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "bookInfo",
-                "id",
-                "273"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "retrieveBookInfo",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8081/api/v1/bookInfo/id/273",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "bookInfo",
-                "id",
-                "273"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "deleteBookInfo",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8081/api/v1/bookInfo/id/273",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "bookInfo",
-                "id",
-                "273"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "file system item",
-      "item": [
-        {
-          "name": "getFiles",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8081/api/v1/file",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "file"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getAllExtensions",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:8081/api/v2/file/extension",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v2",
-                "file",
-                "extension"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getByFileExtension",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"extension\": \"epub\",\n    \"nextCursor\": 256,\n    \"limit\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v2/file/cursored/extension",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v2",
-                "file",
-                "cursored",
-                "extension"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "downloadFile",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"extension\": \"epub\",\n    \"nextCursor\": null,\n    \"limit\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v2/file/download/1232",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v2",
-                "file",
-                "download",
-                "1232"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getTagsCursored",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"nextCursor\": 11,\n    \"limit\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v1/tag",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "tag"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getCategoriesCursored",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"nextCursor\": null,\n    \"limit\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v1/category",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "category"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getFilesCursored",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"parentId\": 1232,\n    \"nextCursor\": null,\n    \"limit\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v2/file/cursored",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v2",
-                "file",
-                "cursored"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getFilesCursoredByCategory",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"parentId\": 2,\n    \"nextCursor\": null,\n    \"limit\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v2/file/cursored/category",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v2",
-                "file",
-                "cursored",
-                "category"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getFilesCursoredByTag",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"parentId\": 19,\n    \"nextCursor\": 1274,\n    \"limit\": 10\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v2/file/cursored/tag",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v2",
-                "file",
-                "cursored",
-                "tag"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "getFilesCursoredRoot",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v2/file/cursored",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v2",
-                "file",
-                "cursored"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "indexerJob",
-      "item": [
-        {
-          "name": "job run",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:8081/api/v1/job/indexer/run",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "job",
-                "indexer",
-                "run"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "anubis",
-      "item": [
-        {
-          "name": "getFiles",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://192.168.1.102:8081/api/v1/file",
-              "protocol": "http",
-              "host": [
-                "192",
-                "168",
-                "1",
-                "102"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "file"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "runJobAnubis",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://192.168.1.102:8081/api/v1/job/indexer/run",
-              "protocol": "http",
-              "host": [
-                "192",
-                "168",
-                "1",
-                "102"
-              ],
-              "port": "8081",
-              "path": [
-                "api",
-                "v1",
-                "job",
-                "indexer",
-                "run"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    }
-  ]
+	"info": {
+		"_postman_id": "ade8f16c-cc92-42d1-8ef9-d532effe7e06",
+		"name": "Europea Library",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3791908",
+		"_collection_link": "https://universal-astronaut-464565.postman.co/workspace/Mine~d5302425-80bd-4eda-8155-f0f59819963b/collection/3791908-ade8f16c-cc92-42d1-8ef9-d532effe7e06?action=share&source=collection_link&creator=3791908"
+	},
+	"item": [
+		{
+			"name": "book info",
+			"item": [
+				{
+					"name": "createBookInfo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Ciao\",\n    \"description\": \"Ciao mondo!\",\n    \"imageUrl\": \"http://image.com\",\n    \"authors\": \"Mario Rossi\",\n    \"note\": \"note\",\n    \"sbn\": \"123456789\",\n    \"isbn\": \"1234567890123\",\n    \"publisher\": \"McGrawHill\",\n    \"year\": 2002,\n    \"tagList\": [\n        {\n            \"name\": \"ciao mondo\"\n        },\n        {\n            \"name\": \"mondo\"\n        }\n    ],\n    \"fileSystemItemIdList\":[29558]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/bookInfo",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"bookInfo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateBookInfo",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"createdDate\": \"2024-03-15T19:35:30.816573769\",\n    \"lastModifiedDate\": \"2020-03-15T19:35:30.816573769\",\n    \"title\": \"Ciao mondo ciao mondo crudele\",                      \n    \"id\": 273,\n    \"description\": \"Ciao mondo crudele!\",\n    \"tagList\": [\n        {\n            \"name\": \"ciao mondo super crudele ciao\"\n        },\n        {\n            \"name\": \"mondo ciao mondo\"\n        }\n    ],\n    \"imageUrl\": \"http://image.com\",\n    \"authors\": \"Mario Rossi\",\n    \"note\": \"note\",\n    \"sbn\": \"123456789\",\n    \"isbn\": \"1234567890123\",\n    \"publisher\": \"McGrawHill\",\n    \"year\": 2002,\n       \"fileSystemItemIdList\":[4,5,6]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/bookInfo/id/273",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"bookInfo",
+								"id",
+								"273"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "retrieveBookInfo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/v1/bookInfo/id/273",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"bookInfo",
+								"id",
+								"273"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteBookInfo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/v1/bookInfo/id/273",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"bookInfo",
+								"id",
+								"273"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "file system item",
+			"item": [
+				{
+					"name": "getFiles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/v1/file",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"file"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllExtensions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/v2/file/extension",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v2",
+								"file",
+								"extension"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getByFileExtension",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"extension\": \"epub\",\n    \"nextCursor\": 256,\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v2/file/cursored/extension",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v2",
+								"file",
+								"cursored",
+								"extension"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"java\",\n    \"nextCursor\": 256,\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v2/file/cursored/search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v2",
+								"file",
+								"cursored",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "downloadFile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"extension\": \"epub\",\n    \"nextCursor\": null,\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v2/file/download/1232",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v2",
+								"file",
+								"download",
+								"1232"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTagsCursored",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nextCursor\": 11,\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/tag",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"tag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCategoriesCursored",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nextCursor\": null,\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/category",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getFilesCursored",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"parentId\": 1232,\n    \"nextCursor\": null,\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v2/file/cursored",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v2",
+								"file",
+								"cursored"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getFilesCursoredByCategory",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"parentId\": 2,\n    \"nextCursor\": null,\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v2/file/cursored/category",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v2",
+								"file",
+								"cursored",
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getFilesCursoredByTag",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"parentId\": 19,\n    \"nextCursor\": 1274,\n    \"limit\": 10\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v2/file/cursored/tag",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v2",
+								"file",
+								"cursored",
+								"tag"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getFilesCursoredRoot",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v2/file/cursored",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v2",
+								"file",
+								"cursored"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "indexerJob",
+			"item": [
+				{
+					"name": "job run",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/v1/job/indexer/run",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"job",
+								"indexer",
+								"run"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "anubis",
+			"item": [
+				{
+					"name": "getFiles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://192.168.1.102:8081/api/v1/file",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"1",
+								"102"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"file"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "runJobAnubis",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://192.168.1.102:8081/api/v1/job/indexer/run",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"1",
+								"102"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"v1",
+								"job",
+								"indexer",
+								"run"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
 }

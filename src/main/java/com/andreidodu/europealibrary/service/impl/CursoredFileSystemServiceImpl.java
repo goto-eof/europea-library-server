@@ -157,4 +157,15 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .map(this.fileSystemItemMapper::toDTO)
                 .orElseThrow(() -> new ApplicationException("Item not found"));
     }
+
+    @Override
+    public SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> search(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
+        SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> result = new SearchResultDTO<>();
+        List<FileSystemItem> children = this.fileSystemItemRepository.search(searchFileSystemItemRequestDTO);
+        result.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+                .ifPresent(result::setNextCursor);
+        result.setQuery(searchFileSystemItemRequestDTO);
+        return result;
+    }
 }
