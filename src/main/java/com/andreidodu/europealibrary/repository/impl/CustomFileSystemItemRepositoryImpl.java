@@ -34,7 +34,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         Long parentId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
-        int numberOfResults = calculateExplorerLimit(cursorRequestDTO);
+        int numberOfResults = calculateExplorerResultLimitPerRequest(cursorRequestDTO);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -60,7 +60,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         Long categoryId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
-        int numberOfResults = calculateExplorerLimit(cursorRequestDTO);
+        int numberOfResults = calculateExplorerResultLimitPerRequest(cursorRequestDTO);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
         QCategory category = QCategory.category;
@@ -88,7 +88,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
         Long tagId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
 
-        int numberOfResults = calculateExplorerLimit(cursorRequestDTO);
+        int numberOfResults = calculateExplorerResultLimitPerRequest(cursorRequestDTO);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
         QTag tag = QTag.tag;
@@ -117,7 +117,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         final String extension = cursorTypeRequestDTO.getExtension();
         Long cursorId = cursorTypeRequestDTO.getNextCursor();
-        int numberOfResults = calculateExplorerLimit(cursorTypeRequestDTO);
+        int numberOfResults = calculateExplorerResultLimitPerRequest(cursorTypeRequestDTO);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -171,7 +171,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         BooleanBuilder booleanBuilder = applySearchFilters(searchFileSystemItemRequestDTO, fileSystemItem);
 
-        final int numberOfResults = calculateExplorerLimit(searchFileSystemItemRequestDTO);
+        final int numberOfResults = calculateExplorerResultLimitPerRequest(searchFileSystemItemRequestDTO);
 
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
@@ -182,7 +182,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
                 .fetch();
     }
 
-    private <T extends Limitable> int calculateExplorerLimit(T dto) {
+    private <T extends Limitable> int calculateExplorerResultLimitPerRequest(T dto) {
         return dto.getLimit() == null ? ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE : dto.getLimit();
     }
 
