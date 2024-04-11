@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.batch.indexer.config.step;
 
 import com.andreidodu.europealibrary.batch.indexer.step.tagdeleter.DbTagObsoleteDeleterProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.tagdeleter.DbTagObsoleteDeleterWriter;
-import com.andreidodu.europealibrary.model.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;

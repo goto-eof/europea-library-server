@@ -98,7 +98,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         try {
             googleBookResponse = retrieveGoogleBook(fileSystemItem);
         } catch (Exception e) {
-            log.error("google books api throw an error: {}", e.getMessage());
+            log.debug("google books api throw an error: {}", e.getMessage());
             ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
             apiResponseDTO.setStatus(ApiStatusEnum.FATAL_ERROR);
             return apiResponseDTO;
@@ -194,7 +194,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         try {
             googleBookResponse = retrieveBookInfoFromGoogleBooks(fileSystemItem);
         } catch (RuntimeException e) {
-            log.error("Error while trying to contact google books api: {}", e.getMessage());
             throw new ApplicationException("Google Books API throw an error: " + e.getMessage(), e);
         }
         return googleBookResponse;

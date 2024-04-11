@@ -1,7 +1,6 @@
 package com.andreidodu.europealibrary.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,10 +53,10 @@ public class PersistenceConfiguration {
 //    }
 //
 
-    @Bean("resourcelessTransactionManager")
-    public ResourcelessTransactionManager resourcelessTransactionManager() {
-        return new ResourcelessTransactionManager();
-    }
+//    @Bean("resourcelessTransactionManager")
+//    public ResourcelessTransactionManager resourcelessTransactionManager() {
+//        return new ResourcelessTransactionManager();
+//    }
 
     @Bean(name = "entityManagerFactory")
     public LocalSessionFactoryBean sessionFactory() {
