@@ -193,6 +193,10 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         fileterByTitleIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
 
+        filterByDescriptionIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
+
+        filterByYearIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
+
         filterByIsbnIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
 
         filterByPublisherIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
@@ -206,6 +210,16 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
         final Long cursorId = searchFileSystemItemRequestDTO.getNextCursor();
         Optional.ofNullable(cursorId)
                 .ifPresent(nextCursor -> booleanBuilder.and(fileSystemItem.id.goe(nextCursor)));
+    }
+
+    private static void filterByYearIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
+        Optional.ofNullable(searchFileSystemItemRequestDTO.getYear())
+                .ifPresent(year -> booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publishedDate.containsIgnoreCase(year.toString())));
+    }
+
+    private static void filterByDescriptionIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
+        Optional.ofNullable(searchFileSystemItemRequestDTO.getDescription())
+                .ifPresent(description -> booleanBuilder.and(fileSystemItem.fileMetaInfo.description.containsIgnoreCase(description)));
     }
 
     private static void filterByAuthorIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {

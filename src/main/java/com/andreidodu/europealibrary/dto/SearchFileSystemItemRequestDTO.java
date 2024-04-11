@@ -11,6 +11,8 @@ public class SearchFileSystemItemRequestDTO implements Limitable {
     private String title;
     private String publisher;
     private String author;
+    private String description;
+    private Integer year;
     private String isbn;
     private Long nextCursor;
     private Integer limit;
