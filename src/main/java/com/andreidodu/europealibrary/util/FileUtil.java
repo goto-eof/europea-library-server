@@ -24,7 +24,7 @@ public class FileUtil {
         }
     }
 
-    public Optional<String> fileNameToHash(String filename) {
+    public Optional<String> fileToHash(String filename) {
         return this.fileToSha256(new File(filename));
     }
 

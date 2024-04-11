@@ -43,11 +43,6 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     @Transactional(transactionManager = "transactionManager")
     public FileSystemItem process(final File file) {
         log.debug("Processing file: {}", file.getAbsoluteFile());
-        // if job was stopped prematurely, then I have already a record on DB
-//        Optional<FileSystemItem> fileSystemIteminInsertedOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), );
-//        if (fileSystemIteminInsertedOptional.isPresent()) {
-//            return recoverExistingFileSystemItem(fileSystemIteminInsertedOptional.get());
-//        }
         List<FileSystemItem> fileSystemItemInReadyOptional = getFileSystemItemByPathNameAndJobStep(file.getParentFile().getAbsolutePath(), file.getName(), List.of(JobStepEnum.INSERTED.getStepNumber(), JobStepEnum.READY.getStepNumber()));
         return fileSystemItemInReadyOptional.stream().findFirst().map(/*case when file is in the same directory*/this::reprocessOldFileSystemItem)
                 .orElseGet(() -> /*case when file is new*/ buildFileSystemItemFromScratch(file));
@@ -60,12 +55,6 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         return fileSystemItem;
     }
-
-//    private FileSystemItem recoverExistingFileSystemItem(FileSystemItem fileSystemItem) {
-//        this.entityManager.detach(fileSystemItem);
-//        fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
-//        return fileSystemItem;
-//    }
 
     private FileSystemItem buildFileSystemItemFromScratch(File file) {
         try {

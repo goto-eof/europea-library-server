@@ -52,13 +52,11 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
     }
 
     @Override
-    public boolean accept(String filename, FileSystemItem fileSystemItem) {
-        final boolean result = dataExtractorStrategyUtil.isFileExtensionInWhiteList(pdfUtil.getPdfFileExtension()) &&
+    public boolean accept(String fullPathAndName, FileSystemItem fileSystemItem) {
+        return !this.fileUtil.isDirectory(fullPathAndName) && dataExtractorStrategyUtil.isFileExtensionInWhiteList(pdfUtil.getPdfFileExtension()) &&
                 !disablePDFMetadataExtractor &&
-                pdfUtil.isPdf(filename) &&
+                pdfUtil.isPdf(fullPathAndName) &&
                 dataExtractorStrategyUtil.wasNotAlreadyProcessed(fileSystemItem);
-
-        return result;
     }
 
 

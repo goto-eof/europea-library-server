@@ -29,8 +29,8 @@ public class OtherMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStra
     }
 
     @Override
-    public boolean accept(String filename, FileSystemItem fileSystemItem) {
-        return !fileUtil.isDirectory(filename) && (fileSystemItem == null || fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null);
+    public boolean accept(String fullPathAndName, FileSystemItem fileSystemItem) {
+        return !fileUtil.isDirectory(fullPathAndName) && (fileSystemItem == null || fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null);
     }
 
     @Override

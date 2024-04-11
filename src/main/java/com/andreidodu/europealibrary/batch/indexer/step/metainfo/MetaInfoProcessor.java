@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,9 @@ public class MetaInfoProcessor implements ItemProcessor<Long, FileSystemItem> {
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
+        if (BooleanUtils.isTrue(fileSystemItem.getIsDirectory()) || fileSystemItem.getFileMetaInfoId() != null) {
+            return null;
+        }
         return metaInfoRetriever.buildMetaInfoFromEbookIfNecessary(fileSystemItem)
                 .map(fileMetaInfo -> {
                     this.entityManager.detach(fileSystemItem);

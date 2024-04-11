@@ -9,7 +9,7 @@ public interface MetaInfoExtractorStrategy {
 
     String getStrategyName();
 
-    boolean accept(String filename, FileSystemItem fileSystemItem);
+    boolean accept(String fullPathAndName, FileSystemItem fileSystemItem);
 
     Optional<FileMetaInfo> extract(String filename, FileSystemItem fileSystemItem);
 }

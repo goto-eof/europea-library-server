@@ -3,10 +3,13 @@ package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
-import com.andreidodu.europealibrary.model.*;
+import com.andreidodu.europealibrary.model.BookInfo;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
+import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
+import com.andreidodu.europealibrary.util.FileUtil;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -21,7 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,6 +41,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final BookInfoRepository bookInfoRepository;
     private final TagUtil tagUtil;
+    private final FileUtil fileUtil;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
     @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
@@ -52,10 +57,10 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     }
 
     @Override
-    public boolean accept(String filename, FileSystemItem fileSystemItem) {
-        return dataExtractorStrategyUtil.isFileExtensionInWhiteList(epubUtil.getEpubFileExtension()) &&
+    public boolean accept(String fullPathAndName, FileSystemItem fileSystemItem) {
+        return !this.fileUtil.isDirectory(fullPathAndName) && dataExtractorStrategyUtil.isFileExtensionInWhiteList(epubUtil.getEpubFileExtension()) &&
                 !disableEpubMetadataExtractor &&
-                epubUtil.isEpub(filename) &&
+                epubUtil.isEpub(fullPathAndName) &&
                 dataExtractorStrategyUtil.wasNotAlreadyProcessed(fileSystemItem);
     }
 

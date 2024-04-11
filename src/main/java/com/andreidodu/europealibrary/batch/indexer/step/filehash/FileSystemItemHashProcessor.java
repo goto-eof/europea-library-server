@@ -24,31 +24,27 @@ public class FileSystemItemHashProcessor implements ItemProcessor<Long, FileSyst
     public FileSystemItem process(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
         this.entityManager.detach(fileSystemItem);
-        if (isCalculateAndUpdateHashAndMetaInfoIdIfNecessary(fileSystemItem)) {
+        if (isCalculateAndUpdateHashAndMetaInfoId(fileSystemItem)) {
             return fileSystemItem;
         }
         return null;
     }
 
-    private boolean isCalculateAndUpdateHashAndMetaInfoIdIfNecessary(FileSystemItem fileSystemItem) {
+    private boolean isCalculateAndUpdateHashAndMetaInfoId(FileSystemItem fileSystemItem) {
         if (fileSystemItem.getIsDirectory()) {
             return false;
         }
 
-
         if (StringUtil.isNotEmpty(fileSystemItem.getSha256())) {
-            return true;
+            return false;
         }
 
-
         return isCalculateSha256(fileSystemItem);
-
-
     }
 
     private boolean isCalculateSha256(FileSystemItem fileSystemItem) {
         final String fileFullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        return this.fileUtil.fileNameToHash(fileFullPath).map(sha256 -> {
+        return this.fileUtil.fileToHash(fileFullPath).map(sha256 -> {
                     fileSystemItem.setSha256(sha256);
                     return true;
                 })
