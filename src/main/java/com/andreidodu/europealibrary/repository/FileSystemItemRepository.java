@@ -26,5 +26,4 @@ public interface FileSystemItemRepository extends TransactionalRepository<FileSy
     @Query(value = "select fsi.id from FileSystemItem fsi where fsi.basePath = :basePath and fsi.name = :name and fsi.jobStep = :jobStep")
     Optional<Long> findIdByBasePathAndNameAndJobStep(String basePath, String name, int jobStep);
 
-    List<FileSystemItem> findBySha256Like(String sha256);
 }

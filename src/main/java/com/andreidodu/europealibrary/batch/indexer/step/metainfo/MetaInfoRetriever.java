@@ -43,7 +43,7 @@ public class MetaInfoRetriever {
     }
 
     private Optional<FileMetaInfo> retrieveMetaInfoByHash(FileSystemItem fileSystemItem) {
-        return this.fileSystemItemRepository.findBySha256Like(fileSystemItem.getSha256())
+        return this.fileSystemItemRepository.findBySha256(fileSystemItem.getSha256())
                 .stream()
                 .filter(fsi -> fsi.getFileMetaInfoId() != null)
                 .findFirst()

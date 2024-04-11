@@ -44,7 +44,8 @@ public class FileSystemItemHashProcessor implements ItemProcessor<Long, FileSyst
 
     private boolean isCalculateSha256(FileSystemItem fileSystemItem) {
         final String fileFullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
-        return this.fileUtil.fileToHash(fileFullPath).map(sha256 -> {
+        return this.fileUtil.fileToHash(fileFullPath)
+                .map(sha256 -> {
                     fileSystemItem.setSha256(sha256);
                     return true;
                 })
