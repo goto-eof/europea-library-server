@@ -72,12 +72,8 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         try {
             return epubUtil.retrieveBook(filename)
                     .map(book -> {
-                        if (book.getMetadata().getFirstTitle().trim().isEmpty()) {
-                            log.debug("metadata not found for: {}", filename);
-                            return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem).get();
-                        }
                         log.debug("metadata found for: {}", filename);
-                        return manageCaseBookTitleNotEmpty(book, filename, fileMetaInfo);
+                        return manageCaseBookInfoNotEmpty(book, filename, fileMetaInfo);
                     });
         } catch (Exception e) {
             log.error("invalid file: {} ({})", filename, e.getMessage());
@@ -85,17 +81,26 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         }
     }
 
-    private FileMetaInfo manageCaseBookTitleNotEmpty(Book book, String fullPath, FileMetaInfo existingFileMetaInfo) {
+    private FileMetaInfo manageCaseBookInfoNotEmpty(Book book, String fullPath, FileMetaInfo existingFileMetaInfo) {
         log.debug("gathering information from ebook {}", fullPath);
-        FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
+      final  FileMetaInfo fileMetaInfo = existingFileMetaInfo == null ? new FileMetaInfo() : existingFileMetaInfo;
 
         Metadata metadata = book.getMetadata();
 
-        fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(metadata.getFirstTitle(), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH));
-        fileMetaInfo.setDescription(StringUtil.cleanAndTrimToNullSubstring(StringUtil.removeHTML(getFirst(metadata.getDescriptions())), DataPropertiesConst.FILE_META_INFO_DESCRIPTION_MAX_LENGTH));
-        fileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
-        fileMetaInfo = buildBookInfo(book, fileMetaInfo, metadata);
-        return fileMetaInfo;
+        calculateAndSetBookTitle(fullPath, metadata, fileMetaInfo);
+
+        fileMetaInfo.setDescription(StringUtil.cleanAndTrimToNullSubstring(StringUtil.removeHTML(getFirstAvailable(metadata.getDescriptions())), DataPropertiesConst.FILE_META_INFO_DESCRIPTION_MAX_LENGTH));
+        FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+        savedFileMetaInfo = buildBookInfo(book, savedFileMetaInfo, metadata);
+        return savedFileMetaInfo;
+    }
+
+    private void calculateAndSetBookTitle(String fullPath, Metadata metadata, FileMetaInfo fileMetaInfo) {
+        final  String title = StringUtil.cleanAndTrimToNullSubstring(metadata.getFirstTitle(), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH);
+        Optional.ofNullable(title).ifPresentOrElse(cleanedTitle -> {
+            fileMetaInfo.setTitle(title);
+        }, ()-> Optional.ofNullable(StringUtil.cleanAndTrimToNullSubstring(fileUtil.calculateFileBaseName(fullPath), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH))
+                .ifPresentOrElse(fileMetaInfo::setTitle, () -> fileMetaInfo.setTitle("")));
     }
 
     private FileMetaInfo buildBookInfo(Book book, FileMetaInfo fileMetaInfo, Metadata metadata) {
@@ -159,7 +164,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         return dates.stream().filter(date -> date.getEvent() == null).map(Date::getValue).findFirst();
     }
 
-    private String getFirst(List<String> list) {
+    private String getFirstAvailable(List<String> list) {
         if (list != null && !list.isEmpty()) {
             return list.stream().findFirst().get();
         }
