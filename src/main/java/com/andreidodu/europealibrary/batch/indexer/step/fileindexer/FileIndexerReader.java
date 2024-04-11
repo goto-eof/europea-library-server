@@ -12,10 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Slf4j
@@ -37,13 +34,11 @@ public class FileIndexerReader implements ItemStreamReader<File> {
 
     @Override
     public File read() {
-        if (!directories.isEmpty()) {
-            File file = directories.poll();
-            log.debug("processed: " + file.getAbsolutePath() + "/" + file.getName());
-            return file;
-        }
-        log.debug("no more files to extract");
-        return null;
+        return Optional.ofNullable(directories.poll())
+                .map(file -> {
+                    log.debug("processed: " + file.getAbsolutePath() + "/" + file.getName());
+                    return file;
+                }).orElse(null);
     }
 
     private void loadDirectoryIfNecessary(File file) {
