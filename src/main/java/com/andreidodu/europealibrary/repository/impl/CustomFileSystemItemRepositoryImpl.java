@@ -191,7 +191,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         filterByNextCursorIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
 
-        fileterByTitleIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
+        filterByTitleIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
 
         filterByDescriptionIfNecessary(searchFileSystemItemRequestDTO, booleanBuilder, fileSystemItem);
 
@@ -240,7 +240,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
                 );
     }
 
-    private static void fileterByTitleIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
+    private static void filterByTitleIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getTitle())
                 .ifPresent(title -> booleanBuilder.and(fileSystemItem.fileMetaInfo.title.containsIgnoreCase(title)));
     }
