@@ -66,7 +66,7 @@ public class FileHashStepConfig {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
         queryProvider.setSelectClause("SELECT id");
         queryProvider.setFromClause("FROM el_file_system_item");
-        queryProvider.setWhereClause("WHERE record_status = 1 and base_path like '" + ebookDirectory + "%'");
+        queryProvider.setWhereClause("WHERE record_status = 1 and base_path like '" + ebookDirectory + "%' and sha256 is null and (is_directory is null or is_directory = false)");
         Map<String, Order> orderByKeys = new HashMap<>();
         orderByKeys.put("id", Order.ASCENDING);
         queryProvider.setSortKeys(orderByKeys);
