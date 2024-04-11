@@ -57,6 +57,7 @@ com:
         indexer:
           # the directory that contains all your e-book which need to be indexed
           e-books-directory: "/your/path/to/e-books/directory"
+          avoid-duplicate-meta-info: true
           step-indexer:
             force-load-meta-info-from-web: false
             override-meta-info: false

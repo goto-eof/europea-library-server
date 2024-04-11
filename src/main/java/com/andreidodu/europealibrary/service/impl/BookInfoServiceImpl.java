@@ -29,6 +29,12 @@ public class BookInfoServiceImpl implements BookInfoService {
     private final FileSystemItemRepository fileSystemItemRepository;
     private final TagUtil tagUtil;
 
+    private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
+        if (id == null || !id.equals(dto.getId())) {
+            throw new ApplicationException("IDs does not match");
+        }
+    }
+
     @Override
     public FileMetaInfoBookDTO retrieveById(Long id) {
         FileMetaInfo model = this.checkFileMetaInfoExistence(id);
@@ -63,12 +69,6 @@ public class BookInfoServiceImpl implements BookInfoService {
         model.setFileSystemItemList(fileSystemItemList);
         FileMetaInfo newModel = this.repository.save(model);
         return this.fileMetaInfoBookMapper.toDTO(newModel);
-    }
-
-    private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
-        if (id == null || !id.equals(dto.getId())) {
-            throw new ApplicationException("IDs does not match");
-        }
     }
 
     @Override

@@ -21,16 +21,22 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @RequiredArgsConstructor
 public class FileIndexerReader implements ItemStreamReader<File> {
 
+    private final static ConcurrentLinkedQueue<File> directories = new ConcurrentLinkedQueue<>();
+    private final FileUtil fileUtil;
     @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
     private String ebookDirectory;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.skip-file-extensions}")
     private List<String> fileExtensionsToIgnore;
-
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.allow-file-extensions}")
     private List<String> fileExtensionsToAllow;
 
-    private final FileUtil fileUtil;
-    private final static ConcurrentLinkedQueue<File> directories = new ConcurrentLinkedQueue<>();
+    private static Comparator<File> sortByIsDirectoryAndName() {
+        return (Comparator
+                .comparing(File::isDirectory)
+                .reversed()
+                .thenComparing(File::getName)
+                .reversed());
+    }
 
     @Override
     public File read() {
@@ -63,14 +69,6 @@ public class FileIndexerReader implements ItemStreamReader<File> {
             files.forEach(this::loadDirectoryIfNecessary);
             log.debug("added {} children", files.size());
         }
-    }
-
-    private static Comparator<File> sortByIsDirectoryAndName() {
-        return (Comparator
-                .comparing(File::isDirectory)
-                .reversed()
-                .thenComparing(File::getName)
-                .reversed());
     }
 
     @Override

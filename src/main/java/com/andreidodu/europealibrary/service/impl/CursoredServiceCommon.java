@@ -1,7 +1,5 @@
 package com.andreidodu.europealibrary.service.impl;
 
-import com.andreidodu.europealibrary.constants.ApplicationConst;
-import com.andreidodu.europealibrary.model.Category;
 import com.andreidodu.europealibrary.model.common.Identificable;
 
 import java.util.List;

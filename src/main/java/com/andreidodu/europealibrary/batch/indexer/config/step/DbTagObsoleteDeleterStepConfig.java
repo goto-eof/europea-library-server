@@ -26,14 +26,13 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class DbTagObsoleteDeleterStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-tag-obsolete-deleter.batch-size}")
-    private Integer batchSize;
-
     private final DataSource dataSource;
     private final JobRepository jobRepository;
     private final DbTagObsoleteDeleterProcessor processor;
     private final DbTagObsoleteDeleterWriter fileItemWriter;
     private final HibernateTransactionManager transactionManager;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-tag-obsolete-deleter.batch-size}")
+    private Integer batchSize;
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;

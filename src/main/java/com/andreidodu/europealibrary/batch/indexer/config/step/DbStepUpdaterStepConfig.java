@@ -24,20 +24,19 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class DbStepUpdaterStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
-    private Integer batchSize;
-
     private final DataSource dataSource;
     private final JobRepository jobRepository;
-    @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     private final DbStepUpdaterProcessor processor;
     private final DbStepUpdaterBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-step-updater.batch-size}")
+    private Integer batchSize;
+    @Autowired
+    @Qualifier("threadPoolTaskExecutor")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Bean("dbJobStepUpdaterStep")
-    public Step dbJobStepUpdaterStep( JdbcPagingItemReader<Long> dbStepUpdaterReader) {
+    public Step dbJobStepUpdaterStep(JdbcPagingItemReader<Long> dbStepUpdaterReader) {
         return new StepBuilder("dbJobStepUpdaterStep", jobRepository)
                 .<Long, Long>chunk(batchSize, transactionManager)
                 .allowStartIfComplete(true)

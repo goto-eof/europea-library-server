@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class JobRunnerController {
     final private JobRunnerService jobRunnerService;
 
-    @RequestMapping("/indexer/run")
-    public ResponseEntity<JobStatusDTO> handle() throws Exception {
-        jobRunnerService.runJobAsync();
-        return ResponseEntity.ok(buildJobStartedResponse());
-    }
-
     private static JobStatusDTO buildJobStartedResponse() {
         return JobStatusDTO.builder()
                 .message("Job started")
                 .isRunning(true)
                 .build();
+    }
+
+    @RequestMapping("/indexer/run")
+    public ResponseEntity<JobStatusDTO> handle() throws Exception {
+        jobRunnerService.runJobAsync();
+        return ResponseEntity.ok(buildJobStartedResponse());
     }
 }

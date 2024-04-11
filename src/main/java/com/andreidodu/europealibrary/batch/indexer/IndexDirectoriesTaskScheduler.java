@@ -23,6 +23,10 @@ public class IndexDirectoriesTaskScheduler {
     private final JobLauncher jobLauncher;
     private final Job job;
 
+    private static JobParameters generateJobParameters() {
+        return new JobParametersBuilder().addDate(JOB_PARAMETER_DATE_KEY, new Date(System.currentTimeMillis())).toJobParameters();
+    }
+
     @Scheduled(cron = "${com.andreidodu.europea-library.task.indexer.cron.expression}")
     public void runIndexAndCatalogueTaskScheduler() throws JobInstanceAlreadyCompleteException, JobParametersInvalidException, JobRestartException {
         try {
@@ -32,9 +36,5 @@ public class IndexDirectoriesTaskScheduler {
         } catch (RuntimeException e) {
             log.error("Error starting job: {}", e.getMessage());
         }
-    }
-
-    private static JobParameters generateJobParameters() {
-        return new JobParametersBuilder().addDate(JOB_PARAMETER_DATE_KEY, new Date(System.currentTimeMillis())).toJobParameters();
     }
 }

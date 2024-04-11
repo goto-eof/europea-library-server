@@ -18,6 +18,12 @@ import java.util.Optional;
 public class CategoryUtil {
     private final CategoryRepository categoryRepository;
 
+    private static Category createCategoryFromName(String categoryName) {
+        Category category = new Category();
+        category.setName(categoryName);
+        return category;
+    }
+
     @Retryable(retryFor = {DataIntegrityViolationException.class, NullPointerException.class}, maxAttemptsExpression = "1000000")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Category createCategoryEntity(String categoryName) {
@@ -33,12 +39,6 @@ public class CategoryUtil {
         if (category == null || category.getId() == null) {
             throw new NullPointerException();
         }
-        return category;
-    }
-
-    private static Category createCategoryFromName(String categoryName) {
-        Category category = new Category();
-        category.setName(categoryName);
         return category;
     }
 }

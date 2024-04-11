@@ -1,8 +1,8 @@
 package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.constants.ApplicationConst;
-import com.andreidodu.europealibrary.dto.CursorDTO;
 import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
+import com.andreidodu.europealibrary.dto.CursorDTO;
 import com.andreidodu.europealibrary.dto.TagDTO;
 import com.andreidodu.europealibrary.mapper.TagMapper;
 import com.andreidodu.europealibrary.model.Tag;

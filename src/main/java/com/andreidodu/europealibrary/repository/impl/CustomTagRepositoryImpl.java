@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.repository.impl;
 
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.model.QTag;
 import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.CustomTagRepository;

@@ -25,17 +25,16 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class ParentAssociatorStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-parent-associator-step.batch-size}")
-    private Integer batchSize;
-
     private final JobRepository jobRepository;
     private final ParentAssociatorProcessor processor;
     private final ParentAssociatorBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
+    private final DataSource dataSource;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-parent-associator-step.batch-size}")
+    private Integer batchSize;
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-    private final DataSource dataSource;
 
     @Bean("parentAssociatorStep")
     public Step parentAssociatorStep(JdbcPagingItemReader<Long> parentAssociatorReader) {

@@ -25,6 +25,11 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class DbFsiObsoleteDeleterStepConfig {
+    private final DataSource dataSource;
+    private final JobRepository jobRepository;
+    private final DbFSIObsoleteDeleterProcessor processor;
+    private final DbFSIObsoleteDeleterWriter fileItemWriter;
+    private final HibernateTransactionManager transactionManager;
     @Value("${com.andreidodu.europea-library.job.indexer.step-fsi-obsolete-deleter.batch-size}")
     private Integer stepFsiObsoleteDeleterBatchSize;
     @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
@@ -32,12 +37,6 @@ public class DbFsiObsoleteDeleterStepConfig {
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
-    private final DataSource dataSource;
-    private final JobRepository jobRepository;
-    private final DbFSIObsoleteDeleterProcessor processor;
-    private final DbFSIObsoleteDeleterWriter fileItemWriter;
-    private final HibernateTransactionManager transactionManager;
 
     @Bean("dbFSIObsoleteDeleterStep")
     public Step dbFSIObsoleteDeleterStep(JdbcPagingItemReader<Long> dbFSIObsoleteDeleterReader) {

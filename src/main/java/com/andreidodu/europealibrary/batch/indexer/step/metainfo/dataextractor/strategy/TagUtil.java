@@ -18,7 +18,13 @@ import java.util.Optional;
 public class TagUtil {
     private final TagRepository tagRepository;
 
-    @Retryable(retryFor = {DataIntegrityViolationException.class, NullPointerException.class}, maxAttemptsExpression = "1000000" )
+    private static Tag createTagFromName(String tag) {
+        Tag tagEntity = new Tag();
+        tagEntity.setName(tag);
+        return tagEntity;
+    }
+
+    @Retryable(retryFor = {DataIntegrityViolationException.class, NullPointerException.class}, maxAttemptsExpression = "1000000")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Tag loadOrCreateTagEntity(String tagName) {
         Optional<Tag> tagOptional = this.tagRepository.findByNameIgnoreCase(tagName);
@@ -34,11 +40,5 @@ public class TagUtil {
             throw new NullPointerException();
         }
         return tag;
-    }
-
-    private static Tag createTagFromName(String tag) {
-        Tag tagEntity = new Tag();
-        tagEntity.setName(tag);
-        return tagEntity;
     }
 }

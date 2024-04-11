@@ -2,7 +2,8 @@ package com.andreidodu.europealibrary.repository.impl;
 
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.model.*;
+import com.andreidodu.europealibrary.model.Category;
+import com.andreidodu.europealibrary.model.QCategory;
 import com.andreidodu.europealibrary.repository.CustomCategoryRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;

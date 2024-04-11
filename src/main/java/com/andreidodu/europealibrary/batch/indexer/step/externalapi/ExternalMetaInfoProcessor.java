@@ -29,6 +29,14 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
     @PersistenceContext
     private EntityManager entityManager;
 
+    private static void putThreadOnSleep() {
+        try {
+            Thread.sleep(SLEEP_TIME_BETWEEN_API_REQUESTS);
+        } catch (InterruptedException e) {
+            log.error("failed to put thread in sleep mode");
+        }
+    }
+
     @Override
     public FileSystemItem process(Long fileSystemItemId) {
         FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId).get();
@@ -50,13 +58,5 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
                 .map(ApiResponseDTO::getEntity)
                 .orElseThrow(() -> new SkipStepException("step was skipped because google books api returned an error"));
 
-    }
-
-    private static void putThreadOnSleep() {
-        try {
-            Thread.sleep(SLEEP_TIME_BETWEEN_API_REQUESTS);
-        } catch (InterruptedException e) {
-            log.error("failed to put thread in sleep mode");
-        }
     }
 }

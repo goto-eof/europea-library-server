@@ -19,15 +19,14 @@ import java.io.File;
 @Configuration
 @RequiredArgsConstructor
 public class FileIndexerStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size}")
-    private Integer stepIndexerBatchSize;
-
     private final FileIndexerProcessor processor;
     private final FileIndexerReader fileIndexerReader;
     private final FileIndexerBulkWriter writer;
     private final JobRepository jobRepository;
     private final HibernateTransactionManager transactionManager;
     private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.batch-size}")
+    private Integer stepIndexerBatchSize;
 
     @Bean("fileIndexerAndCataloguerStep")
     public Step fileIndexerAndCataloguerStep() {

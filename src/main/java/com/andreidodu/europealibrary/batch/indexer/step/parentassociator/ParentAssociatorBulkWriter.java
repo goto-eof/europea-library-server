@@ -18,9 +18,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class ParentAssociatorBulkWriter implements ItemWriter<FileSystemItem> {
-    private final DataSource dataSource;
-
     private static final String BULK_UPDATE_TEMPLATE = "update el_file_system_item set parent_id=? where id=?;";
+    private final DataSource dataSource;
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) throws SQLException {

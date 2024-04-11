@@ -24,12 +24,11 @@ import java.util.Set;
 @Transactional
 @RequiredArgsConstructor
 public class DataExtractorStrategyUtil {
+    private final StepUtil stepUtil;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.do-not-extract-metadata-from-file-extensions}")
     List<String> doNotProcessFileExtensions;
     @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
     private String ebookDirectory;
-
-    private final StepUtil stepUtil;
 
     public boolean wasNotAlreadyProcessed(FileSystemItem fileSystemItem) {
         if (fileSystemItem == null) {

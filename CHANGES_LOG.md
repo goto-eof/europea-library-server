@@ -1,5 +1,5 @@
-
 ## Changes log
+
 - 2023-04-01 - finished conversion of job indexer to a multi-threading job.
 - 2024-03-27 - fix: do not save failed status when retrieving ebook from google books api, feature: add search for
   filSystemItem entities by category and search by tag (cursored).

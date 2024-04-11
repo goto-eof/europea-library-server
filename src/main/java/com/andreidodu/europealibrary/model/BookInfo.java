@@ -61,7 +61,7 @@ public class BookInfo extends ModelCommon {
     @Column(name = "record_status")
     private Integer recordStatus;
 
-    @OneToOne//(cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
     private FileMetaInfo fileMetaInfo;
 

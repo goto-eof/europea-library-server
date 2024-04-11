@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.batch.indexer.config.step;
 
 import com.andreidodu.europealibrary.batch.indexer.step.categorydeleter.DbCategoryObsoleteDeleterProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.categorydeleter.DbCategoryObsoleteDeleterWriter;
-import com.andreidodu.europealibrary.model.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
@@ -27,14 +26,13 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class DbCategoryObsoleteDeleterStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-category-obsolete-deleter.batch-size}")
-    private Integer batchSize;
-
     private final DataSource dataSource;
     private final JobRepository jobRepository;
     private final DbCategoryObsoleteDeleterProcessor processor;
     private final DbCategoryObsoleteDeleterWriter fileItemWriter;
     private final HibernateTransactionManager transactionManager;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-category-obsolete-deleter.batch-size}")
+    private Integer batchSize;
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;

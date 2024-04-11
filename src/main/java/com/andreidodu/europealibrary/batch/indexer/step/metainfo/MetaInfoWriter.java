@@ -14,10 +14,9 @@ import org.springframework.stereotype.Component;
 @Deprecated
 @RequiredArgsConstructor
 public class MetaInfoWriter implements ItemWriter<FileSystemItem> {
+    private final FileSystemItemRepository fileSystemItemRepository;
     @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.batch-size}")
     private Integer batchSize;
-
-    private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) {

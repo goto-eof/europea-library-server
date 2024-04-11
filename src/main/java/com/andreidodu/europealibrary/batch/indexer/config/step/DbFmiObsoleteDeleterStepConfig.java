@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.batch.indexer.config.step;
 
 import com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter.DbFMIObsoleteDeleterProcessor;
 import com.andreidodu.europealibrary.batch.indexer.step.dbfmiobsoletedeleter.DbFMIObsoleteDeleterWriter;
-import com.andreidodu.europealibrary.model.FileMetaInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
@@ -27,14 +26,13 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class DbFmiObsoleteDeleterStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-fmi-obsolete-deleter.batch-size}")
-    private Integer stepFmiObsoleteDeleterBatchSize;
-
     private final DataSource dataSource;
     private final JobRepository jobRepository;
     private final DbFMIObsoleteDeleterProcessor processor;
     private final DbFMIObsoleteDeleterWriter fileItemWriter;
     private final HibernateTransactionManager transactionManager;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-fmi-obsolete-deleter.batch-size}")
+    private Integer stepFmiObsoleteDeleterBatchSize;
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;

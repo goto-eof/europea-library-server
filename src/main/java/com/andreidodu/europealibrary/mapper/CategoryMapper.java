@@ -1,9 +1,7 @@
 package com.andreidodu.europealibrary.mapper;
 
 import com.andreidodu.europealibrary.dto.CategoryDTO;
-import com.andreidodu.europealibrary.dto.TagDTO;
 import com.andreidodu.europealibrary.model.Category;
-import com.andreidodu.europealibrary.model.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -22,9 +22,6 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class ExternalMetaInfoStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-ext-meta-info-writer.batch-size}")
-    private Integer batchSize;
-
     private final JobRepository jobRepository;
     private final JdbcPagingItemReader<Long> metaInfoBuilderReader;
     private final ExternalMetaInfoProcessor processor;
@@ -32,6 +29,8 @@ public class ExternalMetaInfoStepConfig {
     private final HibernateTransactionManager transactionManager;
     private final ExternalMetaInfoStepListener externalMetaInfoStepListener;
     private final DataSource dataSource;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-ext-meta-info-writer.batch-size}")
+    private Integer batchSize;
 
     @Bean("externalMetaInfoBuilderStep")
     public Step externalMetaInfoBuilderStep(JdbcPagingItemReader<Long> externalMetaInfoBuilderReader) {

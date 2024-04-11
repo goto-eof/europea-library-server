@@ -26,15 +26,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem> {
 
-    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
-    private boolean forceLoadMetaInfoFromWeb;
-    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.override-meta-info}")
-    private boolean overrideMetaInfo;
-
     final private FileMapper fileMapper;
     final private FileUtil fileUtil;
     final private FileSystemItemMapper fileSystemItemMapper;
     final private FileSystemItemRepository fileSystemItemRepository;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
+    private boolean forceLoadMetaInfoFromWeb;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.override-meta-info}")
+    private boolean overrideMetaInfo;
     @PersistenceContext
     private EntityManager entityManager;
 

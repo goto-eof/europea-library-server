@@ -18,9 +18,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class MetaInfoBulkWriter implements ItemWriter<FileSystemItem> {
-    private final DataSource dataSource;
-
     private static final String BULK_UPDATE_TEMPLATE = "update el_file_system_item set file_meta_info_id=? where id=?;";
+    private final DataSource dataSource;
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) throws SQLException {

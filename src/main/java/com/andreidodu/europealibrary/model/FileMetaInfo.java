@@ -4,8 +4,6 @@ import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -42,7 +40,7 @@ public class FileMetaInfo extends ModelCommon {
     )
     private List<Tag> tagList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "fileMetaInfo")
+    @OneToMany(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY)
     private List<FileSystemItem> fileSystemItemList;
 
 

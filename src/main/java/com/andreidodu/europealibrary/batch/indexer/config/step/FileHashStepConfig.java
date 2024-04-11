@@ -25,19 +25,18 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class FileHashStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-file-hash-updater.batch-size}")
-    private Integer batchSize;
-    @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
-    private String ebookDirectory;
-
     private final JobRepository jobRepository;
-    @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     private final FileSystemItemHashProcessor processor;
     private final FileSystemItemHashBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
     private final DataSource dataSource;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-file-hash-updater.batch-size}")
+    private Integer batchSize;
+    @Value("${com.andreidodu.europea-library.job.indexer.e-books-directory}")
+    private String ebookDirectory;
+    @Autowired
+    @Qualifier("threadPoolTaskExecutor")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     @Bean("fileSystemItemHashStep")
     public Step fileSystemItemHashStep(JdbcPagingItemReader<Long> hashStorerReader) {

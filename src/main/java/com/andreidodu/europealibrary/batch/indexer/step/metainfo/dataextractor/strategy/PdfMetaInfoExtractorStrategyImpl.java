@@ -34,17 +34,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrategy {
     final private static String STRATEGY_NAME = "pdf-meta-info-extractor-strategy";
-    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-pdf-metadata-extractor}")
-    private boolean disablePDFMetadataExtractor;
-    @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
-    private boolean disableIsbExtractor;
-
     private final PdfUtil pdfUtil;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final BookInfoRepository bookInfoRepository;
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
     private final FileUtil fileUtil;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-pdf-metadata-extractor}")
+    private boolean disablePDFMetadataExtractor;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
+    private boolean disableIsbExtractor;
 
     @Override
     public String getStrategyName() {
@@ -72,31 +71,31 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
     }
 
     private Optional<FileMetaInfo> buildMetaInfoFromFile(String filename, FileSystemItem fileSystemItem) throws IOException {
-            File file = new File(filename);
-            PDDocument pdf = Loader.loadPDF(file);
-            PDDocumentInformation documentInformation = pdf.getDocumentInformation();
+        File file = new File(filename);
+        PDDocument pdf = Loader.loadPDF(file);
+        PDDocumentInformation documentInformation = pdf.getDocumentInformation();
 
-            FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
-            FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
+        FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
+        FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
 
-            final String title = StringUtil.cleanAndTrimToNullSubstring(documentInformation.getTitle(), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH);
-            Optional.ofNullable(title)
-                    .ifPresentOrElse(fileMetaInfo::setTitle,
-                            () -> fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(fileUtil.calculateFileBaseName(filename), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH)));
+        final String title = StringUtil.cleanAndTrimToNullSubstring(documentInformation.getTitle(), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH);
+        Optional.ofNullable(title)
+                .ifPresentOrElse(fileMetaInfo::setTitle,
+                        () -> fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(fileUtil.calculateFileBaseName(filename), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH)));
 
-            final FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
-            BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
-            bookInfo.setFileMetaInfo(fileMetaInfo);
-            log.debug("PDF METADATA extracted: {}", fileMetaInfo);
-            bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
-            this.bookInfoRepository.save(bookInfo);
+        final FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+        BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
+        bookInfo.setFileMetaInfo(fileMetaInfo);
+        log.debug("PDF METADATA extracted: {}", fileMetaInfo);
+        bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
+        this.bookInfoRepository.save(bookInfo);
 
-            final String keywordsStringTrimmed = StringUtil.cleanAndTrimToNull(documentInformation.getKeywords());
-            return Optional.of(Optional.ofNullable(keywordsStringTrimmed).map((keywordsString) -> {
-                List<String> keywords = new ArrayList<>();
-                keywords.add(keywordsStringTrimmed);
-                return dataExtractorStrategyUtil.createAndAssociateTags(keywords, savedFileMetaInfo);
-            }).orElse(savedFileMetaInfo));
+        final String keywordsStringTrimmed = StringUtil.cleanAndTrimToNull(documentInformation.getKeywords());
+        return Optional.of(Optional.ofNullable(keywordsStringTrimmed).map((keywordsString) -> {
+            List<String> keywords = new ArrayList<>();
+            keywords.add(keywordsStringTrimmed);
+            return dataExtractorStrategyUtil.createAndAssociateTags(keywords, savedFileMetaInfo);
+        }).orElse(savedFileMetaInfo));
     }
 
     private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld) throws IOException {

@@ -18,11 +18,9 @@ import java.util.List;
 // @Transactional(transactionManager = "jdbcTransactionManager")
 public class JdbcWriter {
 
-    private final DataSource dataSource;
-
-
     private static final String BULK_INSERT_TEMPLATE = "insert into el_file_system_item (name, base_path, sha256, size, extension, file_create_date, file_update_date, is_directory, parent_id, job_step, file_meta_info_id, job_status, record_status, version) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     private static final String BULK_UPDATE_TEMPLATE = "update el_file_system_item set name=?, base_path=?, sha256=?, size=?, extension=?, file_create_date=?, file_update_date=?, is_directory=?, parent_id=?, job_step=?, file_meta_info_id=?, job_status=?, record_status=?, version=? where id=?;";
+    private final DataSource dataSource;
 
     public void bulkInsertOrUpdate(List<FileSystemItem> fileSystemItemList) throws SQLException {
         if (fileSystemItemList.isEmpty()) {

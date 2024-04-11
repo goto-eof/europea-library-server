@@ -10,9 +10,9 @@ import java.util.List;
 @Setter
 @ToString
 public class GoogleBookResponseDTO {
+    List<GoogleBookItemDTO> items;
     private String kind;
     private int totalItems;
-    List<GoogleBookItemDTO> items;
 
     @Getter
     @Setter

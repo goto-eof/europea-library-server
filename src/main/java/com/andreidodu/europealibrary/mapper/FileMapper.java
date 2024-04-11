@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.mapper;
 
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.util.DateUtil;
-import com.andreidodu.europealibrary.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

@@ -1,9 +1,9 @@
 package com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.strategy;
 
-import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
-import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.WebRetrievementStatusEnum;
+import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
+import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.MetaInfoRetrieverStrategy;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy.TagUtil;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
@@ -29,28 +29,51 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStrategy {
-    private static final String STRATEGY_NAME = "google-book-meta-info-retriever-strategy";
     public static final String IDENTIFIER_TYPE_ISBN_10 = "ISBN_10";
     public static final int MAX_RESULTS = 1;
     public static final String GOOGLE_QUERY_INTITLE = "intitle:";
     public static final String GOOGLE_QUERY_INAUTHOR = "inauthor:";
     public static final String GOOGLE_QUERY_INPUBLISHER = "inpublisher:";
     public static final String GOOGLE_QUERY_ISBN = "isbn:";
-    @Value("${google.books.api_key}")
-    private String googleBooksApiKey;
-
+    private static final String STRATEGY_NAME = "google-book-meta-info-retriever-strategy";
     private final GoogleBooksClient googleBooksClient;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final CategoryUtil categoryUtil;
     private final TagUtil tagUtil;
     private final StepUtil stepUtil;
+    private final BookInfoRepository bookInfoRepository;
+    @Value("${google.books.api_key}")
+    private String googleBooksApiKey;
     @PersistenceContext
     private EntityManager entityManager;
-
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
 
-    private final BookInfoRepository bookInfoRepository;
+    private static boolean hasISBNOrTitleAuthorsOrPublisher(FileSystemItem fileSystemItem) {
+        log.debug("checking if satisfies conditions: {}", fileSystemItem);
+        return fileSystemItem != null &&
+                fileSystemItem.getFileMetaInfo() != null &&
+                fileSystemItem.getFileMetaInfo().getBookInfo() != null &&
+                hasISBN13(fileSystemItem) ||
+                fileSystemItem != null &&
+                        fileSystemItem.getFileMetaInfo() != null &&
+                        fileSystemItem.getFileMetaInfo().getTitle() != null &&
+                        fileSystemItem.getFileMetaInfo().getBookInfo() != null &&
+                        (StringUtil.isNotEmpty(fileSystemItem.getFileMetaInfo().getBookInfo().getAuthors()) ||
+                                StringUtil.isNotEmpty(fileSystemItem.getFileMetaInfo().getBookInfo().getPublisher()));
+    }
+
+    private static boolean hasISBN13(FileSystemItem fileSystemItem) {
+        return StringUtil.isNotEmpty(fileSystemItem.getFileMetaInfo().getBookInfo().getIsbn13());
+    }
+
+    private static boolean isEmptyResponse(GoogleBookResponseDTO googleBookResponse) {
+        return googleBookResponse == null || googleBookResponse.getItems() == null || googleBookResponse.getItems().isEmpty();
+    }
+
+    private static String calculateQueryISBN13(FileSystemItem fileSystemItem) {
+        return GOOGLE_QUERY_ISBN + fileSystemItem.getFileMetaInfo().getBookInfo().getIsbn13();
+    }
 
     @Override
     public String getStrategyName() {
@@ -70,24 +93,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         List<Integer> successStatuses = List.of(WebRetrievementStatusEnum.SUCCESS.getStatus(), WebRetrievementStatusEnum.SUCCESS_EMPTY.getStatus());
         Integer webRetrieveStatus = bookInfo.getWebRetrievementStatus();
         return webRetrieveStatus == null || !successStatuses.contains(webRetrieveStatus);
-    }
-
-    private static boolean hasISBNOrTitleAuthorsOrPublisher(FileSystemItem fileSystemItem) {
-        log.debug("checking if satisfies conditions: {}", fileSystemItem);
-        return fileSystemItem != null &&
-                fileSystemItem.getFileMetaInfo() != null &&
-                fileSystemItem.getFileMetaInfo().getBookInfo() != null &&
-                hasISBN13(fileSystemItem) ||
-                fileSystemItem != null &&
-                        fileSystemItem.getFileMetaInfo() != null &&
-                        fileSystemItem.getFileMetaInfo().getTitle() != null &&
-                        fileSystemItem.getFileMetaInfo().getBookInfo() != null &&
-                        (StringUtil.isNotEmpty(fileSystemItem.getFileMetaInfo().getBookInfo().getAuthors()) ||
-                                StringUtil.isNotEmpty(fileSystemItem.getFileMetaInfo().getBookInfo().getPublisher()));
-    }
-
-    private static boolean hasISBN13(FileSystemItem fileSystemItem) {
-        return StringUtil.isNotEmpty(fileSystemItem.getFileMetaInfo().getBookInfo().getIsbn13());
     }
 
     @Override
@@ -161,7 +166,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
 
     }
 
-
     private FileMetaInfo createAndAssociateTags(Set<String> tagsSet, FileMetaInfo savedFileMetaInfo) {
         try {
             List<String> tags = new ArrayList<>(tagsSet);
@@ -185,10 +189,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         return bookInfo;
     }
 
-    private static boolean isEmptyResponse(GoogleBookResponseDTO googleBookResponse) {
-        return googleBookResponse == null || googleBookResponse.getItems() == null || googleBookResponse.getItems().isEmpty();
-    }
-
     private GoogleBookResponseDTO retrieveGoogleBook(FileSystemItem fileSystemItem) {
         GoogleBookResponseDTO googleBookResponse;
         try {
@@ -204,10 +204,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             return this.googleBooksClient.retrieveMetaInfo(calculateQueryISBN13(fileSystemItem), MAX_RESULTS, googleBooksApiKey);
         }
         return this.googleBooksClient.retrieveMetaInfo(calculateQueryTitleAuthorPublisher(fileSystemItem), MAX_RESULTS, googleBooksApiKey);
-    }
-
-    private static String calculateQueryISBN13(FileSystemItem fileSystemItem) {
-        return GOOGLE_QUERY_ISBN + fileSystemItem.getFileMetaInfo().getBookInfo().getIsbn13();
     }
 
     private String calculateQueryTitleAuthorPublisher(FileSystemItem fileSystemItem) {

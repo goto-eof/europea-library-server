@@ -1,8 +1,6 @@
 package com.andreidodu.europealibrary.dto;
 
 import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
-import com.andreidodu.europealibrary.model.Category;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 

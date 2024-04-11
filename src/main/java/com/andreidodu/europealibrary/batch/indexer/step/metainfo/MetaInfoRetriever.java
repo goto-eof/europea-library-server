@@ -7,6 +7,7 @@ import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,17 +22,22 @@ public class MetaInfoRetriever {
     final private List<MetaInfoExtractorStrategy> metaInfoExtractorStrategyList;
     final private FileMetaInfoRepository fileMetaInfoRepository;
     final private FileSystemItemRepository fileSystemItemRepository;
+    @Value("${com.andreidodu.europea-library.job.indexer.avoid-duplicate-meta-info}")
+    private boolean avoidDuplicateMetaInfo;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Optional<FileMetaInfo> buildMetaInfoFromEbookIfNecessary(FileSystemItem fileSystemItem) {
         String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
 
-        log.debug("checking for meta-info for file {}...", fullPath);
-        Optional<FileMetaInfo> fileMetaInfoByHash = retrieveMetaInfoByHash(fileSystemItem);
-        if (fileMetaInfoByHash.isPresent()) {
-            log.debug("found meta info by hash");
-            return fileMetaInfoByHash;
+        if (avoidDuplicateMetaInfo) {
+            log.debug("checking for meta-info for file {}...", fullPath);
+            Optional<FileMetaInfo> fileMetaInfoByHash = retrieveMetaInfoByHash(fileSystemItem);
+            if (fileMetaInfoByHash.isPresent()) {
+                log.debug("found meta info by hash");
+                return fileMetaInfoByHash;
+            }
         }
+
         log.debug("generating new file meta info");
         return this.metaInfoExtractorStrategyList
                 .stream()

@@ -25,18 +25,16 @@ import java.util.Map;
 @Configuration
 @RequiredArgsConstructor
 public class MetaInfoStepConfig {
-    @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.batch-size}")
-    private Integer batchSize;
-
     private final DataSource dataSource;
     private final MetaInfoProcessor processor;
     private final MetaInfoBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
+    private final JobRepository jobRepository;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.batch-size}")
+    private Integer batchSize;
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
-    private final JobRepository jobRepository;
 
     @Bean("metaInfoBuilderStep")
     public Step metaInfoBuilderStep(JdbcPagingItemReader<Long> metaInfoBuilderReader) {

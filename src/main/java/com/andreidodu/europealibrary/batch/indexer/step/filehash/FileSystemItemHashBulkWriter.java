@@ -18,9 +18,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class FileSystemItemHashBulkWriter implements ItemWriter<FileSystemItem> {
-    private final DataSource dataSource;
-
     private static final String BULK_UPDATE_TEMPLATE = "update el_file_system_item set sha256=? where id=?;";
+    private final DataSource dataSource;
 
     @Override
     public void write(Chunk<? extends FileSystemItem> chunk) throws SQLException {

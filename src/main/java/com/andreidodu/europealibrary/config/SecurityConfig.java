@@ -20,10 +20,9 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private final CorsConfigurationSource corsConfigurationSource;
     @Value("${com.andreidodu.europea-library.client.url}")
     private String allowedOrigin;
-
-    private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
