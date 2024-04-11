@@ -35,8 +35,11 @@ public class ParentAssociatorProcessor implements ItemProcessor<Long, FileSystem
     private boolean recalculateParent(FileSystemItem fileSystemItem) {
         return this.getFileSystemItemByPathNameAndJobStep(fileUtil.calculateParentBasePath(fileSystemItem.getBasePath()), fileUtil.calculateFileName(fileSystemItem.getBasePath()), JobStepEnum.INSERTED.getStepNumber())
                 .map(parentId -> {
-                    fileSystemItem.setParentId(parentId);
-                    return true;
+                    if (!parentId.equals(fileSystemItem.getParentId())) {
+                        fileSystemItem.setParentId(parentId);
+                        return true;
+                    }
+                    return false;
                 }).orElse(false);
     }
 
