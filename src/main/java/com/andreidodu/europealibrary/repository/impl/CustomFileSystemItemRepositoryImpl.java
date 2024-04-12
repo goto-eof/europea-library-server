@@ -5,9 +5,10 @@ import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.CursorTypeRequestDTO;
 import com.andreidodu.europealibrary.dto.SearchFileSystemItemRequestDTO;
-import com.andreidodu.europealibrary.dto.common.Limitable;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
+import com.andreidodu.europealibrary.repository.common.CommonRepository;
+import com.andreidodu.europealibrary.util.LimitUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemRepository {
+public class CustomFileSystemItemRepositoryImpl extends CommonRepository implements CustomFileSystemItemRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -34,7 +35,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         Long parentId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
-        int numberOfResults = calculateExplorerResultLimitPerRequest(cursorRequestDTO);
+        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -60,7 +61,8 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         Long categoryId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
-        int numberOfResults = calculateExplorerResultLimitPerRequest(cursorRequestDTO);
+
+        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
         QCategory category = QCategory.category;
@@ -88,7 +90,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
         Long tagId = cursorRequestDTO.getParentId();
         Long cursorId = cursorRequestDTO.getNextCursor();
 
-        int numberOfResults = calculateExplorerResultLimitPerRequest(cursorRequestDTO);
+        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
         QTag tag = QTag.tag;
@@ -117,7 +119,8 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         final String extension = cursorTypeRequestDTO.getExtension();
         Long cursorId = cursorTypeRequestDTO.getNextCursor();
-        int numberOfResults = calculateExplorerResultLimitPerRequest(cursorTypeRequestDTO);
+
+        int numberOfResults = LimitUtil.calculateLimit(cursorTypeRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -171,7 +174,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
         BooleanBuilder booleanBuilder = applySearchFilters(searchFileSystemItemRequestDTO, fileSystemItem);
 
-        final int numberOfResults = calculateExplorerResultLimitPerRequest(searchFileSystemItemRequestDTO);
+        int numberOfResults = LimitUtil.calculateLimit(searchFileSystemItemRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
@@ -180,10 +183,6 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
                 .limit(numberOfResults + 1)
                 .orderBy(fileSystemItem.id.asc())
                 .fetch();
-    }
-
-    private <T extends Limitable> int calculateExplorerResultLimitPerRequest(T dto) {
-        return dto.getLimit() == null ? ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE : dto.getLimit();
     }
 
     private static BooleanBuilder applySearchFilters(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, QFileSystemItem fileSystemItem) {
@@ -219,22 +218,26 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
     private static void filterByDescriptionIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getDescription())
+                .filter(item -> !item.trim().isEmpty())
                 .ifPresent(description -> booleanBuilder.and(fileSystemItem.fileMetaInfo.description.containsIgnoreCase(description)));
     }
 
     private static void filterByAuthorIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getAuthor())
+                .filter(item -> !item.trim().isEmpty())
                 .ifPresent(author -> Arrays.stream(author.split(" "))
                         .forEach(authorItem -> booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.authors.containsIgnoreCase(author))));
     }
 
     private static void filterByPublisherIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getPublisher())
+                .filter(item -> !item.trim().isEmpty())
                 .ifPresent(publisher -> booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publisher.equalsIgnoreCase(publisher)));
     }
 
     private static void filterByIsbnIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getIsbn())
+                .filter(item -> !item.trim().isEmpty())
                 .ifPresent(isbn ->
                         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.isbn10.equalsIgnoreCase(isbn).or(fileSystemItem.fileMetaInfo.bookInfo.isbn13.equalsIgnoreCase(isbn)))
                 );
@@ -242,6 +245,7 @@ public class CustomFileSystemItemRepositoryImpl implements CustomFileSystemItemR
 
     private static void filterByTitleIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getTitle())
+                .filter(item -> !item.trim().isEmpty())
                 .ifPresent(title -> booleanBuilder.and(fileSystemItem.fileMetaInfo.title.containsIgnoreCase(title)));
     }
 }

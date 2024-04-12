@@ -14,16 +14,15 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class DbFMIObsoleteDeleterWriter implements ItemWriter<Long> {
-    final private FileMetaInfoRepository repository;
+    final private FileMetaInfoRepository fileMetaInfoRepository;
     final private BookInfoRepository bookInfoRepository;
 
     @Override
     public void write(Chunk<? extends Long> chunk) {
-        this.bookInfoRepository.deleteAllByIdInBatch(this.bookInfoRepository.findAllByFileMetaInfoId((List<Long>) chunk.getItems()))
-        ;
+        this.bookInfoRepository.deleteAllByIdInBatch(this.bookInfoRepository.findAllByFileMetaInfoId((List<Long>) chunk.getItems()));
         this.bookInfoRepository.flush();
-        this.repository.deleteAllByIdInBatch((Iterable<Long>) chunk.getItems());
-        this.repository.flush();
+        this.fileMetaInfoRepository.deleteAllByIdInBatch((Iterable<Long>) chunk.getItems());
+        this.fileMetaInfoRepository.flush();
         log.debug("deleted {} FileMetaInfo records", chunk.getItems().size());
     }
 }

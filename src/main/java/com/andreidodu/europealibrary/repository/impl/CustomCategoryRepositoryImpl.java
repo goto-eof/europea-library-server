@@ -5,6 +5,8 @@ import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
 import com.andreidodu.europealibrary.model.Category;
 import com.andreidodu.europealibrary.model.QCategory;
 import com.andreidodu.europealibrary.repository.CustomCategoryRepository;
+import com.andreidodu.europealibrary.repository.common.CommonRepository;
+import com.andreidodu.europealibrary.util.LimitUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
@@ -17,7 +19,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
+public class CustomCategoryRepositoryImpl extends CommonRepository implements CustomCategoryRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -26,8 +28,7 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
 
         Long cursorId = commonCursoredRequestDTO.getNextCursor();
 
-        int numberOfResults = Optional.ofNullable(commonCursoredRequestDTO.getLimit())
-                .orElse(ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        int numberOfResults = LimitUtil.calculateLimit(commonCursoredRequestDTO, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE);
 
         QCategory category = QCategory.category;
 
@@ -35,10 +36,6 @@ public class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
 
         Optional.ofNullable(cursorId)
                 .ifPresent(id -> booleanBuilder.and(category.id.goe(id)));
-
-        if (numberOfResults > ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE) {
-            numberOfResults = ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE;
-        }
 
         return new JPAQuery<Category>(entityManager)
                 .select(category)

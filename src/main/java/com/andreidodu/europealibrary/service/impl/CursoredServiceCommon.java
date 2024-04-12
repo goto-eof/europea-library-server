@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.service.impl;
 
+import com.andreidodu.europealibrary.dto.common.Limitable;
 import com.andreidodu.europealibrary.model.common.Identificable;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public abstract class CursoredServiceCommon {
                 .limit(limit)
                 .collect(Collectors.toList());
     }
+
+
 }

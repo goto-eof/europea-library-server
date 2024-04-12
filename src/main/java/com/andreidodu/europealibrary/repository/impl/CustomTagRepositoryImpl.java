@@ -5,6 +5,8 @@ import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
 import com.andreidodu.europealibrary.model.QTag;
 import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.CustomTagRepository;
+import com.andreidodu.europealibrary.repository.common.CommonRepository;
+import com.andreidodu.europealibrary.util.LimitUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
@@ -17,7 +19,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomTagRepositoryImpl implements CustomTagRepository {
+public class CustomTagRepositoryImpl extends CommonRepository implements CustomTagRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -26,8 +28,7 @@ public class CustomTagRepositoryImpl implements CustomTagRepository {
 
         Long cursorId = commonCursoredRequestDTO.getNextCursor();
 
-        int numberOfResults = Optional.ofNullable(commonCursoredRequestDTO.getLimit())
-                .orElse(ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        int numberOfResults = LimitUtil.calculateLimit(commonCursoredRequestDTO, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE);
 
         QTag tag = QTag.tag;
 
@@ -35,10 +36,6 @@ public class CustomTagRepositoryImpl implements CustomTagRepository {
 
         Optional.ofNullable(cursorId)
                 .ifPresent(id -> booleanBuilder.and(tag.id.goe(id)));
-
-        if (numberOfResults > ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE) {
-            numberOfResults = ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE;
-        }
 
         return new JPAQuery<Tag>(entityManager)
                 .select(tag)

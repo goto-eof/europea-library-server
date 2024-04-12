@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.finalization;
 
-import com.andreidodu.europealibrary.constants.CacheConst;
+import com.andreidodu.europealibrary.service.CacheLoader;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,8 +8,6 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -17,21 +15,17 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FinalizationTasklet implements Tasklet {
     private final CursoredFileSystemService cursoredFileSystemService;
-    private final CacheManager cacheManager;
+    private final CacheLoader cacheLoader;
 
     public RepeatStatus execute(StepContribution contribution,
                                 ChunkContext chunkContext) throws Exception {
-        clearAndReloadFileExtensionsCache();
+        clearAndReloadCache();
         return RepeatStatus.FINISHED;
     }
 
-    private void clearAndReloadFileExtensionsCache() {
+    private void clearAndReloadCache() {
         log.debug("loading data in cache");
-        Cache cache = cacheManager.getCache(CacheConst.CACHE_NAME_EXTENSIONS);
-        if (cache != null) {
-            cache.clear();
-        }
-        this.cursoredFileSystemService.getAllExtensions();
+        this.cacheLoader.reload();
         log.debug("cache loaded");
     }
 

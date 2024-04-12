@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -30,6 +31,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStrategy {
     public static final String IDENTIFIER_TYPE_ISBN_10 = "ISBN_10";
+    public static final String IDENTIFIER_TYPE_ISBN_13 = "ISBN_13";
     public static final int MAX_RESULTS = 1;
     public static final String GOOGLE_QUERY_INTITLE = "intitle:";
     public static final String GOOGLE_QUERY_INAUTHOR = "inauthor:";
@@ -109,15 +111,16 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             return apiResponseDTO;
         }
         if (isEmptyResponse(googleBookResponse)) {
-            log.debug("book information not found for {}", fileSystemItem);
-            fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS_EMPTY.getStatus());
-            ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
-            apiResponseDTO.setEntity(fileSystemItem.getFileMetaInfo());
-            apiResponseDTO.setStatus(ApiStatusEnum.SUCCESS_EMPTY_RESPONSE);
-            return apiResponseDTO;
+            return buildEmptyResponse(fileSystemItem);
         }
-        log.debug("book information retrieved: {}", googleBookResponse);
-        updateModel(fileSystemItem, googleBookResponse);
+
+        Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> volumeInfo = findFirstMatchingItem(googleBookResponse, fileSystemItem);
+        if (volumeInfo.isEmpty()) {
+            return buildEmptyResponse(fileSystemItem);
+        }
+
+        log.debug("book information retrieved: {}", volumeInfo);
+        updateModel(fileSystemItem, volumeInfo.get());
         fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS.getStatus());
         ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
         apiResponseDTO.setEntity(fileSystemItem.getFileMetaInfo());
@@ -125,8 +128,16 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         return apiResponseDTO;
     }
 
-    private void updateModel(FileSystemItem fileSystemItem, GoogleBookResponseDTO googleBookResponse) {
-        GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo = googleBookResponse.getItems().stream().findFirst().get().getVolumeInfo();
+    private static ApiResponseDTO<FileMetaInfo> buildEmptyResponse(FileSystemItem fileSystemItem) {
+        log.debug("book information not found for {}", fileSystemItem);
+        fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS_EMPTY.getStatus());
+        ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
+        apiResponseDTO.setEntity(fileSystemItem.getFileMetaInfo());
+        apiResponseDTO.setStatus(ApiStatusEnum.SUCCESS_EMPTY_RESPONSE);
+        return apiResponseDTO;
+    }
+
+    private void updateModel(FileSystemItem fileSystemItem, GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo) {
         FileMetaInfo fileMetaInfoOld = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoOld == null ? new FileMetaInfo() : fileMetaInfoOld;
         Optional.ofNullable(volumeInfo.getTitle()).ifPresent(title -> fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(title, DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH)));
@@ -147,6 +158,8 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         bookInfo.setAverageRating(volumeInfo.getAverageRating());
         bookInfo.setRatingsCount(volumeInfo.getRatingsCount());
         bookInfo.setIsbn10(extractValue(volumeInfo.getIndustryIdentifiers(), IDENTIFIER_TYPE_ISBN_10));
+        bookInfo.setIsbn13(extractValue(volumeInfo.getIndustryIdentifiers(), IDENTIFIER_TYPE_ISBN_13));
+
         Optional.ofNullable(volumeInfo.getPublishedDate()).ifPresent(bookInfo::setPublishedDate);
         Optional.ofNullable(volumeInfo.getImageLinks())
                 .flatMap(imageLinks -> Optional.ofNullable(imageLinks.getThumbnail()))
@@ -164,6 +177,58 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         bookInfo = this.createAndAssociateCategoriesIfNecessary(categoryNames, bookInfo);
         savedFileMetaInfo = this.fileMetaInfoRepository.save(savedFileMetaInfo);
 
+    }
+
+    private Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> findFirstMatchingItem(GoogleBookResponseDTO googleBookResponse, FileSystemItem fileSystemItem) {
+        if (fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
+            return Optional.empty();
+        }
+        FileMetaInfo fileMetaInfo = fileSystemItem.getFileMetaInfo();
+        BookInfo bookInfo = fileMetaInfo.getBookInfo();
+
+        return googleBookResponse.getItems().stream().filter(item -> {
+                    Set<String> googleIsbnList = item.getVolumeInfo()
+                            .getIndustryIdentifiers()
+                            .stream()
+                            .map(GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO.IndustryIdentifierDTO::getIdentifier)
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toSet());
+                    if (Optional.ofNullable(bookInfo.getIsbn13()).map(isbn -> googleIsbnList.contains(isbn.toLowerCase())).orElse(false) ||
+                            Optional.ofNullable(bookInfo.getIsbn10()).map(isbn -> googleIsbnList.contains(isbn.toLowerCase())).orElse(false)) {
+                        return true;
+                    }
+                    if (Optional.ofNullable(item.getVolumeInfo().getTitle()).map(String::toLowerCase).map(googleTitle -> googleTitle.contains(fileMetaInfo.getTitle().toLowerCase())).orElse(false)
+                            && (containsSameAuthors(bookInfo, item) || isSamePublisher(bookInfo, item))) {
+                        return true;
+                    }
+                    return false;
+                })
+                .findFirst()
+                .map(GoogleBookResponseDTO.GoogleBookItemDTO::getVolumeInfo);
+
+    }
+
+    private boolean isSamePublisher(BookInfo bookInfo, GoogleBookResponseDTO.GoogleBookItemDTO item) {
+        return Optional.ofNullable(item.getVolumeInfo().getPublisher())
+                .map(publisher -> publisher.equalsIgnoreCase(bookInfo.getPublisher()))
+                .orElse(false);
+    }
+
+    private boolean containsSameAuthors(BookInfo bookInfo, GoogleBookResponseDTO.GoogleBookItemDTO googleBookItem) {
+        return googleBookItem.getVolumeInfo().getAuthors().stream()
+                .map(String::toLowerCase)
+                .anyMatch(googleAuthor -> Arrays.stream(bookInfo.getAuthors().split(","))
+                        .map(String::trim)
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toSet())
+                        .stream()
+                        .anyMatch(localAuthor -> Arrays.stream(localAuthor.split(" "))
+                                .map(String::trim)
+                                .map(String::toLowerCase)
+                                .peek(localAuthorIn -> log.info(localAuthorIn + " - " + googleAuthor))
+                                .collect(Collectors.toSet())
+                                .stream()
+                                .allMatch(googleAuthor::contains)));
     }
 
     private FileMetaInfo createAndAssociateTags(Set<String> tagsSet, FileMetaInfo savedFileMetaInfo) {
