@@ -52,7 +52,7 @@ com:
       task:
         indexer:
           cron:
-            expression: "0 0 */23 * * ?"
+            expression: "0 0 0 * * ?"
       job:
         indexer:
           # the directory that contains all your e-book which need to be indexed
