@@ -109,7 +109,7 @@ public class StringUtil {
         }
         List<String> result = new ArrayList<>();
         result.add(trimmed);
-        List<String> separators = List.of("/", "\\", ",", ";", " - ");
+        List<String> separators = List.of("/", "\\", ",", ";");
         for (String separator : separators) {
             result = splitArraysStrings(result, separator);
         }

@@ -168,13 +168,13 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
 
 
-        Set<String> categoryNames = Optional.ofNullable(volumeInfo.getCategories())
-                .map(this.stepUtil::explodeInUniqueItems)
-                .orElse(new HashSet<>());
-
-        savedFileMetaInfo = this.createAndAssociateTags(categoryNames, savedFileMetaInfo);
+//        Set<String> categoryNames = Optional.ofNullable(volumeInfo.getCategories())
+//                .map(this.stepUtil::explodeInUniqueItems)
+//                .orElse(new HashSet<>());
+//
+//        savedFileMetaInfo = this.createAndAssociateTags(categoryNames, savedFileMetaInfo);
         bookInfo = savedFileMetaInfo.getBookInfo();
-        bookInfo = this.createAndAssociateCategoriesIfNecessary(categoryNames, bookInfo);
+//        bookInfo = this.createAndAssociateCategoriesIfNecessary(categoryNames, bookInfo);
         savedFileMetaInfo = this.fileMetaInfoRepository.save(savedFileMetaInfo);
 
     }

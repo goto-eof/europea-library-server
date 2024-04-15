@@ -4,9 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
-import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
-import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Component
@@ -67,15 +63,15 @@ public class DataExtractorStrategyUtil {
                 });
     }
 
-    public FileMetaInfo createAndAssociateTags(List<String> subjects, FileMetaInfo savedFileMetaInfo) {
-        try {
-            List<String> items = new ArrayList<>(this.stepUtil.explodeInUniqueItems(subjects));
-            Set<Tag> explodedTags = this.stepUtil.createOrLoadItems(items);
-            savedFileMetaInfo = this.stepUtil.associateTags(savedFileMetaInfo, explodedTags);
-        } catch (Exception e) {
-            log.error("something went wrong with tag creation/association: {}", e.getMessage());
-        }
-        return savedFileMetaInfo;
-    }
+//    public FileMetaInfo createAndAssociateTags(List<String> subjects, FileMetaInfo savedFileMetaInfo) {
+//        try {
+//            List<String> items = new ArrayList<>(this.stepUtil.explodeInUniqueItems(subjects));
+//            Set<Tag> explodedTags = this.stepUtil.createOrLoadItems(items);
+//            savedFileMetaInfo = this.stepUtil.associateTags(savedFileMetaInfo, explodedTags);
+//        } catch (Exception e) {
+//            log.error("something went wrong with tag creation/association: {}", e.getMessage());
+//        }
+//        return savedFileMetaInfo;
+//    }
 
 }

@@ -79,6 +79,10 @@ com:
           step-meta-info-writer:
             disable-isbn-extractor: false
             batch-size: 5000
+          step-tag-writer:
+            batch-size: 5000
+          meta-info-tag-associator:
+            batch-size: 5000
           step-ext-meta-info-writer:
             batch-size: 1
           step-step-updater:

@@ -1,5 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
+import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
+import com.andreidodu.europealibrary.batch.indexer.step.metainfo.TmpAssociationUtil;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
@@ -40,6 +42,8 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
     private final FileUtil fileUtil;
+    private final StepUtil stepUtil;
+    private final TmpAssociationUtil tmpAssociationUtil;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-pdf-metadata-extractor}")
     private boolean disablePDFMetadataExtractor;
     @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
@@ -91,11 +95,11 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
         this.bookInfoRepository.save(bookInfo);
 
         final String keywordsStringTrimmed = StringUtil.cleanAndTrimToNull(documentInformation.getKeywords());
-        return Optional.of(Optional.ofNullable(keywordsStringTrimmed).map((keywordsString) -> {
-            List<String> keywords = new ArrayList<>();
-            keywords.add(keywordsStringTrimmed);
-            return dataExtractorStrategyUtil.createAndAssociateTags(keywords, savedFileMetaInfo);
-        }).orElse(savedFileMetaInfo));
+        List<String> keywords = new ArrayList<>();
+        keywords.add(keywordsStringTrimmed);
+        this.tmpAssociationUtil.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), keywords);
+
+        return Optional.of(savedFileMetaInfo);
     }
 
     private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld) throws IOException {

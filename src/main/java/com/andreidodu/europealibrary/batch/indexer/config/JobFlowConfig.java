@@ -27,6 +27,8 @@ public class JobFlowConfig {
     private final Step dbJobStepUpdaterStep;
     private final Step finalizationStep;
     private final Step parentAssociatorStep;
+    private final Step tagWriterStep;
+    private final Step metaInfoTagAssociatorStep;
 
     @Bean("indexerJob")
     public Job indexerJob() {
@@ -35,6 +37,8 @@ public class JobFlowConfig {
                 .on(ExitStatus.COMPLETED.getExitCode()).to(fileSystemItemHashStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(parentAssociatorStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(metaInfoBuilderStep)
+                .on(ExitStatus.COMPLETED.getExitCode()).to(tagWriterStep)
+                .on(ExitStatus.COMPLETED.getExitCode()).to(metaInfoTagAssociatorStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(externalMetaInfoBuilderStep)
                 .from(externalMetaInfoBuilderStep).on(ExitStatus.FAILED.getExitCode()).to(dbFSIObsoleteDeleterStep)
                 .from(externalMetaInfoBuilderStep).on(ExitStatus.COMPLETED.getExitCode()).to(dbFSIObsoleteDeleterStep)

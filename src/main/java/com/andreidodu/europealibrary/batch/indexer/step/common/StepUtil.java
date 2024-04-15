@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.batch.indexer.step.common;
 
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.strategy.CategoryUtil;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy.TagUtil;
-import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.Category;
@@ -43,15 +42,15 @@ public class StepUtil {
     }
 
 
-    public Set<String> explodeInUniqueItems(List<String> itemNameList) {
+    public Set<String> explodeInUniqueItemsCleanedAndTrimmedToNullDistinctLowerCase(List<String> itemNameList, int maxSize) {
         return itemNameList.stream()
-                .filter(tagName -> !StringUtil.clean(tagName.trim()).isEmpty())
-                .map(StringUtil::clean)
+                .map(StringUtil::cleanAndTrimToNull)
+                .filter(Objects::nonNull)
                 .map(StringUtil::splitString)
                 .flatMap(Collection::stream)
                 .map(StringUtil::cleanAndTrimToNull)
                 .filter(Objects::nonNull)
-                .map(tagName -> tagName.substring(0, Math.min(tagName.length(), DataPropertiesConst.TAG_NAME_MAX_LENGTH)))
+                .map(tagName -> tagName.substring(0, Math.min(tagName.length(), maxSize)))
                 .map(StringUtil::cleanAndTrimToNull)
                 .filter(Objects::nonNull)
                 .map(String::toLowerCase)
