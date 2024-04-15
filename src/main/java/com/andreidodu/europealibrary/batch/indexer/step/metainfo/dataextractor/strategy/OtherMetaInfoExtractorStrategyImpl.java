@@ -38,7 +38,7 @@ public class OtherMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStra
         FileMetaInfo oldFileMetaInfo = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = oldFileMetaInfo == null ? new FileMetaInfo() : oldFileMetaInfo;
         Optional.ofNullable(StringUtil.cleanAndTrimToNullSubstring(fileUtil.calculateFileName(filename), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH))
-                .ifPresentOrElse(fileMetaInfo::setTitle, () -> fileMetaInfo.setTitle(""));
+                .ifPresentOrElse(fileMetaInfo::setTitle, () -> fileMetaInfo.setTitle("_NO_TITLE_"));
         return Optional.of(this.fileMetaInfoRepository.save(fileMetaInfo));
     }
 }
