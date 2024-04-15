@@ -107,6 +107,7 @@
                 <constraints nullable="true"/>
             </column>
             <column name="language" type="VARCHAR(10)"/>
+            <column name="is_corrupted" type="boolean"/>
             <column name="note" type="VARCHAR(2000)"/>
             <column name="num_pages" type="int"/>
             <column name="average_rating" type="double"/>
@@ -203,5 +204,14 @@
 
     </changeSet>
 
+    <changeSet id="2024-04-15-001" author="Andrei Dodu">
+        <createTable tableName="${tablePrefix}tmp_association">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tmp_association"/>
+            </column>
+            <column name="target_id" type="bigint"/>
+            <column name="value" type="varchar(500)"/>
+        </createTable>
+    </changeSet>
 
 </databaseChangeLog>

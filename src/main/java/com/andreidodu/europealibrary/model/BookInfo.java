@@ -61,6 +61,9 @@ public class BookInfo extends ModelCommon {
     @Column(name = "record_status")
     private Integer recordStatus;
 
+    @Column(name = "is_corrupted")
+    private Boolean isCorrupted;
+
     @OneToOne
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
     private FileMetaInfo fileMetaInfo;

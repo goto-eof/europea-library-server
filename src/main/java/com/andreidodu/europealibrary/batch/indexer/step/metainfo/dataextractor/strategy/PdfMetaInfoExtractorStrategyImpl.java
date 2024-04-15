@@ -1,5 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
+import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
+import com.andreidodu.europealibrary.batch.indexer.step.metainfo.TmpAssociationUtil;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
@@ -40,6 +42,8 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
     private final FileUtil fileUtil;
+    private final StepUtil stepUtil;
+    private final TmpAssociationUtil tmpAssociationUtil;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-pdf-metadata-extractor}")
     private boolean disablePDFMetadataExtractor;
     @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
@@ -66,49 +70,104 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
             return buildMetaInfoFromFile(filename, fileSystemItem);
         } catch (IOException e) {
             log.debug("failed to load pdf metadata: {}", filename);
-            return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem);
+            return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem, true);
         }
     }
 
-    private Optional<FileMetaInfo> buildMetaInfoFromFile(String filename, FileSystemItem fileSystemItem) throws IOException {
-        File file = new File(filename);
+    private Optional<FileMetaInfo> buildMetaInfoFromFile(String fullPath, FileSystemItem fileSystemItem) throws IOException {
+        File file = new File(fullPath);
         PDDocument pdf = Loader.loadPDF(file);
         PDDocumentInformation documentInformation = pdf.getDocumentInformation();
 
         FileMetaInfo fileMetaInfoEntity = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoEntity == null ? new FileMetaInfo() : fileMetaInfoEntity;
 
-        final String title = StringUtil.cleanAndTrimToNullSubstring(documentInformation.getTitle(), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH);
-        Optional.ofNullable(title)
-                .ifPresentOrElse(fileMetaInfo::setTitle,
-                        () -> fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(fileUtil.calculateFileBaseName(filename), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH)));
+        tryToSetBookTitle(fullPath, documentInformation, fileMetaInfo);
 
         final FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
-        BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo());
+
+        BookInfo bookInfo = buildBookInfo(pdf, fileMetaInfo.getBookInfo(), fullPath);
         bookInfo.setFileMetaInfo(fileMetaInfo);
+
         log.debug("PDF METADATA extracted: {}", fileMetaInfo);
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         this.bookInfoRepository.save(bookInfo);
 
-        final String keywordsStringTrimmed = StringUtil.cleanAndTrimToNull(documentInformation.getKeywords());
-        return Optional.of(Optional.ofNullable(keywordsStringTrimmed).map((keywordsString) -> {
-            List<String> keywords = new ArrayList<>();
-            keywords.add(keywordsStringTrimmed);
-            return dataExtractorStrategyUtil.createAndAssociateTags(keywords, savedFileMetaInfo);
-        }).orElse(savedFileMetaInfo));
+        tryToSetKeywords(fullPath, documentInformation, savedFileMetaInfo);
+
+        return Optional.of(savedFileMetaInfo);
     }
 
-    private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld) throws IOException {
+    private void tryToSetKeywords(String fullPath, PDDocumentInformation documentInformation, FileMetaInfo savedFileMetaInfo) {
+        try {
+            final String keywordsStringTrimmed = StringUtil.cleanAndTrimToNull(documentInformation.getKeywords());
+            List<String> keywords = new ArrayList<>();
+            keywords.add(keywordsStringTrimmed);
+            this.tmpAssociationUtil.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), keywords);
+        } catch (Exception e) {
+            log.debug("invalid pdf book keywords for '{}'", fullPath);
+        }
+    }
+
+    private void tryToSetBookTitle(String fullPath, PDDocumentInformation documentInformation, FileMetaInfo fileMetaInfo) {
+        try {
+            final String title = StringUtil.cleanAndTrimToNullSubstring(documentInformation.getTitle(), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH);
+            Optional.ofNullable(title)
+                    .ifPresentOrElse(fileMetaInfo::setTitle,
+                            () -> setFilenameAsBookTitle(fileMetaInfo, fullPath));
+        } catch (Exception e) {
+            log.debug("invalid pdf book title for '{}', will be used fullPath as title", fullPath);
+            setFilenameAsBookTitle(fileMetaInfo, fullPath);
+        }
+    }
+
+    public void setFilenameAsBookTitle(FileMetaInfo fileMetaInfo, String fullPath) {
+        fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(fileUtil.calculateFileBaseName(fullPath), DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH));
+    }
+
+    private BookInfo buildBookInfo(PDDocument pdDocument, BookInfo bookInfoOld, String fullPath) throws IOException {
         BookInfo bookInfo = bookInfoOld == null ? new BookInfo() : bookInfoOld;
-        bookInfo.setLanguage(StringUtil.cleanAndTrimToNullLowerCaseSubstring(pdDocument.getDocumentCatalog().getLanguage(), DataPropertiesConst.BOOK_INFO_LANGUAGE_MAX_LENGTH));
-        bookInfo.setNumberOfPages(pdDocument.getNumberOfPages());
-        bookInfo.setAuthors(StringUtil.cleanAndTrimToNullSubstring(pdDocument.getDocumentInformation().getAuthor(), DataPropertiesConst.BOOK_INFO_PUBLISHER_MAX_LENGTH));
+        tryToSetLanguage(pdDocument, fullPath, bookInfo);
+        tryToSetNumberOfPages(pdDocument, fullPath, bookInfo);
+        tryToSetAuthors(pdDocument, fullPath, bookInfo);
         if (!disableIsbExtractor) {
+            tryToSetIsbn(pdDocument, fullPath, bookInfo);
+        }
+        return bookInfo;
+    }
+
+    private void tryToSetIsbn(PDDocument pdDocument, String fullPath, BookInfo bookInfo) {
+        try {
             BookCodesDTO<Optional<String>, Optional<String>> bookCodes = this.pdfUtil.retrieveISBN(pdDocument);
             dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
             dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
+        } catch (Exception e) {
+            log.debug("invalid pdf book content for '{}'", fullPath);
         }
-        return bookInfo;
+    }
+
+    private static void tryToSetAuthors(PDDocument pdDocument, String fullPath, BookInfo bookInfo) {
+        try {
+            bookInfo.setAuthors(StringUtil.cleanAndTrimToNullSubstring(pdDocument.getDocumentInformation().getAuthor(), DataPropertiesConst.BOOK_INFO_PUBLISHER_MAX_LENGTH));
+        } catch (Exception e) {
+            log.debug("invalid pdf book authors of pages for '{}'", fullPath);
+        }
+    }
+
+    private static void tryToSetNumberOfPages(PDDocument pdDocument, String fullPath, BookInfo bookInfo) {
+        try {
+            bookInfo.setNumberOfPages(pdDocument.getNumberOfPages());
+        } catch (Exception e) {
+            log.debug("invalid pdf book number of pages for '{}'", fullPath);
+        }
+    }
+
+    private static void tryToSetLanguage(PDDocument pdDocument, String fullPath, BookInfo bookInfo) {
+        try {
+            bookInfo.setLanguage(StringUtil.cleanAndTrimToNullLowerCaseSubstring(pdDocument.getDocumentCatalog().getLanguage(), DataPropertiesConst.BOOK_INFO_LANGUAGE_MAX_LENGTH));
+        } catch (Exception e) {
+            log.debug("invalid pdf book language for '{}'", fullPath);
+        }
     }
 
 
