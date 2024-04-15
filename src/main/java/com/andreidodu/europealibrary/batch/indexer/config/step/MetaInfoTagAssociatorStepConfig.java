@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.batch.indexer.config.step;
 
 import com.andreidodu.europealibrary.batch.indexer.step.metainfotagassociation.MetaInfoTagAssociationBulkWriter;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfotagassociation.MetaInfoTagAssociationProcessor;
+import com.andreidodu.europealibrary.batch.indexer.step.metainfotagassociation.MetaInfoTagAssociationStepListener;
 import com.mysema.commons.lang.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Step;
@@ -30,6 +31,7 @@ public class MetaInfoTagAssociatorStepConfig {
     private final MetaInfoTagAssociationProcessor processor;
     private final MetaInfoTagAssociationBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
+    private final MetaInfoTagAssociationStepListener metaInfoTagAssociationStepListener;
     @Value("${com.andreidodu.europea-library.job.indexer.meta-info-tag-associator.batch-size}")
     private Integer batchSize;
     @Autowired
@@ -45,6 +47,7 @@ public class MetaInfoTagAssociatorStepConfig {
                 .reader(metaInfoTagAssociatorReader)
                 .processor(processor)
                 .writer(writer)
+                .listener(metaInfoTagAssociationStepListener)
                 .build();
     }
 
