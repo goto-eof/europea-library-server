@@ -107,6 +107,7 @@
                 <constraints nullable="true"/>
             </column>
             <column name="language" type="VARCHAR(10)"/>
+            <column name="is_corrupted" type="boolean"/>
             <column name="note" type="VARCHAR(2000)"/>
             <column name="num_pages" type="int"/>
             <column name="average_rating" type="double"/>

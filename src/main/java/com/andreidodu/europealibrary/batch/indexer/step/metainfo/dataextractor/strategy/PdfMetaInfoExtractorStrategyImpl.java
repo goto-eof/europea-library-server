@@ -70,7 +70,7 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
             return buildMetaInfoFromFile(filename, fileSystemItem);
         } catch (IOException e) {
             log.debug("failed to load pdf metadata: {}", filename);
-            return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem);
+            return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem, true);
         }
     }
 

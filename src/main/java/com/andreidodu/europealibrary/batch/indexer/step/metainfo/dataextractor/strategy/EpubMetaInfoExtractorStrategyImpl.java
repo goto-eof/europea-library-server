@@ -85,7 +85,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                     });
         } catch (Exception e) {
             log.debug("invalid file: {} ({})", filename, e.getMessage());
-            return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem);
+            return this.otherMetaInfoExtractorStrategy.extract(filename, fileSystemItem, true);
         }
     }
 
