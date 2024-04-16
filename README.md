@@ -58,7 +58,7 @@ the job is already running then it will continue to process files and no other j
 
 Because the core of the application is the job indexer, I am attaching the job schema in which is explained in summary
 how it works.
-![job_schema](images/job_steps.png)
+![job_schema](images/indexer_job_steps.png)
 
 ## Technologies
 
