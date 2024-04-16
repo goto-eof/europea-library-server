@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
-import com.andreidodu.europealibrary.batch.indexer.step.metainfo.TmpAssociationUtil;
+import com.andreidodu.europealibrary.service.TmpAssociationService;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
@@ -48,7 +48,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     private final TagUtil tagUtil;
     private final FileUtil fileUtil;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
-    private final TmpAssociationUtil tmpAssociationUtil;
+    private final TmpAssociationService tmpAssociationService;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
     @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
@@ -164,7 +164,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         fileMetaInfo.setBookInfo(this.bookInfoRepository.save(bookInfo));
         FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
 
-        this.tmpAssociationUtil.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), metadata.getSubjects());
+        this.tmpAssociationService.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), metadata.getSubjects());
 
         return savedFileMetaInfo;
     }
