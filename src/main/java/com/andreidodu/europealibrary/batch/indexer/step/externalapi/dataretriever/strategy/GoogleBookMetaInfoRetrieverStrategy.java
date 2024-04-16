@@ -13,6 +13,7 @@ import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
+import com.andreidodu.europealibrary.service.TmpAssociationService;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -44,6 +45,8 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final TagUtil tagUtil;
     private final StepUtil stepUtil;
     private final BookInfoRepository bookInfoRepository;
+    private final TmpAssociationService tmpAssociationService;
+
     @Value("${google.books.api_key}")
     private String googleBooksApiKey;
     @PersistenceContext
@@ -122,7 +125,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         log.debug("book information retrieved: {}", volumeInfo);
         updateModel(fileSystemItem, volumeInfo.get());
         fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS.getStatus());
-        ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
+        ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<>();
         apiResponseDTO.setEntity(fileSystemItem.getFileMetaInfo());
         apiResponseDTO.setStatus(ApiStatusEnum.SUCCESS);
         return apiResponseDTO;
@@ -138,6 +141,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     }
 
     private void updateModel(FileSystemItem fileSystemItem, GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo) {
+        final String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
         FileMetaInfo fileMetaInfoOld = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoOld == null ? new FileMetaInfo() : fileMetaInfoOld;
         Optional.ofNullable(volumeInfo.getTitle()).ifPresent(title -> fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(title, DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH)));
@@ -164,19 +168,20 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         Optional.ofNullable(volumeInfo.getImageLinks())
                 .flatMap(imageLinks -> Optional.ofNullable(imageLinks.getThumbnail()))
                 .ifPresent(bookInfo::setImageUrl);
-
+        BookInfo savedBookInfo = this.bookInfoRepository.save(bookInfo);
         FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
 
+        saveCategoriesInTmpTable(fullPath, savedBookInfo.getId(), volumeInfo);
+    }
 
-//        Set<String> categoryNames = Optional.ofNullable(volumeInfo.getCategories())
-//                .map(this.stepUtil::explodeInUniqueItems)
-//                .orElse(new HashSet<>());
-//
-//        savedFileMetaInfo = this.createAndAssociateTags(categoryNames, savedFileMetaInfo);
-        bookInfo = savedFileMetaInfo.getBookInfo();
-//        bookInfo = this.createAndAssociateCategoriesIfNecessary(categoryNames, bookInfo);
-        savedFileMetaInfo = this.fileMetaInfoRepository.save(savedFileMetaInfo);
 
+    private void saveCategoriesInTmpTable(String fullPath, Long metaInfoId, GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfoDTO) {
+        try {
+            List<String> categories = volumeInfoDTO.getCategories();
+            this.tmpAssociationService.addItemsToTmpAssociationTable(metaInfoId, categories);
+        } catch (Exception e) {
+            log.debug("invalid google book api keywords for '{}'", fullPath);
+        }
     }
 
     private Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> findFirstMatchingItem(GoogleBookResponseDTO googleBookResponse, FileSystemItem fileSystemItem) {
