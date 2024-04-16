@@ -16,7 +16,7 @@ public interface FileSystemItemRepository extends TransactionalRepository<FileSy
     @Query("select fsi from FileSystemItem fsi where parentId is null and jobStep=:jobStep")
     Optional<FileSystemItem> findByNoParent(Integer jobStep);
 
-    @Query("select fsi.fileMetaInfo from FileSystemItem fsi where fsi.fileMetaInfoId is not null")
+    @Query("select fsi.fileMetaInfo from FileSystemItem fsi where fsi.fileMetaInfoId is not null and fsi.sha256 = :hash")
     List<FileMetaInfo> findBySha256(String hash);
 
     @Modifying
