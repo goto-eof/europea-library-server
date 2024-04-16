@@ -29,6 +29,8 @@ public class JobFlowConfig {
     private final Step parentAssociatorStep;
     private final Step tagWriterStep;
     private final Step metaInfoTagAssociatorStep;
+    private final Step categoryWriterStep;
+    private final Step bookInfoCategoryAssociatorStep;
 
     @Bean("indexerJob")
     public Job indexerJob() {
@@ -40,8 +42,9 @@ public class JobFlowConfig {
                 .on(ExitStatus.COMPLETED.getExitCode()).to(tagWriterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(metaInfoTagAssociatorStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(externalMetaInfoBuilderStep)
-                .from(externalMetaInfoBuilderStep).on(ExitStatus.FAILED.getExitCode()).to(dbFSIObsoleteDeleterStep)
-                .from(externalMetaInfoBuilderStep).on(ExitStatus.COMPLETED.getExitCode()).to(dbFSIObsoleteDeleterStep)
+                .from(externalMetaInfoBuilderStep).on(ExitStatus.FAILED.getExitCode()).to(categoryWriterStep)
+                .from(externalMetaInfoBuilderStep).on(ExitStatus.COMPLETED.getExitCode()).to(categoryWriterStep)
+                .on(ExitStatus.COMPLETED.getExitCode()).to(bookInfoCategoryAssociatorStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbFMIObsoleteDeleterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbTagObsoleteDeleterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbCategoryObsoleteDeleterStep)

@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.repository;
 
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
 import feign.Param;
@@ -15,7 +16,8 @@ public interface FileSystemItemRepository extends TransactionalRepository<FileSy
     @Query("select fsi from FileSystemItem fsi where parentId is null and jobStep=:jobStep")
     Optional<FileSystemItem> findByNoParent(Integer jobStep);
 
-    List<FileSystemItem> findBySha256(String hash);
+    @Query("select fsi.fileMetaInfo from FileSystemItem fsi where fsi.fileMetaInfoId is not null")
+    List<FileMetaInfo> findBySha256(String hash);
 
     @Modifying
     @Query("update FileSystemItem fsi set fsi.fileMetaInfoId = :fileMetaInfoId where fsi.id = :fileSystemItemId")

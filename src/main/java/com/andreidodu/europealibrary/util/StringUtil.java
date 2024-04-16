@@ -140,7 +140,8 @@ public class StringUtil {
 
     private static List<String> splitStringByChar(String trimmed, String separator) {
         return Arrays.stream(trimmed.split(separator))
-                .map(String::trim)
+                .map(StringUtil::cleanAndTrimToNull)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy;
 
-import com.andreidodu.europealibrary.batch.indexer.step.metainfo.TmpAssociationUtil;
+import com.andreidodu.europealibrary.service.TmpAssociationService;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.MetaInfoExtractorStrategy;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.BookCodesDTO;
@@ -48,7 +48,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     private final TagUtil tagUtil;
     private final FileUtil fileUtil;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
-    private final TmpAssociationUtil tmpAssociationUtil;
+    private final TmpAssociationService tmpAssociationService;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
     @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
@@ -164,9 +164,17 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         fileMetaInfo.setBookInfo(this.bookInfoRepository.save(bookInfo));
         FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
 
-        this.tmpAssociationUtil.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), metadata.getSubjects());
+        tryToExtractAndSetTags(metadata, fullPath, savedFileMetaInfo);
 
         return savedFileMetaInfo;
+    }
+
+    private void tryToExtractAndSetTags(Metadata metadata, String fullPath, FileMetaInfo savedFileMetaInfo) {
+        try {
+            this.tmpAssociationService.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), metadata.getSubjects(), DataPropertiesConst.TAG_NAME_MAX_LENGTH);
+        } catch (Exception e) {
+            log.debug("invalid epub tags for '{}'", fullPath);
+        }
     }
 
     private void tryToExtractAndSetDates(Metadata metadata, String fullPath, BookInfo bookInfo) {
@@ -177,7 +185,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                         bookInfo.setPublishedDate(StringUtil.cleanAndTrimToNullSubstring(date, DataPropertiesConst.BOOK_INFO_PUBLISHED_DATE_MAX_LENGTH));
                     });
         } catch (Exception e) {
-            log.debug("invalid epub dates for '{}', will be used filename as title", fullPath);
+            log.debug("invalid epub dates for '{}'", fullPath);
         }
     }
 
@@ -188,7 +196,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                 bookInfo.setPublisher(StringUtil.cleanAndTrimToNullSubstring(String.join(",", publishers), DataPropertiesConst.BOOK_INFO_PUBLISHER_MAX_LENGTH));
             }
         } catch (Exception e) {
-            log.debug("invalid epub publishers for '{}', will be used filename as title", fullPath);
+            log.debug("invalid epub publishers for '{}'", fullPath);
         }
     }
 
@@ -198,7 +206,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
             dataExtractorStrategyUtil.setISBN13(bookCodes, bookInfo);
             dataExtractorStrategyUtil.setISBN10(bookCodes, bookInfo);
         } catch (Exception e) {
-            log.debug("invalid epub content for '{}', will be used filename as title", fullPath);
+            log.debug("invalid epub content for '{}'", fullPath);
         }
     }
 
@@ -209,7 +217,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                 bookInfo.setAuthors(StringUtil.cleanAndTrimToNullSubstring(String.join(",", authors), DataPropertiesConst.BOOK_INFO_AUTHORS_MAX_LENGTH));
             }
         } catch (Exception e) {
-            log.debug("invalid epub authors for '{}', will be used filename as title", fullPath);
+            log.debug("invalid epub authors for '{}'", fullPath);
         }
     }
 
@@ -217,7 +225,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         try {
             bookInfo.setNumberOfPages(book.getContents().size());
         } catch (Exception e) {
-            log.debug("invalid epub number of pages for '{}', will be used filename as title", fullPath);
+            log.debug("invalid epub number of pages for '{}'", fullPath);
         }
     }
 
@@ -227,7 +235,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
                     .ifPresent(language ->
                             bookInfo.setLanguage(StringUtil.cleanAndTrimToNullLowerCaseSubstring(language, DataPropertiesConst.BOOK_INFO_LANGUAGE_MAX_LENGTH)));
         } catch (Exception e) {
-            log.debug("invalid epub language for '{}', will be used filename as title", fullPath);
+            log.debug("invalid epub language for '{}'", fullPath);
         }
     }
 
@@ -235,7 +243,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
         try {
             isbnList = extractISBN(metadata.getIdentifiers());
         } catch (Exception e) {
-            log.debug("invalid epub identifiers for '{}', will be used filename as title", fullPath);
+            log.debug("invalid epub identifiers for '{}'", fullPath);
         }
         return isbnList;
     }

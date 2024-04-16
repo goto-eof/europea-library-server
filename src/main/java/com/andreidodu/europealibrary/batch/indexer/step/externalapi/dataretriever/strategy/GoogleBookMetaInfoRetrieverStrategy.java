@@ -13,6 +13,7 @@ import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
+import com.andreidodu.europealibrary.service.TmpAssociationService;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -44,12 +45,16 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final TagUtil tagUtil;
     private final StepUtil stepUtil;
     private final BookInfoRepository bookInfoRepository;
+    private final TmpAssociationService tmpAssociationService;
+
     @Value("${google.books.api_key}")
     private String googleBooksApiKey;
     @PersistenceContext
     private EntityManager entityManager;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-ext-meta-info-writer.high-matching-level}")
+    private boolean highMatchingLevel;
 
     private static boolean hasISBNOrTitleAuthorsOrPublisher(FileSystemItem fileSystemItem) {
         log.debug("checking if satisfies conditions: {}", fileSystemItem);
@@ -113,16 +118,23 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         if (isEmptyResponse(googleBookResponse)) {
             return buildEmptyResponse(fileSystemItem);
         }
-
-        Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> volumeInfo = findFirstMatchingItem(googleBookResponse, fileSystemItem);
-        if (volumeInfo.isEmpty()) {
-            return buildEmptyResponse(fileSystemItem);
+        Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> volumeInfo = null;
+        if (highMatchingLevel) {
+            volumeInfo = findFirstMatchingItem(googleBookResponse, fileSystemItem);
+            if (volumeInfo.isEmpty()) {
+                return buildEmptyResponse(fileSystemItem);
+            }
+        } else {
+            volumeInfo = findFirstLowMatchingItem(googleBookResponse, fileSystemItem);
+            if (volumeInfo.isEmpty()) {
+                return buildEmptyResponse(fileSystemItem);
+            }
         }
 
         log.debug("book information retrieved: {}", volumeInfo);
         updateModel(fileSystemItem, volumeInfo.get());
         fileSystemItem.getFileMetaInfo().getBookInfo().setWebRetrievementStatus(WebRetrievementStatusEnum.SUCCESS.getStatus());
-        ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<FileMetaInfo>();
+        ApiResponseDTO<FileMetaInfo> apiResponseDTO = new ApiResponseDTO<>();
         apiResponseDTO.setEntity(fileSystemItem.getFileMetaInfo());
         apiResponseDTO.setStatus(ApiStatusEnum.SUCCESS);
         return apiResponseDTO;
@@ -138,6 +150,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     }
 
     private void updateModel(FileSystemItem fileSystemItem, GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfo) {
+        final String fullPath = fileSystemItem.getBasePath() + "/" + fileSystemItem.getName();
         FileMetaInfo fileMetaInfoOld = fileSystemItem.getFileMetaInfo();
         FileMetaInfo fileMetaInfo = fileMetaInfoOld == null ? new FileMetaInfo() : fileMetaInfoOld;
         Optional.ofNullable(volumeInfo.getTitle()).ifPresent(title -> fileMetaInfo.setTitle(StringUtil.cleanAndTrimToNullSubstring(title, DataPropertiesConst.FILE_META_INFO_TITLE_MAX_LENGTH)));
@@ -164,19 +177,27 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         Optional.ofNullable(volumeInfo.getImageLinks())
                 .flatMap(imageLinks -> Optional.ofNullable(imageLinks.getThumbnail()))
                 .ifPresent(bookInfo::setImageUrl);
+        BookInfo savedBookInfo = this.bookInfoRepository.save(bookInfo);
+        this.fileMetaInfoRepository.save(fileMetaInfo);
 
-        FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+        saveCategoriesInTmpTable(fullPath, savedBookInfo.getId(), volumeInfo);
+    }
 
 
-//        Set<String> categoryNames = Optional.ofNullable(volumeInfo.getCategories())
-//                .map(this.stepUtil::explodeInUniqueItems)
-//                .orElse(new HashSet<>());
-//
-//        savedFileMetaInfo = this.createAndAssociateTags(categoryNames, savedFileMetaInfo);
-        bookInfo = savedFileMetaInfo.getBookInfo();
-//        bookInfo = this.createAndAssociateCategoriesIfNecessary(categoryNames, bookInfo);
-        savedFileMetaInfo = this.fileMetaInfoRepository.save(savedFileMetaInfo);
+    private void saveCategoriesInTmpTable(String fullPath, Long bookInfoId, GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfoDTO) {
+        try {
+            List<String> categories = volumeInfoDTO.getCategories();
+            this.tmpAssociationService.addItemsToTmpAssociationTable(bookInfoId, categories, DataPropertiesConst.CATEGORY_NAME_MAX_LENGTH);
+        } catch (Exception e) {
+            log.debug("invalid google book categories: '{}'", fullPath);
+        }
+    }
 
+    private Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> findFirstLowMatchingItem(GoogleBookResponseDTO googleBookResponse, FileSystemItem fileSystemItem) {
+        if (fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
+            return Optional.empty();
+        }
+        return googleBookResponse.getItems().stream().findFirst().map(GoogleBookResponseDTO.GoogleBookItemDTO::getVolumeInfo);
     }
 
     private Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> findFirstMatchingItem(GoogleBookResponseDTO googleBookResponse, FileSystemItem fileSystemItem) {

@@ -56,7 +56,7 @@ public class ExternalMetaInfoProcessor implements ItemProcessor<Long, FileSystem
                 .map(metaInfoRetrieverStrategy -> metaInfoRetrieverStrategy.process(fileSystemItem))
                 .filter(result -> List.of(ApiStatusEnum.SUCCESS, ApiStatusEnum.SUCCESS_EMPTY_RESPONSE).contains(result.getStatus()))
                 .map(ApiResponseDTO::getEntity)
-                .orElseThrow(() -> new SkipStepException("step was skipped because google books api returned an error"));
+                .orElseThrow(() -> new SkipStepException("step was partially executed or skipped because google books api returned an error"));
 
     }
 }
