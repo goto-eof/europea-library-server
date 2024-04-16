@@ -84,6 +84,7 @@ com:
           meta-info-tag-associator:
             batch-size: 5000
           step-ext-meta-info-writer:
+            high-matching-level: true
             batch-size: 1
           book-info-category-associator:
             batch-size: 5000

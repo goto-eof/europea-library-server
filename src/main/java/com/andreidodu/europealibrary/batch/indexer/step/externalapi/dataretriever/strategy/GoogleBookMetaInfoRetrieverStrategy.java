@@ -53,6 +53,8 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private EntityManager entityManager;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-ext-meta-info-writer.high-matching-level}")
+    private boolean highMatchingLevel;
 
     private static boolean hasISBNOrTitleAuthorsOrPublisher(FileSystemItem fileSystemItem) {
         log.debug("checking if satisfies conditions: {}", fileSystemItem);
@@ -116,10 +118,17 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         if (isEmptyResponse(googleBookResponse)) {
             return buildEmptyResponse(fileSystemItem);
         }
-
-        Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> volumeInfo = findFirstMatchingItem(googleBookResponse, fileSystemItem);
-        if (volumeInfo.isEmpty()) {
-            return buildEmptyResponse(fileSystemItem);
+        Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> volumeInfo = null;
+        if (highMatchingLevel) {
+            volumeInfo = findFirstMatchingItem(googleBookResponse, fileSystemItem);
+            if (volumeInfo.isEmpty()) {
+                return buildEmptyResponse(fileSystemItem);
+            }
+        } else {
+            volumeInfo = findFirstLowMatchingItem(googleBookResponse, fileSystemItem);
+            if (volumeInfo.isEmpty()) {
+                return buildEmptyResponse(fileSystemItem);
+            }
         }
 
         log.debug("book information retrieved: {}", volumeInfo);
@@ -178,10 +187,17 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private void saveCategoriesInTmpTable(String fullPath, Long bookInfoId, GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfoDTO) {
         try {
             List<String> categories = volumeInfoDTO.getCategories();
-            this.tmpAssociationService.addItemsToTmpAssociationTable(bookInfoId, categories,DataPropertiesConst.CATEGORY_NAME_MAX_LENGTH);
+            this.tmpAssociationService.addItemsToTmpAssociationTable(bookInfoId, categories, DataPropertiesConst.CATEGORY_NAME_MAX_LENGTH);
         } catch (Exception e) {
             log.debug("invalid google book categories: '{}'", fullPath);
         }
+    }
+
+    private Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> findFirstLowMatchingItem(GoogleBookResponseDTO googleBookResponse, FileSystemItem fileSystemItem) {
+        if (fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
+            return Optional.empty();
+        }
+        return googleBookResponse.getItems().stream().findFirst().map(GoogleBookResponseDTO.GoogleBookItemDTO::getVolumeInfo);
     }
 
     private Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> findFirstMatchingItem(GoogleBookResponseDTO googleBookResponse, FileSystemItem fileSystemItem) {
