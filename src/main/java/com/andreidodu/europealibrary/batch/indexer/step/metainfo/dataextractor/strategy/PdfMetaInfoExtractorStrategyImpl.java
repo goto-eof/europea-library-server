@@ -93,12 +93,12 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
         bookInfo.setFileExtractionStatus(FileExtractionStatusEnum.SUCCESS.getStatus());
         this.bookInfoRepository.save(bookInfo);
 
-        tryToSetKeywords(fullPath, documentInformation, savedFileMetaInfo);
+        tryToSetTags(fullPath, documentInformation, savedFileMetaInfo);
 
         return Optional.of(savedFileMetaInfo);
     }
 
-    private void tryToSetKeywords(String fullPath, PDDocumentInformation documentInformation, FileMetaInfo savedFileMetaInfo) {
+    private void tryToSetTags(String fullPath, PDDocumentInformation documentInformation, FileMetaInfo savedFileMetaInfo) {
         try {
             final String keywordsStringTrimmed = StringUtil.cleanAndTrimToNull(documentInformation.getKeywords());
             List<String> keywords = new ArrayList<>();
