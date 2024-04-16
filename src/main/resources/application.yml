@@ -85,6 +85,10 @@ com:
             batch-size: 5000
           step-ext-meta-info-writer:
             batch-size: 1
+          book-info-category-associator:
+            batch-size: 5000
+          step-category-writer:
+            batch-size: 5000
           step-step-updater:
             batch-size: 5000
           step-fmi-obsolete-deleter:
