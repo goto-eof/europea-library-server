@@ -31,7 +31,7 @@ public class BookInfoCategoryAssociatorStepConfig {
     private final BookInfoCategoryAssociationProcessor processor;
     private final BookInfoCategoryAssociationBulkWriter writer;
     private final HibernateTransactionManager transactionManager;
-    private final BookInfoCategoryAssociationStepListener metaInfoCategoryAssociationStepListener;
+    private final BookInfoCategoryAssociationStepListener bookInfoCategoryAssociationStepListener;
     @Value("${com.andreidodu.europea-library.job.indexer.book-info-category-associator.batch-size}")
     private Integer batchSize;
     @Autowired
@@ -47,7 +47,7 @@ public class BookInfoCategoryAssociatorStepConfig {
                 .reader(bookInfoCategoryAssociatorReader)
                 .processor(processor)
                 .writer(writer)
-                .listener(metaInfoCategoryAssociationStepListener)
+                .listener(bookInfoCategoryAssociationStepListener)
                 .build();
     }
 

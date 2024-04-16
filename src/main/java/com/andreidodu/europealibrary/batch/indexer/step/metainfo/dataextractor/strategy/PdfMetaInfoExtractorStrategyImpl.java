@@ -103,7 +103,7 @@ public class PdfMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrate
             final String keywordsStringTrimmed = StringUtil.cleanAndTrimToNull(documentInformation.getKeywords());
             List<String> keywords = new ArrayList<>();
             keywords.add(keywordsStringTrimmed);
-            this.tmpAssociationService.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), keywords);
+            this.tmpAssociationService.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), keywords, DataPropertiesConst.TAG_NAME_MAX_LENGTH);
         } catch (Exception e) {
             log.debug("invalid pdf book keywords for '{}'", fullPath);
         }

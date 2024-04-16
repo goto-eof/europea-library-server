@@ -20,9 +20,9 @@ public class TmpAssociationServiceImpl implements TmpAssociationService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void addItemsToTmpAssociationTable(Long targetId, List<String> items) {
+    public void addItemsToTmpAssociationTable(Long targetId, List<String> items, int maxLength) {
         this.tmpAssociationRepository.saveAllAndFlush(
-                this.stepUtil.explodeInUniqueItemsCleanedAndTrimmedToNullDistinctLowerCase(items, DataPropertiesConst.TAG_NAME_MAX_LENGTH)
+                this.stepUtil.explodeInUniqueItemsCleanedAndTrimmedToNullDistinctLowerCase(items, maxLength)
                         .stream()
                         .map(item -> buildTmpAssociation(targetId, item))
                         .toList());

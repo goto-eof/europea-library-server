@@ -171,7 +171,7 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
 
     private void tryToExtractAndSetTags(Metadata metadata, String fullPath, FileMetaInfo savedFileMetaInfo) {
         try {
-            this.tmpAssociationService.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), metadata.getSubjects());
+            this.tmpAssociationService.addItemsToTmpAssociationTable(savedFileMetaInfo.getId(), metadata.getSubjects(), DataPropertiesConst.TAG_NAME_MAX_LENGTH);
         } catch (Exception e) {
             log.debug("invalid epub tags for '{}'", fullPath);
         }

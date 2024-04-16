@@ -169,18 +169,18 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
                 .flatMap(imageLinks -> Optional.ofNullable(imageLinks.getThumbnail()))
                 .ifPresent(bookInfo::setImageUrl);
         BookInfo savedBookInfo = this.bookInfoRepository.save(bookInfo);
-        FileMetaInfo savedFileMetaInfo = this.fileMetaInfoRepository.save(fileMetaInfo);
+        this.fileMetaInfoRepository.save(fileMetaInfo);
 
         saveCategoriesInTmpTable(fullPath, savedBookInfo.getId(), volumeInfo);
     }
 
 
-    private void saveCategoriesInTmpTable(String fullPath, Long metaInfoId, GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfoDTO) {
+    private void saveCategoriesInTmpTable(String fullPath, Long bookInfoId, GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO volumeInfoDTO) {
         try {
             List<String> categories = volumeInfoDTO.getCategories();
-            this.tmpAssociationService.addItemsToTmpAssociationTable(metaInfoId, categories);
+            this.tmpAssociationService.addItemsToTmpAssociationTable(bookInfoId, categories,DataPropertiesConst.CATEGORY_NAME_MAX_LENGTH);
         } catch (Exception e) {
-            log.debug("invalid google book api keywords for '{}'", fullPath);
+            log.debug("invalid google book categories: '{}'", fullPath);
         }
     }
 

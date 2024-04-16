@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TmpAssociationService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void addItemsToTmpAssociationTable(Long targetId, List<String> items);
+    void addItemsToTmpAssociationTable(Long targetId, List<String> items, int maxLength);
 }
