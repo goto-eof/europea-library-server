@@ -71,35 +71,35 @@ com:
             disable-epub-metadata-extractor: false
             # disables the strategy
             disable-pdf-metadata-extractor: false
-            batch-size: 5000
+            batch-size: 100
           step-parent-associator-step:
-            batch-size: 5000
+            batch-size: 100
           step-file-hash-updater:
-            batch-size: 5000
+            batch-size: 100
           step-meta-info-writer:
             disable-isbn-extractor: false
-            batch-size: 5000
+            batch-size: 100
           step-tag-writer:
-            batch-size: 5000
+            batch-size: 100
           meta-info-tag-associator:
-            batch-size: 5000
+            batch-size: 100
           step-ext-meta-info-writer:
             high-matching-level: true
             batch-size: 1
           book-info-category-associator:
-            batch-size: 5000
+            batch-size: 100
           step-category-writer:
-            batch-size: 5000
+            batch-size: 100
           step-step-updater:
-            batch-size: 5000
+            batch-size: 100
           step-fmi-obsolete-deleter:
-            batch-size: 5000
+            batch-size: 100
           step-fsi-obsolete-deleter:
-            batch-size: 5000
+            batch-size: 100
           step-tag-obsolete-deleter:
-            batch-size: 5000
+            batch-size: 100
           step-category-obsolete-deleter:
-            batch-size: 5000
+            batch-size: 100
 
 batch-db:
   url: jdbc:postgresql://localhost:5439/db
