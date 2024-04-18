@@ -43,17 +43,19 @@ public class FileIndexerReader implements ItemStreamReader<File> {
     @Override
     public File read() {
         return Optional.ofNullable(directories.poll())
-                .map(file -> {
-                    log.debug("processed: " + file.getAbsolutePath() + "/" + file.getName());
-                    if (isIgnoreEmptyDirectoriesEnabled && file.isDirectory()) {
-                        File[] files = file.listFiles();
-                        if (files != null && files.length == 0) {
-                            log.debug("directory empty: ignoring it!");
-                            return null;
-                        }
-                    }
-                    return file;
-                }).orElse(null);
+                .orElse(null);
+    }
+
+    private boolean checkIsValid(File file) {
+        log.debug("processed: " + file.getAbsolutePath() + "/" + file.getName());
+        if (isIgnoreEmptyDirectoriesEnabled && file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files == null || files.length == 0) {
+                log.debug("directory empty: ignoring it!");
+                return false;
+            }
+        }
+        return true;
     }
 
     private void loadDirectoryIfNecessary(File file) {
@@ -72,6 +74,7 @@ public class FileIndexerReader implements ItemStreamReader<File> {
                     })
                     .filter(fileItem -> fileExtensionsToIgnore.isEmpty() || fileItem.isDirectory() || !fileExtensionsToIgnore.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
                     .filter(fileItem -> fileExtensionsToAllow.isEmpty() || fileItem.isDirectory() || fileExtensionsToAllow.contains(fileUtil.getExtension(fileItem.getName()).toLowerCase()))
+                    .filter(this::checkIsValid)
                     .sorted(sortByIsDirectoryAndName())
                     .toList();
             directories.addAll(files);

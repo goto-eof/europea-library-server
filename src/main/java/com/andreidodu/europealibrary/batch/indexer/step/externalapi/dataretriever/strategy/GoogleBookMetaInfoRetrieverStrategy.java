@@ -116,17 +116,21 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
             return apiResponseDTO;
         }
         if (isEmptyResponse(googleBookResponse)) {
+            log.debug("google book response: {}", googleBookResponse);
             return buildEmptyResponse(fileSystemItem);
         }
+        log.debug("google book response ok: {}", googleBookResponse);
         Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> volumeInfo = null;
         if (highMatchingLevel) {
-            volumeInfo = findFirstMatchingItem(googleBookResponse, fileSystemItem);
+            volumeInfo = findFirstHighMatchingItem(googleBookResponse, fileSystemItem);
             if (volumeInfo.isEmpty()) {
+                log.debug("highMatchingLevel enabled: no results found");
                 return buildEmptyResponse(fileSystemItem);
             }
         } else {
             volumeInfo = findFirstLowMatchingItem(googleBookResponse, fileSystemItem);
             if (volumeInfo.isEmpty()) {
+                log.debug("lowMatchingLevelEnabled: no results found");
                 return buildEmptyResponse(fileSystemItem);
             }
         }
@@ -200,7 +204,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         return googleBookResponse.getItems().stream().findFirst().map(GoogleBookResponseDTO.GoogleBookItemDTO::getVolumeInfo);
     }
 
-    private Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> findFirstMatchingItem(GoogleBookResponseDTO googleBookResponse, FileSystemItem fileSystemItem) {
+    private Optional<GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO> findFirstHighMatchingItem(GoogleBookResponseDTO googleBookResponse, FileSystemItem fileSystemItem) {
         if (fileSystemItem.getFileMetaInfo() == null || fileSystemItem.getFileMetaInfo().getBookInfo() == null) {
             return Optional.empty();
         }
@@ -246,7 +250,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
                         .anyMatch(localAuthor -> Arrays.stream(localAuthor.split(" "))
                                 .map(String::trim)
                                 .map(String::toLowerCase)
-                                .peek(localAuthorIn -> log.info(localAuthorIn + " - " + googleAuthor))
                                 .collect(Collectors.toSet())
                                 .stream()
                                 .allMatch(googleAuthor::contains)));

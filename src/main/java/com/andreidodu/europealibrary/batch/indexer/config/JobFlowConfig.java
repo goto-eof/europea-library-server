@@ -45,6 +45,7 @@ public class JobFlowConfig {
                 .from(externalMetaInfoBuilderStep).on(ExitStatus.FAILED.getExitCode()).to(categoryWriterStep)
                 .from(externalMetaInfoBuilderStep).on(ExitStatus.COMPLETED.getExitCode()).to(categoryWriterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(bookInfoCategoryAssociatorStep)
+                .on(ExitStatus.COMPLETED.getExitCode()).to(dbFSIObsoleteDeleterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbFMIObsoleteDeleterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbTagObsoleteDeleterStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(dbCategoryObsoleteDeleterStep)

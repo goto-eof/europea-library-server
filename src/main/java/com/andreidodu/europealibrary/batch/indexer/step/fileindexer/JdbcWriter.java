@@ -15,7 +15,6 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-// @Transactional(transactionManager = "jdbcTransactionManager")
 public class JdbcWriter {
 
     private static final String BULK_INSERT_TEMPLATE = "insert into el_file_system_item (name, base_path, sha256, size, extension, file_create_date, file_update_date, is_directory, parent_id, job_step, file_meta_info_id, job_status, record_status, version) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
