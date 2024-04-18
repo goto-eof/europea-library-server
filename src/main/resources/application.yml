@@ -59,6 +59,7 @@ com:
           e-books-directory: "/your/path/to/e-books/directory"
           avoid-duplicate-meta-info: true
           step-indexer:
+            ignore-empty-directories: true
             force-load-meta-info-from-web: false
             override-meta-info: false
             # will be skipped by strategy

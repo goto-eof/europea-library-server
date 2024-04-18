@@ -29,6 +29,8 @@ public class FileIndexerReader implements ItemStreamReader<File> {
     private List<String> fileExtensionsToIgnore;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.allow-file-extensions}")
     private List<String> fileExtensionsToAllow;
+    @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.ignore-empty-directories}")
+    private boolean isIgnoreEmptyDirectoriesEnabled;
 
     private static Comparator<File> sortByIsDirectoryAndName() {
         return (Comparator
@@ -43,6 +45,13 @@ public class FileIndexerReader implements ItemStreamReader<File> {
         return Optional.ofNullable(directories.poll())
                 .map(file -> {
                     log.debug("processed: " + file.getAbsolutePath() + "/" + file.getName());
+                    if (isIgnoreEmptyDirectoriesEnabled && file.isDirectory()) {
+                        File[] files = file.listFiles();
+                        if (files != null && files.length == 0) {
+                            log.debug("directory empty: ignoring it!");
+                            return null;
+                        }
+                    }
                     return file;
                 }).orElse(null);
     }
