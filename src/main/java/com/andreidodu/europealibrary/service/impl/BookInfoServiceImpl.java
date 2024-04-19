@@ -69,6 +69,7 @@ public class BookInfoServiceImpl implements BookInfoService {
                 .stream()
                 .map(TagDTO::getName)
                 .map(String::toLowerCase)
+                .map(String::trim)
                 .distinct()
                 .map(this.tagUtil::loadOrCreateTagEntity)
                 .collect(Collectors.toList()));
@@ -76,6 +77,7 @@ public class BookInfoServiceImpl implements BookInfoService {
                 .stream()
                 .map(CategoryDTO::getName)
                 .map(String::toLowerCase)
+                .map(String::trim)
                 .distinct()
                 .map(this.categoryUtil::createCategoryEntity)
                 .collect(Collectors.toList()));
