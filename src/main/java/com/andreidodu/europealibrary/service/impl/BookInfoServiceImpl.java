@@ -1,8 +1,11 @@
 package com.andreidodu.europealibrary.service.impl;
 
+import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.strategy.CategoryUtil;
 import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy.TagUtil;
+import com.andreidodu.europealibrary.dto.CategoryDTO;
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.TagDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.FileMetaInfoBookMapper;
@@ -28,6 +31,7 @@ public class BookInfoServiceImpl implements BookInfoService {
     private final FileMetaInfoBookMapper fileMetaInfoBookMapper;
     private final FileSystemItemRepository fileSystemItemRepository;
     private final TagUtil tagUtil;
+    private final CategoryUtil categoryUtil;
 
     private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
         if (id == null || !id.equals(dto.getId())) {
@@ -57,16 +61,24 @@ public class BookInfoServiceImpl implements BookInfoService {
     }
 
     @Override
-    public FileMetaInfoBookDTO updateBookInfo(Long id, FileMetaInfoBookDTO dto) {
-        validateUpdateInput(id, dto);
-        FileMetaInfo model = checkFileMetaInfoExistence(id);
+    public FileMetaInfoBookDTO updateBookInfo(Long fileMetaInfoId, FileMetaInfoBookDTO dto) {
+        validateUpdateInput(fileMetaInfoId, dto);
+        FileMetaInfo model = checkFileMetaInfoExistence(fileMetaInfoId);
         this.fileMetaInfoBookMapper.map(model, dto);
         model.setTagList(dto.getTagList()
                 .stream()
-                .map(tagDTO -> this.tagUtil.loadOrCreateTagEntity(tagDTO.getName()))
+                .map(TagDTO::getName)
+                .map(String::toLowerCase)
+                .distinct()
+                .map(this.tagUtil::loadOrCreateTagEntity)
                 .collect(Collectors.toList()));
-        List<FileSystemItem> fileSystemItemList = this.fileSystemItemRepository.findAllById(dto.getFileSystemItemIdList());
-        model.setFileSystemItemList(fileSystemItemList);
+        model.getBookInfo().setCategoryList(dto.getCategoryList()
+                .stream()
+                .map(CategoryDTO::getName)
+                .map(String::toLowerCase)
+                .distinct()
+                .map(this.categoryUtil::createCategoryEntity)
+                .collect(Collectors.toList()));
         FileMetaInfo newModel = this.repository.save(model);
         return this.fileMetaInfoBookMapper.toDTO(newModel);
     }

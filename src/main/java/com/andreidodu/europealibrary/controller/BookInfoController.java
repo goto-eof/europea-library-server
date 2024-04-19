@@ -36,8 +36,8 @@ public class BookInfoController {
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<FileMetaInfoBookDTO> update(@PathVariable Long id, @RequestBody FileMetaInfoBookDTO dto) throws Exception {
-        FileMetaInfoBookDTO updatedDTO = this.bookInfoService.updateBookInfo(id, dto);
+    public ResponseEntity<FileMetaInfoBookDTO> update(@PathVariable("id") Long fileMetaInfoId, @RequestBody FileMetaInfoBookDTO dto) throws Exception {
+        FileMetaInfoBookDTO updatedDTO = this.bookInfoService.updateBookInfo(fileMetaInfoId, dto);
         return ResponseEntity.ok(updatedDTO);
     }
 

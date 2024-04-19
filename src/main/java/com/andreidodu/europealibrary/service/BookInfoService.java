@@ -8,7 +8,7 @@ public interface BookInfoService {
 
     FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto);
 
-    FileMetaInfoBookDTO updateBookInfo(Long id, FileMetaInfoBookDTO dto);
+    FileMetaInfoBookDTO updateBookInfo(Long fileMetaInfoId, FileMetaInfoBookDTO dto);
 
     OperationStatusDTO delete(Long id);
 
