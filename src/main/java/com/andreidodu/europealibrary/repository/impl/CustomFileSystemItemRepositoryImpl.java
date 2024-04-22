@@ -218,12 +218,14 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
     private static void filterByDescriptionIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getDescription())
+                .map(String::trim)
                 .filter(item -> !item.trim().isEmpty())
                 .ifPresent(description -> booleanBuilder.and(fileSystemItem.fileMetaInfo.description.containsIgnoreCase(description)));
     }
 
     private static void filterByAuthorIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getAuthor())
+                .map(String::trim)
                 .filter(item -> !item.trim().isEmpty())
                 .ifPresent(author -> Arrays.stream(author.split(" "))
                         .forEach(authorItem -> booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.authors.containsIgnoreCase(author))));
@@ -231,12 +233,14 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
     private static void filterByPublisherIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getPublisher())
+                .map(String::trim)
                 .filter(item -> !item.trim().isEmpty())
                 .ifPresent(publisher -> booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publisher.equalsIgnoreCase(publisher)));
     }
 
     private static void filterByIsbnIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getIsbn())
+                .map(String::trim)
                 .filter(item -> !item.trim().isEmpty())
                 .ifPresent(isbn ->
                         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.isbn10.equalsIgnoreCase(isbn).or(fileSystemItem.fileMetaInfo.bookInfo.isbn13.equalsIgnoreCase(isbn)))
@@ -245,6 +249,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
     private static void filterByTitleIfNecessary(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO, BooleanBuilder booleanBuilder, QFileSystemItem fileSystemItem) {
         Optional.ofNullable(searchFileSystemItemRequestDTO.getTitle())
+                .map(String::trim)
                 .filter(item -> !item.trim().isEmpty())
                 .ifPresent(title -> booleanBuilder.and(fileSystemItem.fileMetaInfo.title.containsIgnoreCase(title)));
     }
