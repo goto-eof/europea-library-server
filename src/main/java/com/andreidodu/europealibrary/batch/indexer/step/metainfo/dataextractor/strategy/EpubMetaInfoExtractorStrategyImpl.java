@@ -45,7 +45,6 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     private final DataExtractorStrategyUtil dataExtractorStrategyUtil;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final BookInfoRepository bookInfoRepository;
-    private final TagUtil tagUtil;
     private final FileUtil fileUtil;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
     private final TmpAssociationService tmpAssociationService;

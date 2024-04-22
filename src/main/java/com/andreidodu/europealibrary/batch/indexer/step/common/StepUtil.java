@@ -1,14 +1,14 @@
 package com.andreidodu.europealibrary.batch.indexer.step.common;
 
-import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.strategy.CategoryUtil;
-import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy.TagUtil;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.Category;
-import com.andreidodu.europealibrary.model.FileMetaInfo;
+import com.andreidodu.europealibrary.model.FileMetaInfo; 
 import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
+import com.andreidodu.europealibrary.service.CategoryService;
+import com.andreidodu.europealibrary.service.TagService;
 import com.andreidodu.europealibrary.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(propagation = Propagation.MANDATORY)
 public class StepUtil {
-    private final TagUtil tagUtil;
-    private final CategoryUtil categoryUtil;
+    private final TagService tagService;
+    private final CategoryService categoryService;
     private final FileMetaInfoRepository fileMetaInfoRepository;
     private final BookInfoRepository bookInfoRepository;
 
@@ -38,7 +38,7 @@ public class StepUtil {
     }
 
     private Tag createOrLoadTagEntity(String tagName) {
-        return tagUtil.loadOrCreateTagEntity(tagName);
+        return tagService.loadOrCreateTagEntity(tagName);
     }
 
 
@@ -83,7 +83,7 @@ public class StepUtil {
     }
 
     private Category createOrLoadCategoryEntity(String categoryName) {
-        return categoryUtil.createCategoryEntity(categoryName);
+        return categoryService.createCategoryEntity(categoryName);
     }
 
     public BookInfo associateCategories(BookInfo bookInfo, Set<Category> explodedCategories) {

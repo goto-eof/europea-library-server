@@ -4,7 +4,6 @@ import com.andreidodu.europealibrary.batch.indexer.enums.ApiStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.WebRetrievementStatusEnum;
 import com.andreidodu.europealibrary.batch.indexer.step.common.StepUtil;
 import com.andreidodu.europealibrary.batch.indexer.step.externalapi.dataretriever.MetaInfoRetrieverStrategy;
-import com.andreidodu.europealibrary.batch.indexer.step.metainfo.dataextractor.strategy.TagUtil;
 import com.andreidodu.europealibrary.client.GoogleBooksClient;
 import com.andreidodu.europealibrary.constants.DataPropertiesConst;
 import com.andreidodu.europealibrary.dto.ApiResponseDTO;
@@ -41,8 +40,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private static final String STRATEGY_NAME = "google-book-meta-info-retriever-strategy";
     private final GoogleBooksClient googleBooksClient;
     private final FileMetaInfoRepository fileMetaInfoRepository;
-    private final CategoryUtil categoryUtil;
-    private final TagUtil tagUtil;
     private final StepUtil stepUtil;
     private final BookInfoRepository bookInfoRepository;
     private final TmpAssociationService tmpAssociationService;
