@@ -216,8 +216,53 @@
 
 
     <changeSet id="2024-05-24-001" author="Andrei Dodu">
+
         <createSequence sequenceName="${tablePrefix}user_seq" cycle="false" startValue="1" incrementBy="50"
                         cacheSize="50"/>
+
+        <createTable tableName="${tablePrefix}user">
+            <column name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}user_seq">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user"/>
+            </column>
+            <column name="username" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" defaultValueBoolean="false" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+        <createSequence sequenceName="${tablePrefix}role_seq" cycle="false" startValue="1" incrementBy="50"
+                        cacheSize="50"/>
+
+        <createTable tableName="${tablePrefix}role">
+            <column name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}role_seq">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_role"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints foreignKeyName="fk_user_id" references="{tablePrefix}user(id)" unique="true"
+                             nullable="false"/>
+            </column>
+            <column name="role" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+
     </changeSet>
 
 </databaseChangeLog>

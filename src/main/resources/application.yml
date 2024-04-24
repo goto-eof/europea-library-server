@@ -123,6 +123,7 @@ logging:
     com:
       andreidodu: ERROR
     org:
+      springframework: INFO
       apache:
         pdfbox: OFF
         fontbox: OFF
@@ -136,3 +137,6 @@ logging:
 #logging.level.org.hibernate.stat: ERROR # debug
 #logging.level.org.hibernate.SQL_SLOW: ERROR # info
 #logging.level.org.hibernate.cache: ERROR #debug
+rsa:
+  private-key: classpath:certs/private-key.pem
+  public-key: classpath:certs/public-key.pem
