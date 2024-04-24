@@ -251,7 +251,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_role"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints foreignKeyName="fk_user_id" references="{tablePrefix}user(id)" unique="true"
+                <constraints foreignKeyName="fk_user_id" references="el_user(id)" unique="true"
                              nullable="false"/>
             </column>
             <column name="role" type="VARCHAR(100)">
