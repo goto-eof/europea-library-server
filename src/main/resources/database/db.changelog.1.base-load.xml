@@ -214,4 +214,10 @@
         </createTable>
     </changeSet>
 
+
+    <changeSet id="2024-05-24-001" author="Andrei Dodu">
+        <createSequence sequenceName="${tablePrefix}user_seq" cycle="false" startValue="1" incrementBy="50"
+                        cacheSize="50"/>
+    </changeSet>
+
 </databaseChangeLog>
