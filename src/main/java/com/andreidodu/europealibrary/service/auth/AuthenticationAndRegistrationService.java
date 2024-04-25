@@ -2,10 +2,12 @@ package com.andreidodu.europealibrary.service.auth;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.dto.auth.*;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.mapper.UserMapper;
 import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
 import com.andreidodu.europealibrary.repository.auth.UserRepository;
+import com.andreidodu.europealibrary.util.StringUtil;
 import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -93,11 +95,25 @@ public class AuthenticationAndRegistrationService {
 
     public UserDTO register(RegistrationRequestDTO registrationRequestDTO) {
         validateInput(registrationRequestDTO);
+        validateUserAlreadyExists(registrationRequestDTO);
+
         User user = createUser(registrationRequestDTO);
         List<Authority> authorityList = buildAuthorityList(user);
         user.setAuthorityList(authorityList);
+
         User savedUser = this.userRepository.save(user);
+
         return this.userMapper.toDTO(savedUser);
+    }
+
+    private void validateUserAlreadyExists(RegistrationRequestDTO registrationRequestDTO) {
+        if (this.userRepository.existsByUsername(registrationRequestDTO.getUsername())) {
+            throw new ApplicationException("username not available");
+        }
+        if (this.userRepository.existsByEmail(registrationRequestDTO.getEmail())) {
+            throw new ApplicationException("email already used");
+        }
+
     }
 
     private static List<Authority> buildAuthorityList(User user) {
@@ -111,17 +127,17 @@ public class AuthenticationAndRegistrationService {
 
     private User createUser(RegistrationRequestDTO registrationRequestDTO) {
         User user = new User();
-        user.setUsername(registrationRequestDTO.getUsername());
-        user.setEmail(registrationRequestDTO.getEmail());
+        user.setUsername(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getUsername()));
+        user.setEmail(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getEmail()));
         user.setPassword(this.passwordEncoder.encode(registrationRequestDTO.getPassword()));
         user.setEnabled(true);
         return user;
     }
 
     private static void validateInput(RegistrationRequestDTO registrationRequestDTO) {
-        Assert.notNull(registrationRequestDTO, "payload could not be null");
-        Assert.notNull(registrationRequestDTO.getUsername(), "username could not be null");
-        Assert.notNull(registrationRequestDTO.getEmail(), "email could not be null");
-        Assert.notNull(registrationRequestDTO.getPassword(), "password could not be null");
+        Assert.notNull(registrationRequestDTO, "payload could not be empty");
+        Assert.notNull(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getUsername()), "username could not be empty");
+        Assert.notNull(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getEmail()), "email could not be empty");
+        Assert.notNull(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getPassword()), "password could not be empty");
     }
 }
