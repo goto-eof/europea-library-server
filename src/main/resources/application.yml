@@ -45,6 +45,9 @@ server:
 com:
   andreidodu:
     europea-library:
+      default-admin-username: admin
+      default-admin-email: admin@admin.com
+      default-admin-password: password
       core-pool-size: 6
       max-pool-size: 12
       client:

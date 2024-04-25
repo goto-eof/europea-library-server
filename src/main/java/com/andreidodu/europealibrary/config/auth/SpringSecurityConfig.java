@@ -52,7 +52,6 @@ public class SpringSecurityConfig {
     }
 
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
 
@@ -80,8 +79,10 @@ public class SpringSecurityConfig {
 
     @Bean
     JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(rsaKeyConfigProperties.publicKey()).privateKey(rsaKeyConfigProperties.privateKey()).build();
-
+        JWK jwk = new RSAKey
+                .Builder(rsaKeyConfigProperties.publicKey())
+                .privateKey(rsaKeyConfigProperties.privateKey())
+                .build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
