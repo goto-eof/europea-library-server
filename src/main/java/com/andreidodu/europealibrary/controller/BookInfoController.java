@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.controller;
 
-import com.andreidodu.europealibrary.annotation.auth.IsAdministrator;
+import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.service.BookInfoService;
@@ -28,21 +28,21 @@ public class BookInfoController {
         return ResponseEntity.ok(dto);
     }
 
-    @IsAdministrator
+    @AllowOnlyAdministrator
     @PostMapping("/create")
     public ResponseEntity<FileMetaInfoBookDTO> create(@RequestBody FileMetaInfoBookDTO dto) throws Exception {
         FileMetaInfoBookDTO createdDTO = this.bookInfoService.createBookInfo(dto);
         return ResponseEntity.ok(createdDTO);
     }
 
-    @IsAdministrator
+    @AllowOnlyAdministrator
     @PutMapping("/id/{id}")
     public ResponseEntity<FileMetaInfoBookDTO> update(@PathVariable("id") Long fileMetaInfoId, @RequestBody FileMetaInfoBookDTO dto) throws Exception {
         FileMetaInfoBookDTO updatedDTO = this.bookInfoService.updateBookInfo(fileMetaInfoId, dto);
         return ResponseEntity.ok(updatedDTO);
     }
 
-    @IsAdministrator
+    @AllowOnlyAdministrator
     @DeleteMapping("/id/{id}")
     public ResponseEntity<OperationStatusDTO> delete(@PathVariable Long id) throws Exception {
         OperationStatusDTO operationStatusDTO = this.bookInfoService.delete(id);

@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.controller;
 
+import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAuthenticatedUsers;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,7 @@ public class CursoredFileController {
         return ResponseEntity.ok(cursoredFileSystemService.getAllExtensions());
     }
 
+    @AllowOnlyAuthenticatedUsers
     @GetMapping(path = "/download/{fileSystemItemId}")
     public ResponseEntity<InputStreamResource> download(@PathVariable Long fileSystemItemId) {
         DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(fileSystemItemId);
