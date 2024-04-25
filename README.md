@@ -39,6 +39,13 @@ Before running the software as Spring Boot application it is necessary to follow
           to [Google Console](https://console.cloud.google.com/apis/credentials?hl=it) and create an API key. Remember
           also to enable Google Books API. The indexer job runs once per day, so that if you have for example 3.000
           e-books, it will take about 3 days to retrieve all information about your library.
+    - edit the default `username`, `email` and `password` (at the first run the application will store these information
+      on the db):
+      ```
+      default-admin-username: admin
+      default-admin-email: admin@admin.com
+      default-admin-password: password
+      ```
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command
     - run the project as Spring Boot application
 
