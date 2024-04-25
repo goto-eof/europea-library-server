@@ -32,7 +32,7 @@ cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-
 
 Before running the software as Spring Boot application it is necessary to follow some steps:
 
-- edit the application.yml
+- edit the `application.yml` in the following way:
     - set the `google.books.api_key` to your google api key
         - Europea Library uses Google Books API to retrieve information about books. This API has daily limits: 1,000
           requests/day. To get the API key go
