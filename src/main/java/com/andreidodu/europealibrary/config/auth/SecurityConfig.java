@@ -69,9 +69,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/error/**").permitAll();
-                    auth.requestMatchers("/api/auth/**").permitAll();
-                    auth.anyRequest().authenticated();
+                    auth.requestMatchers("/error/**").fullyAuthenticated();
+                    auth.requestMatchers("/api/auth/**").fullyAuthenticated();
+                    auth.anyRequest().fullyAuthenticated();
                 })
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> jwt.decoder(jwtDecoder())))
