@@ -14,14 +14,16 @@ import java.util.List;
 @Setter
 public class AuthUserDTO implements UserDetails {
 
-    private List<RoleDTO> roleList;
+    private List<AuthorityDTO> authorityList;
+    private String username;
+    private String password;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-        for (RoleDTO role : this.roleList) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        for (AuthorityDTO authority : this.authorityList) {
+            authorities.add(new SimpleGrantedAuthority(authority.getName()));
         }
 
         return authorities;
@@ -29,12 +31,12 @@ public class AuthUserDTO implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return this.username;
     }
 
     @Override

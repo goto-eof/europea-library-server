@@ -36,6 +36,6 @@ public class User extends ModelCommon {
     private Boolean enabled;
 
     @OneToMany(mappedBy = "user")
-    private List<Role> roleList;
+    private List<Authority> authorityList;
 
 }

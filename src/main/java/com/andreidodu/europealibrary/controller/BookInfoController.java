@@ -7,11 +7,9 @@ import com.andreidodu.europealibrary.service.BookInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Service
 @RestController
 @RequestMapping("/api/v1/bookInfo")
 @RequiredArgsConstructor
@@ -30,7 +28,7 @@ public class BookInfoController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @IsAdministrator
     public ResponseEntity<FileMetaInfoBookDTO> create(@RequestBody FileMetaInfoBookDTO dto) throws Exception {
         FileMetaInfoBookDTO createdDTO = this.bookInfoService.createBookInfo(dto);

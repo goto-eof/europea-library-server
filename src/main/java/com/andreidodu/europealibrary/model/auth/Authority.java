@@ -9,16 +9,16 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Getter
 @Setter
-@Table(name = "el_role_user", uniqueConstraints = {@UniqueConstraint(columnNames = "user_id,role_name")})
+@Table(name = "el_authority_user", uniqueConstraints = {@UniqueConstraint(columnNames = "user_id,role_name")})
 @EntityListeners(AuditingEntityListener.class)
-public class Role extends ModelCommon {
+public class Authority extends ModelCommon {
 
     @Id
-    @GeneratedValue(generator = "el_role_user_seq", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "el_role_user_seq", sequenceName = "el_role_user_seq", allocationSize = 50)
+    @GeneratedValue(generator = "el_authority_user_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "el_authority_user_seq", sequenceName = "el_authority_user_seq", allocationSize = 50)
     private Long id;
 
-    @Column(name = "role_name")
+    @Column(name = "name")
     private String name;
 
     @ManyToOne
