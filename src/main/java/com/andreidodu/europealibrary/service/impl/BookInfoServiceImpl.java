@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.service.impl;
 
+import com.andreidodu.europealibrary.annotation.auth.IsAdministrator;
 import com.andreidodu.europealibrary.dto.CategoryDTO;
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
@@ -45,6 +46,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         return this.fileMetaInfoBookMapper.toDTO(model);
     }
 
+    @IsAdministrator
     @Override
     public FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto) {
         FileMetaInfo model = this.fileMetaInfoBookMapper.toModel(dto);
@@ -60,6 +62,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         return this.fileMetaInfoBookMapper.toDTO(newModel);
     }
 
+    @IsAdministrator
     @Override
     public FileMetaInfoBookDTO updateBookInfo(Long fileMetaInfoId, FileMetaInfoBookDTO dto) {
         validateUpdateInput(fileMetaInfoId, dto);
@@ -85,6 +88,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         return this.fileMetaInfoBookMapper.toDTO(newModel);
     }
 
+    @IsAdministrator
     @Override
     public OperationStatusDTO delete(Long id) {
         return this.repository.findById(id).map(model -> {
