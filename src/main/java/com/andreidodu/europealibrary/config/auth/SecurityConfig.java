@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.config.auth;
 
-import com.andreidodu.europealibrary.constants.AuthConst;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -65,12 +64,7 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/v1/bookInfo/create/**").hasAuthority(AuthConst.AUTHORITY_ADMINISTRATOR);
-                    auth.requestMatchers("/api/v1/bookInfo/id/**").hasAuthority(AuthConst.AUTHORITY_ADMINISTRATOR);
-                    auth.requestMatchers("/api/v2/file/download/**").hasAnyAuthority(AuthConst.AUTHORITY_USER, AuthConst.AUTHORITY_ADMINISTRATOR);
-                    auth.anyRequest().permitAll();
-                })
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> jwt.decoder(jwtDecoder())))
                 .userDetailsService(userDetailsService)
