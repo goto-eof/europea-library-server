@@ -35,7 +35,7 @@ public class User extends ModelCommon {
     @Column(name = "enabled")
     private Boolean enabled;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST})
     private List<Authority> authorityList;
 
 }

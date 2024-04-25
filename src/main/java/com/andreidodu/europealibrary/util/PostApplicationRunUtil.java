@@ -46,7 +46,7 @@ public class PostApplicationRunUtil {
     private void createDefaultAdminRoles(User user) {
         Authority authority = new Authority();
         authority.setUser(user);
-        authority.setName(AuthConst.ROLE_ADMINISTRATOR);
+        authority.setName(AuthConst.AUTHORITY_ADMINISTRATOR);
         this.roleRepository.save(authority);
     }
 

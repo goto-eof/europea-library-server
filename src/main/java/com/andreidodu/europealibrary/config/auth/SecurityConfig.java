@@ -66,8 +66,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/v1/bookInfo/create/**").hasAuthority(AuthConst.ROLE_ADMINISTRATOR);
-                    auth.requestMatchers("/api/v1/bookInfo/id/**").hasAuthority(AuthConst.ROLE_ADMINISTRATOR);
+                    auth.requestMatchers("/api/v1/bookInfo/create/**").hasAuthority(AuthConst.AUTHORITY_ADMINISTRATOR);
+                    auth.requestMatchers("/api/v1/bookInfo/id/**").hasAuthority(AuthConst.AUTHORITY_ADMINISTRATOR);
                     auth.anyRequest().permitAll();
                 })
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

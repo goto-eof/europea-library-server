@@ -1,11 +1,12 @@
 package com.andreidodu.europealibrary.service.auth;
 
-import com.andreidodu.europealibrary.dto.auth.AuthRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.AuthResponseDTO;
-import com.andreidodu.europealibrary.dto.auth.AuthUserDTO;
-import com.andreidodu.europealibrary.dto.auth.UserDTO;
+import com.andreidodu.europealibrary.constants.AuthConst;
+import com.andreidodu.europealibrary.dto.auth.*;
+import com.andreidodu.europealibrary.mapper.UserMapper;
+import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
 import com.andreidodu.europealibrary.repository.auth.UserRepository;
+import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +24,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthenticationAndRegistrationService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationAndRegistrationService.class);
     private final JwtEncoder jwtEncoder;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+    private final UserMapper userMapper;
 
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
         Authentication authentication =
@@ -85,5 +89,39 @@ public class AuthService {
         userDTO.setEmail(user.getEmail());
         userDTO.setUsername(user.getUsername());
         return userDTO;
+    }
+
+    public UserDTO register(RegistrationRequestDTO registrationRequestDTO) {
+        validateInput(registrationRequestDTO);
+        User user = createUser(registrationRequestDTO);
+        List<Authority> authorityList = buildAuthorityList(user);
+        user.setAuthorityList(authorityList);
+        User savedUser = this.userRepository.save(user);
+        return this.userMapper.toDTO(savedUser);
+    }
+
+    private static List<Authority> buildAuthorityList(User user) {
+        List<Authority> authorityList = new ArrayList<>();
+        Authority userAuthority = new Authority();
+        userAuthority.setName(AuthConst.AUTHORITY_USER);
+        userAuthority.setUser(user);
+        authorityList.add(userAuthority);
+        return authorityList;
+    }
+
+    private User createUser(RegistrationRequestDTO registrationRequestDTO) {
+        User user = new User();
+        user.setUsername(registrationRequestDTO.getUsername());
+        user.setEmail(registrationRequestDTO.getEmail());
+        user.setPassword(this.passwordEncoder.encode(registrationRequestDTO.getPassword()));
+        user.setEnabled(true);
+        return user;
+    }
+
+    private static void validateInput(RegistrationRequestDTO registrationRequestDTO) {
+        Assert.notNull(registrationRequestDTO, "payload could not be null");
+        Assert.notNull(registrationRequestDTO.getUsername(), "username could not be null");
+        Assert.notNull(registrationRequestDTO.getEmail(), "email could not be null");
+        Assert.notNull(registrationRequestDTO.getPassword(), "password could not be null");
     }
 }

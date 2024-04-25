@@ -28,22 +28,22 @@ public class BookInfoController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping("/create")
     @IsAdministrator
+    @PostMapping("/create")
     public ResponseEntity<FileMetaInfoBookDTO> create(@RequestBody FileMetaInfoBookDTO dto) throws Exception {
         FileMetaInfoBookDTO createdDTO = this.bookInfoService.createBookInfo(dto);
         return ResponseEntity.ok(createdDTO);
     }
 
-    @PutMapping("/id/{id}")
     @IsAdministrator
+    @PutMapping("/id/{id}")
     public ResponseEntity<FileMetaInfoBookDTO> update(@PathVariable("id") Long fileMetaInfoId, @RequestBody FileMetaInfoBookDTO dto) throws Exception {
         FileMetaInfoBookDTO updatedDTO = this.bookInfoService.updateBookInfo(fileMetaInfoId, dto);
         return ResponseEntity.ok(updatedDTO);
     }
 
-    @DeleteMapping("/id/{id}")
     @IsAdministrator
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<OperationStatusDTO> delete(@PathVariable Long id) throws Exception {
         OperationStatusDTO operationStatusDTO = this.bookInfoService.delete(id);
         return ResponseEntity.ok(operationStatusDTO);
