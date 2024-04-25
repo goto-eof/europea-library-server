@@ -32,6 +32,9 @@ public class User extends ModelCommon {
     @JsonIgnore
     private String password;
 
+    @Column(name = "enabled")
+    private Boolean enabled;
+
     @OneToMany(mappedBy = "user")
     private List<Role> roleList;
 

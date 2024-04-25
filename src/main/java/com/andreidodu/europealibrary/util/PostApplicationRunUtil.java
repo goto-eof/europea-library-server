@@ -55,6 +55,7 @@ public class PostApplicationRunUtil {
         user.setUsername(defaultAdminUsername);
         user.setEmail(defaultAdminEmail);
         user.setPassword(bCryptPasswordEncoder.encode(defaultAdminPassword));
+        user.setEnabled(true);
         user = userRepository.save(user);
         return user;
     }
