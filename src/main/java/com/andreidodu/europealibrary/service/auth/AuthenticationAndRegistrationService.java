@@ -2,7 +2,7 @@ package com.andreidodu.europealibrary.service.auth;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.dto.auth.*;
-import com.andreidodu.europealibrary.exception.ApplicationException;
+import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.UserMapper;
 import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
@@ -108,10 +108,10 @@ public class AuthenticationAndRegistrationService {
 
     private void validateUserAlreadyExists(RegistrationRequestDTO registrationRequestDTO) {
         if (this.userRepository.existsByUsername(registrationRequestDTO.getUsername())) {
-            throw new ApplicationException("username not available");
+            throw new ValidationException("username not available");
         }
         if (this.userRepository.existsByEmail(registrationRequestDTO.getEmail())) {
-            throw new ApplicationException("email already used");
+            throw new ValidationException("email already used");
         }
 
     }

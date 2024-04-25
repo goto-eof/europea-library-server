@@ -1,7 +1,9 @@
 package com.andreidodu.europealibrary.controller.advice;
 
 import com.andreidodu.europealibrary.dto.HttpErrorDTO;
+import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
+import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.exception.WorkInProgressException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,8 +29,20 @@ public class ControllerAdvice {
 
     @ExceptionHandler(value = {BadCredentialsException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public HttpErrorDTO handleException(BadCredentialsException e) {
+    public HttpErrorDTO handleBadCredentialsException(BadCredentialsException e) {
         return new HttpErrorDTO(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
+    }
+
+    @ExceptionHandler(value = {ValidationException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public HttpErrorDTO handleValidationException(ValidationException e) {
+        return new HttpErrorDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+    }
+
+    @ExceptionHandler(value = {ApplicationException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public HttpErrorDTO handleApplicationExceptionException(ApplicationException e) {
+        return new HttpErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
     }
 
 }
