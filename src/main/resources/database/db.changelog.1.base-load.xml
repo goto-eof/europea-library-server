@@ -242,13 +242,13 @@
             <column name="version" type="INT"/>
         </createTable>
 
-        <createSequence sequenceName="${tablePrefix}role_seq" cycle="false" startValue="1" incrementBy="50"
+        <createSequence sequenceName="${tablePrefix}role_user_seq" cycle="false" startValue="1" incrementBy="50"
                         cacheSize="50"/>
 
-        <createTable tableName="${tablePrefix}role">
+        <createTable tableName="${tablePrefix}role_user">
             <column name="id" type="BIGINT"
-                    defaultValueSequenceNext="${tablePrefix}role_seq">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_role"/>
+                    defaultValueSequenceNext="${tablePrefix}role_user_seq">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_role_user"/>
             </column>
             <column name="user_id" type="BIGINT">
                 <constraints foreignKeyName="fk_user_id" references="el_user(id)" unique="true"
