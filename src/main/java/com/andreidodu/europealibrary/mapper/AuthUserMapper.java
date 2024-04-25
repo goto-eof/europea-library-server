@@ -11,6 +11,9 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public abstract class AuthUserMapper {
 
+    @Mapping(ignore = true, target = "id")
+    @Mapping(ignore = true, target = "email")
+    @Mapping(ignore = true, target = "roleList")
     public abstract User toModel(AuthUserDTO dto);
 
     @Mapping(ignore = true, target = "authorities")

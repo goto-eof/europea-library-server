@@ -1,14 +1,17 @@
 package com.andreidodu.europealibrary.model.auth;
 
+import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "el_role", uniqueConstraints = {@UniqueConstraint(columnNames = "user_id,role_name")})
-public class Role {
+@EntityListeners(AuditingEntityListener.class)
+public class Role extends ModelCommon {
 
     @Id
     @GeneratedValue(generator = "el_role_seq", strategy = GenerationType.SEQUENCE)
