@@ -58,12 +58,6 @@ public class SecurityConfig {
         return new ProviderManager(authProvider);
     }
 
-   // @Bean
-   // public static GrantedAuthorityDefaults grantedAuthorityDefaults() {
-   //     return new GrantedAuthorityDefaults("");
-    //}
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity

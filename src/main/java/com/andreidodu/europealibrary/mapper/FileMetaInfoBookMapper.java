@@ -54,6 +54,7 @@ public abstract class FileMetaInfoBookMapper {
     @Mapping(ignore = true, target = "id")
     @Mapping(ignore = true, target = "recordStatus")
     @Mapping(ignore = true, target = "isCorrupted")
+    @Mapping(ignore = true, target = "imageUrl")
     public abstract void map(@MappingTarget BookInfo model, FileMetaInfoBookDTO source);
 
     public FileMetaInfo toModel(FileMetaInfoBookDTO dto) {
