@@ -30,6 +30,7 @@ public class QRCodeServiceImpl implements QRCodeService {
     @Override
     public DownloadDTO generateOrLoadQRCode(String data, Long identifier)
             throws WriterException, IOException {
+        new File(qrCodePath).mkdirs();
         final String filename = qrCodePath + "/" + identifier + ".png";
 
         if (new File(filename).exists()) {
@@ -43,7 +44,7 @@ public class QRCodeServiceImpl implements QRCodeService {
         MatrixToImageWriter.writeToPath(
                 matrix,
                 filename.substring(filename.lastIndexOf('.') + 1),
-                Path.of(qrCodePath));
+                Path.of(filename));
 
         return fileToDownloadDTO(filename);
     }
