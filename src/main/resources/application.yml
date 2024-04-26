@@ -45,6 +45,7 @@ server:
 com:
   andreidodu:
     europea-library:
+      qr-code-path: /your/path/here
       default-admin-username: admin
       default-admin-email: admin@admin.com
       default-admin-password: password
