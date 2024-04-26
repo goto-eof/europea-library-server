@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAnyRole('" + AuthConst.AUTHORITY_USER + "','" + AuthConst.AUTHORITY_ADMINISTRATOR + "')")
+@PreAuthorize("hasAnyAuthority('" + AuthConst.AUTHORITY_USER + "','" + AuthConst.AUTHORITY_ADMINISTRATOR + "')")
 public @interface AllowOnlyAuthenticatedUsers {
 }

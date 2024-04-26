@@ -209,21 +209,18 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
         BookInfo bookInfo = fileMetaInfo.getBookInfo();
 
         return googleBookResponse.getItems().stream().filter(item -> {
-                    Set<String> googleIsbnList = item.getVolumeInfo()
-                            .getIndustryIdentifiers()
-                            .stream()
-                            .map(GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO.IndustryIdentifierDTO::getIdentifier)
-                            .map(String::toLowerCase)
-                            .collect(Collectors.toSet());
+                    Set<String> googleIsbnList = Optional.ofNullable(item.getVolumeInfo()
+                                    .getIndustryIdentifiers())
+                            .map(identifiers -> identifiers.stream().map(GoogleBookResponseDTO.GoogleBookItemDTO.VolumeInfoDTO.IndustryIdentifierDTO::getIdentifier)
+                                    .map(String::toLowerCase)
+                                    .collect(Collectors.toSet()))
+                            .orElse(new HashSet<>());
                     if (Optional.ofNullable(bookInfo.getIsbn13()).map(isbn -> googleIsbnList.contains(isbn.toLowerCase())).orElse(false) ||
                             Optional.ofNullable(bookInfo.getIsbn10()).map(isbn -> googleIsbnList.contains(isbn.toLowerCase())).orElse(false)) {
                         return true;
                     }
-                    if (Optional.ofNullable(item.getVolumeInfo().getTitle()).map(String::toLowerCase).map(googleTitle -> googleTitle.contains(fileMetaInfo.getTitle().toLowerCase())).orElse(false)
-                            && (containsSameAuthors(bookInfo, item) || isSamePublisher(bookInfo, item))) {
-                        return true;
-                    }
-                    return false;
+                    return Optional.ofNullable(item.getVolumeInfo().getTitle()).map(String::toLowerCase).map(googleTitle -> googleTitle.contains(fileMetaInfo.getTitle().toLowerCase())).orElse(false)
+                            && (containsSameAuthors(bookInfo, item) || isSamePublisher(bookInfo, item));
                 })
                 .findFirst()
                 .map(GoogleBookResponseDTO.GoogleBookItemDTO::getVolumeInfo);

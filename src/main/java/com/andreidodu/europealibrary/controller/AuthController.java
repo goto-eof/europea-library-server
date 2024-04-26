@@ -30,7 +30,7 @@ public class AuthController {
     public ResponseEntity<UserDTO> getUser(Authentication authentication) {
         return Optional.ofNullable(authentication)
                 .map(auth -> {
-                    UserDTO userDTO = this.authenticationAndRegistrationService.getUser(auth.getName());
+                    UserDTO userDTO = this.authenticationAndRegistrationService.getMe(auth.getName());
                     return ResponseEntity.ok(userDTO);
                 })
                 .orElse(ResponseEntity.badRequest().build());
@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody RegistrationRequestDTO registrationRequestDTO) {
+    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegistrationRequestDTO registrationRequestDTO) {
         return ResponseEntity.ok(this.authenticationAndRegistrationService.register(registrationRequestDTO));
     }
 }

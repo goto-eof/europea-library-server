@@ -1,8 +1,8 @@
 package com.andreidodu.europealibrary.service.auth;
 
-import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.dto.auth.*;
 import com.andreidodu.europealibrary.exception.ValidationException;
+import com.andreidodu.europealibrary.mapper.AuthorityMapper;
 import com.andreidodu.europealibrary.mapper.UserMapper;
 import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
@@ -41,6 +41,7 @@ public class AuthenticationAndRegistrationService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
+    private final AuthorityMapper authorityMapper;
 
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
         Authentication authentication =
@@ -84,16 +85,17 @@ public class AuthenticationAndRegistrationService {
     }
 
 
-    public UserDTO getUser(String username) {
+    public UserDTO getMe(String username) {
         User user = this.userRepository.findByUsername(username)
                 .orElseThrow();
         UserDTO userDTO = new UserDTO();
         userDTO.setEmail(user.getEmail());
         userDTO.setUsername(user.getUsername());
+        userDTO.setAuthorityList(this.authorityMapper.toDTO(user.getAuthorityList()));
         return userDTO;
     }
 
-    public UserDTO register(RegistrationRequestDTO registrationRequestDTO) {
+    public AuthResponseDTO register(RegistrationRequestDTO registrationRequestDTO) {
         validateInput(registrationRequestDTO);
         validateUserAlreadyExists(registrationRequestDTO);
 
@@ -102,8 +104,7 @@ public class AuthenticationAndRegistrationService {
         user.setAuthorityList(authorityList);
 
         User savedUser = this.userRepository.save(user);
-
-        return this.userMapper.toDTO(savedUser);
+        return this.login(new AuthRequestDTO(registrationRequestDTO.getUsername(), registrationRequestDTO.getPassword()));
     }
 
     private void validateUserAlreadyExists(RegistrationRequestDTO registrationRequestDTO) {
@@ -119,7 +120,7 @@ public class AuthenticationAndRegistrationService {
     private static List<Authority> buildAuthorityList(User user) {
         List<Authority> authorityList = new ArrayList<>();
         Authority userAuthority = new Authority();
-        userAuthority.setName(AuthConst.AUTHORITY_USER);
+        userAuthority.setName("USER");
         userAuthority.setUser(user);
         authorityList.add(userAuthority);
         return authorityList;

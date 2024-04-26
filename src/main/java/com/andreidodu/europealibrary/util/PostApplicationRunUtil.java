@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.util;
 
-import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
 import com.andreidodu.europealibrary.repository.auth.RoleRepository;
@@ -46,7 +45,7 @@ public class PostApplicationRunUtil {
     private void createDefaultAdminRoles(User user) {
         Authority authority = new Authority();
         authority.setUser(user);
-        authority.setName(AuthConst.AUTHORITY_ADMINISTRATOR);
+        authority.setName("ADMINISTRATOR");
         this.roleRepository.save(authority);
     }
 
