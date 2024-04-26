@@ -23,6 +23,11 @@ import java.nio.file.Path;
 public class QRCodeServiceImpl implements QRCodeService {
     @Value("${com.andreidodu.europea-library.qr-code-path}")
     private String qrCodePath;
+
+    @Value("${com.andreidodu.europea-library.client.url}")
+    private String clientUrl;
+    @Value("${com.andreidodu.europea-library.client.download-endpoint}")
+    private String downloadEndpoint;
     public static final String DEFAULT_CHARSET = "UTF-8";
     public static final int HEIGHT = 100;
     public static final int WIDTH = 100;
@@ -36,9 +41,9 @@ public class QRCodeServiceImpl implements QRCodeService {
         if (new File(filename).exists()) {
             return fileToDownloadDTO(filename);
         }
-
+        final String downloadUrl = clientUrl + downloadEndpoint + "/" + identifier;
         BitMatrix matrix = new MultiFormatWriter().encode(
-                new String(data.getBytes(DEFAULT_CHARSET), DEFAULT_CHARSET),
+                new String(downloadUrl.getBytes(DEFAULT_CHARSET), DEFAULT_CHARSET),
                 BarcodeFormat.QR_CODE, WIDTH, HEIGHT);
 
         MatrixToImageWriter.writeToPath(
