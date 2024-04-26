@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.service.auth;
 
+import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.dto.auth.*;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.AuthorityMapper;
@@ -120,7 +121,7 @@ public class AuthenticationAndRegistrationService {
     private static List<Authority> buildAuthorityList(User user) {
         List<Authority> authorityList = new ArrayList<>();
         Authority userAuthority = new Authority();
-        userAuthority.setName("USER");
+        userAuthority.setName(AuthConst.AUTHORITY_USER);
         userAuthority.setUser(user);
         authorityList.add(userAuthority);
         return authorityList;
