@@ -8,7 +8,7 @@ spring:
     dispatch-options-request: true
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5439/db
+    url: jdbc:postgresql://localhost:5439/europea_library
     username: postgres
     password: postgres
     testOnBorrow: true
@@ -17,21 +17,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-      # current_session_context_class: org.springframework.orm.hibernate6.SpringSessionContext
     properties:
-    # hibernate:
-    # format_sql: true
-    # show_sql: true
-    # default_schema: public
-    # generate_statistics: true
-    # highlight_sql: true
-    # order_inserts: true
-    # order_updates: true
-    # current_session_context_class: org.springframework.orm.hibernate6.SpringSessionContext
-    # jdbc:
-    #batch_size: 50
-    #batch_versioned_data: true
-    #show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     change-log: classpath:/database/db.changelog.xml
@@ -108,7 +94,7 @@ com:
             batch-size: 100
 
 batch-db:
-  url: jdbc:postgresql://localhost:5439/db
+  url: jdbc:postgresql://localhost:5439/europea_library
   username: postgres
   password: postgres
 

@@ -6,11 +6,11 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=db
+      - POSTGRES_DB=europea_library
     ports:
       - '5439:5432'
     volumes:
-      - db:/var/lib/postgresql/db
+      - db:/var/lib/postgresql/europea_library
 volumes:
   db:
     driver: local
