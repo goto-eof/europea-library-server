@@ -48,15 +48,12 @@ com:
       qr-code-path: /your/path/here
       default-admin-username: admin
       default-admin-email: admin@admin.com
-      default-admin-password: password
+      default-admin-password: Password_1
       core-pool-size: 6
       max-pool-size: 12
       client:
         url: http://localhost:4200
         view-book-info-endpoint: /file-info
-      server:
-        url: http://localhost:8081
-        download-endpoint: /api/v2/file/download
       task:
         indexer:
           cron:
