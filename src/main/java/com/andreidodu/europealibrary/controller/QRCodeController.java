@@ -24,7 +24,7 @@ public class QRCodeController {
     private final QRCodeService qrCodeService;
     @Value("${com.andreidodu.europea-library.client.url}")
     private String clientUrl;
-    @Value("${com.andreidodu.europea-library.server.view-book-info-endpoint}")
+    @Value("${com.andreidodu.europea-library.client.view-book-info-endpoint}")
     private String viewBookInfoEndpoint;
 
     @GetMapping(path = "/get/{fileSystemItemId}")

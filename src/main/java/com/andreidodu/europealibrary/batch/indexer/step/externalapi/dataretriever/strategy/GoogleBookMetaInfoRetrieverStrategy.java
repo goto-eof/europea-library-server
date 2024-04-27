@@ -234,7 +234,12 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     }
 
     private boolean containsSameAuthors(BookInfo bookInfo, GoogleBookResponseDTO.GoogleBookItemDTO googleBookItem) {
-        return googleBookItem.getVolumeInfo().getAuthors().stream()
+        List<String> authors = googleBookItem.getVolumeInfo().getAuthors();
+        if (Optional.ofNullable(authors).isEmpty()) {
+            authors = new ArrayList<>();
+        }
+        return authors
+                .stream()
                 .map(String::toLowerCase)
                 .anyMatch(googleAuthor -> Arrays.stream(bookInfo.getAuthors().split(","))
                         .map(String::trim)
@@ -247,29 +252,6 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
                                 .collect(Collectors.toSet())
                                 .stream()
                                 .allMatch(googleAuthor::contains)));
-    }
-
-    private FileMetaInfo createAndAssociateTags(Set<String> tagsSet, FileMetaInfo savedFileMetaInfo) {
-        try {
-            List<String> tags = new ArrayList<>(tagsSet);
-            Set<Tag> explodedTags = this.stepUtil.createOrLoadItems(tags);
-            savedFileMetaInfo = this.stepUtil.associateTags(savedFileMetaInfo, explodedTags);
-        } catch (Exception e) {
-            log.error("something went wrong with tag creation/association: {}", e.getMessage());
-        }
-        return savedFileMetaInfo;
-    }
-
-    private BookInfo createAndAssociateCategoriesIfNecessary(Set<String> categoriesSet, BookInfo bookInfo) {
-        try {
-            List<String> categories = new ArrayList<>(categoriesSet);
-            Set<Category> explodedTags = this.stepUtil.createOrLoadCategories(categories);
-            bookInfo = this.stepUtil.associateCategories(bookInfo, explodedTags);
-            return bookInfo;
-        } catch (Exception e) {
-            log.error("something went wrong with tag creation/association: {}", e.getMessage());
-        }
-        return bookInfo;
     }
 
     private GoogleBookResponseDTO retrieveGoogleBook(FileSystemItem fileSystemItem) {
