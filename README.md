@@ -47,6 +47,20 @@ Before running the software as Spring Boot application it is necessary to follow
       default-admin-password: password
       ```
     - edit the `qr-code-path` property in order to allow to generate QRCodes for each e-book;
+    - generate certificates for encrypting and decrypting our JWT tokens:
+        - Generate a Private Key (RSA):
+        ```
+        openssl genpkey -algorithm RSA -out private-key.pem
+        ```
+        - Extract the Public Key from the Private Key by running:
+        ```
+        openssl rsa -pubout -in private-key.pem -out public-key.pem
+        ```
+        - Then convert it to the appropriate PCKS format and replace the old one
+        ```
+        openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key.pem -out private-key.pem -nocrypt
+        ```
+        - replace the existing certificates in `src/main/resources/certs` with those that you generated
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command
     - run the project as Spring Boot application
 
@@ -84,7 +98,7 @@ how it works.
 ## Technologies
 
 Java • Spring Boot • Spring Batch • Spring Security • Spring JPA • Queryds • Hibernate • Feign • Liquibase • PostgreSQL
-• Docker • epublib • pdfbox
+• Docker • epublib • pdfbox • Google ZXing
 
 ## External services
 
