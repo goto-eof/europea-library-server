@@ -63,12 +63,11 @@ public class CursoredFileController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.set("Content-Disposition", "attachment; filename=" + download.getFileName());
+        headers.set("Content-Disposition", "attachment; filename=\"" + download.getFileName()+"\"");
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(download.getFileSize())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(download.getInputStreamResource());
     }
 

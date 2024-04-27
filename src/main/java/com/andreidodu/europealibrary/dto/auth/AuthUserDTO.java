@@ -17,6 +17,7 @@ public class AuthUserDTO implements UserDetails {
     private List<AuthorityDTO> authorityList;
     private String username;
     private String password;
+    private boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -56,6 +57,6 @@ public class AuthUserDTO implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 }
