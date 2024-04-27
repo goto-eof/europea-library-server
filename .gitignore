@@ -5,6 +5,8 @@ build/
 !**/src/test/**/build/
 **/application-dev.yml
 **/application-prod.yml
+**/private-key.pem
+**/public-key.pem
 ### STS ###
 .apt_generated
 .classpath
