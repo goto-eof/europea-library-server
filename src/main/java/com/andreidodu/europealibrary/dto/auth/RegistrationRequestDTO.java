@@ -1,7 +1,6 @@
 package com.andreidodu.europealibrary.dto.auth;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +8,7 @@ import lombok.Setter;
 @Setter
 public class RegistrationRequestDTO extends AuthRequestDTO {
 
-    @Min(5)
-    @Max(320)
+    @Size(min = 5, max = 302)
     private String email;
 
 }
