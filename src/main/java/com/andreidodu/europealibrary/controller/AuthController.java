@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.dto.auth.AuthResponseDTO;
 import com.andreidodu.europealibrary.dto.auth.RegistrationRequestDTO;
 import com.andreidodu.europealibrary.dto.auth.UserDTO;
 import com.andreidodu.europealibrary.service.auth.AuthenticationAndRegistrationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class AuthController {
     private final AuthenticationAndRegistrationService authenticationAndRegistrationService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO authRequestDTO) {
+    public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequestDTO) {
         AuthResponseDTO authResponseDTO = this.authenticationAndRegistrationService.login(authRequestDTO);
         return ResponseEntity.ok(authResponseDTO);
     }
@@ -38,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@RequestBody RegistrationRequestDTO registrationRequestDTO) {
+    public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegistrationRequestDTO registrationRequestDTO) {
         return ResponseEntity.ok(this.authenticationAndRegistrationService.register(registrationRequestDTO));
     }
 }
