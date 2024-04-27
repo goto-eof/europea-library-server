@@ -46,6 +46,7 @@ Before running the software as Spring Boot application it is necessary to follow
       default-admin-email: admin@admin.com
       default-admin-password: password
       ```
+    - edit the `qr-code-path` property in order to allow to generate QRCodes for each e-book;
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command
     - run the project as Spring Boot application
 
@@ -60,6 +61,19 @@ extraction was done for all the files (except the cases when the directory conta
 completed all steps, the API becomes available for queries, so that the client application can interact with the API (
 otherwise an HTTP 404 status is returned). Moreover, the indexer job starts every night at 11:00 PM (configurable). If
 the job is already running then it will continue to process files and no other job will run.
+
+## Features
+- index large digital books collection quickly;
+- explore e-books by directory;
+- explore e-books by category;
+- explore e-books by tag;
+- explore e-books by file type;
+- view book information;
+- download e-books;
+- search by title, author, publisher, ISBN and published date;
+- edit e-book information (only administrator is able to do this);
+- generate e-book URL QRCode;
+- login/register to the system.
 
 ## Job steps
 
