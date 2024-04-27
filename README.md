@@ -24,7 +24,7 @@
 # Europea Library (server - Work In Progress)
 
 A library web application that allows to index, retrieve information about books from file metadata/web (by using
-multi-threading), search and download e-books. The front-end project can be
+multi-threading), search and download e-books (need to be authenticated in order to beable to download). The front-end project can be
 found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can be
 cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
 
@@ -60,7 +60,7 @@ Before running the software as Spring Boot application it is necessary to follow
         ```
         openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key.pem -out private-key.pem -nocrypt
         ```
-        - put your certificates in `src/main/resources/certs` (you should have a private-key.pem and a public-key.pem)
+        - put your certificates in `src/main/resources/certs` (you should have a `private-key.pem` and a `public-key.pem`)
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your PostgreSQL running instance a database named `europea_library`
     - run the project as Spring Boot application
 
@@ -83,11 +83,11 @@ the job is already running then it will continue to process files and no other j
 - explore e-books by tag;
 - explore e-books by file type;
 - view book information;
-- download e-books;
+- download e-books (only authenticated users are able to do this);
 - search by title, author, publisher, ISBN and published date;
 - edit e-book information (only administrator is able to do this);
 - generate e-book URL QR Code;
-- login/register to the system (2 categories of user: ADMINISTRATOR and USER).
+- login/register to the system (2 categories of users: ADMINISTRATOR and USER).
 
 ## Job steps
 
