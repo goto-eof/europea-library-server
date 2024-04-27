@@ -24,7 +24,7 @@
 # Europea Library (server - Work In Progress)
 
 A library web application that allows to index, retrieve information about books from file metadata/web (by using
-multithreading), search and download ebooks. The front-end project can be
+multi-threading), search and download e-books. The front-end project can be
 found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can be
 cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
 
@@ -33,7 +33,7 @@ cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-
 Before running the software as Spring Boot application it is necessary to follow some steps:
 
 - edit the `application.yml` in the following way:
-    - set the `google.books.api_key` to your google api key
+    - set the `google.books.api_key` to your Google API key
         - Europea Library uses Google Books API to retrieve information about books. This API has daily limits: 1,000
           requests/day. To get the API key go
           to [Google Console](https://console.cloud.google.com/apis/credentials?hl=it) and create an API key. Remember
@@ -46,7 +46,7 @@ Before running the software as Spring Boot application it is necessary to follow
       default-admin-email: admin@admin.com
       default-admin-password: password
       ```
-    - edit the `qr-code-path` property in order to allow to generate QRCodes for each e-book;
+    - edit the `qr-code-path` property in order to allow to generate QR Codes for each e-book;
     - generate certificates for encrypting and decrypting our JWT tokens:
         - Generate a Private Key (RSA):
         ```
@@ -86,8 +86,8 @@ the job is already running then it will continue to process files and no other j
 - download e-books;
 - search by title, author, publisher, ISBN and published date;
 - edit e-book information (only administrator is able to do this);
-- generate e-book URL QRCode;
-- login/register to the system.
+- generate e-book URL QR Code;
+- login/register to the system (2 categories of user: ADMINISTRATOR and USER).
 
 ## Job steps
 
