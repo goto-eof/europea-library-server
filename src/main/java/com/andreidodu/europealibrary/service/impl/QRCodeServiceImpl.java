@@ -21,29 +21,27 @@ import java.nio.file.Path;
 @Service
 @RequiredArgsConstructor
 public class QRCodeServiceImpl implements QRCodeService {
+    public static final String QRCODE_FILE_EXTENSION_PNG = ".png";
     @Value("${com.andreidodu.europea-library.qr-code-path}")
     private String qrCodePath;
 
-    @Value("${com.andreidodu.europea-library.client.url}")
-    private String clientUrl;
-    @Value("${com.andreidodu.europea-library.client.download-endpoint}")
-    private String downloadEndpoint;
+
     public static final String DEFAULT_CHARSET = "UTF-8";
-    public static final int HEIGHT = 100;
-    public static final int WIDTH = 100;
+    public static final int HEIGHT = 150;
+    public static final int WIDTH = 150;
 
     @Override
     public DownloadDTO generateOrLoadQRCode(String data, Long identifier)
             throws WriterException, IOException {
         new File(qrCodePath).mkdirs();
-        final String filename = qrCodePath + "/" + identifier + ".png";
+        final String filename = qrCodePath + "/" + identifier + QRCODE_FILE_EXTENSION_PNG;
 
         if (new File(filename).exists()) {
             return fileToDownloadDTO(filename);
         }
-        final String downloadUrl = clientUrl + downloadEndpoint + "/" + identifier;
+
         BitMatrix matrix = new MultiFormatWriter().encode(
-                new String(downloadUrl.getBytes(DEFAULT_CHARSET), DEFAULT_CHARSET),
+                new String(data.getBytes(DEFAULT_CHARSET), DEFAULT_CHARSET),
                 BarcodeFormat.QR_CODE, WIDTH, HEIGHT);
 
         MatrixToImageWriter.writeToPath(

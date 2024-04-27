@@ -9,4 +9,5 @@ import org.springframework.core.io.InputStreamResource;
 public class DownloadDTO {
     private InputStreamResource inputStreamResource;
     private long fileSize;
+    private String fileName;
 }

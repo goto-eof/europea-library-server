@@ -144,6 +144,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                         DownloadDTO downloadDTO = new DownloadDTO();
                         downloadDTO.setInputStreamResource(resource);
                         downloadDTO.setFileSize(file.length());
+                        downloadDTO.setFileName(fileSystemItem.getName());
                         return downloadDTO;
                     } catch (IOException e) {
                         throw new ApplicationException("Unable to retrieve file");

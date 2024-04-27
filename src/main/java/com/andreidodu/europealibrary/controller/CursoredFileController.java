@@ -6,6 +6,7 @@ import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,7 +60,13 @@ public class CursoredFileController {
     @GetMapping(path = "/download/{fileSystemItemId}")
     public ResponseEntity<InputStreamResource> download(@PathVariable Long fileSystemItemId) {
         DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(fileSystemItemId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.set("Content-Disposition", "attachment; filename=" + download.getFileName());
+
         return ResponseEntity.ok()
+                .headers(headers)
                 .contentLength(download.getFileSize())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(download.getInputStreamResource());

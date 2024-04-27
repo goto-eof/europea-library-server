@@ -53,6 +53,9 @@ com:
       max-pool-size: 12
       client:
         url: http://localhost:4200
+        view-book-info-endpoint: /file-info
+      server:
+        url: http://localhost:8081
         download-endpoint: /api/v2/file/download
       task:
         indexer:

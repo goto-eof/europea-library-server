@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.service.QRCodeService;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +22,15 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class QRCodeController {
     private final QRCodeService qrCodeService;
+    @Value("${com.andreidodu.europea-library.client.url}")
+    private String clientUrl;
+    @Value("${com.andreidodu.europea-library.server.view-book-info-endpoint}")
+    private String viewBookInfoEndpoint;
 
     @GetMapping(path = "/get/{fileSystemItemId}")
-    public ResponseEntity<InputStreamResource> download(@PathVariable Long fileSystemItemId) throws IOException, WriterException {
-        DownloadDTO download = this.qrCodeService.generateOrLoadQRCode("http://localhost/download", fileSystemItemId);
+    public ResponseEntity<InputStreamResource> viewBookInfoQRCode(@PathVariable Long fileSystemItemId) throws IOException, WriterException {
+        final String viewBookInfoUrl = clientUrl + viewBookInfoEndpoint + "/" + fileSystemItemId;
+        DownloadDTO download = this.qrCodeService.generateOrLoadQRCode(viewBookInfoUrl, fileSystemItemId);
         return ResponseEntity.ok()
                 .contentLength(download.getFileSize())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
