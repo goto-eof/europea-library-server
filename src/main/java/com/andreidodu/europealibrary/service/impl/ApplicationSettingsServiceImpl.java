@@ -19,15 +19,17 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
     final private ApplicationSettingsMapper applicationSettingsMapper;
     final private ApplicationSettingsRepository applicationSettingsRepository;
 
-
+    @Override
     public ApplicationSettingsDTO lockApplication() {
         return changeApplicationLock(true);
     }
 
+    @Override
     public ApplicationSettingsDTO unlockApplication() {
         return changeApplicationLock(false);
     }
 
+    @Override
     public boolean isApplicationLocked() {
         return this.loadOrCreateDefaultApplicationSettings().getApplicationLock();
     }
@@ -39,7 +41,7 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
         return this.applicationSettingsMapper.toDTO(applicationSettings);
     }
 
-    public ApplicationSettings loadOrCreateDefaultApplicationSettings() {
+    private ApplicationSettings loadOrCreateDefaultApplicationSettings() {
         Optional<ApplicationSettings> applicationSettingsOptional = this.applicationSettingsRepository.findAll().stream().findFirst();
         if (applicationSettingsOptional.isEmpty()) {
             ApplicationSettings applicationSettings = new ApplicationSettings();

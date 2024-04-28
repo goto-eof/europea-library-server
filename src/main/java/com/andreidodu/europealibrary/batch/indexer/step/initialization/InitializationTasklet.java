@@ -1,8 +1,6 @@
-package com.andreidodu.europealibrary.batch.indexer.step.finalization;
+package com.andreidodu.europealibrary.batch.indexer.step.initialization;
 
 import com.andreidodu.europealibrary.service.ApplicationSettingsService;
-import com.andreidodu.europealibrary.service.CacheLoader;
-import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
@@ -14,21 +12,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FinalizationTasklet implements Tasklet {
+public class InitializationTasklet implements Tasklet {
     private final ApplicationSettingsService applicationSettingsService;
-    private final CacheLoader cacheLoader;
 
     public RepeatStatus execute(StepContribution contribution,
                                 ChunkContext chunkContext) {
-        clearAndReloadCache();
-        this.applicationSettingsService.unlockApplication();
+        this.applicationSettingsService.lockApplication();
         return RepeatStatus.FINISHED;
-    }
-
-    private void clearAndReloadCache() {
-        log.debug("loading data in cache");
-        this.cacheLoader.reload();
-        log.debug("cache loaded");
     }
 
 }
