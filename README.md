@@ -67,7 +67,7 @@ Before running the software as Spring Boot application it is necessary to follow
       ./gradlew bootJar
       ```
       in order to create the jar file
-    - then create a file called start.sh
+    - then create a file called `start.sh`
       ```
       #!/bin/bash
       /bin/java -Dspring.config.location=application.yml -jar europea-library.jar
