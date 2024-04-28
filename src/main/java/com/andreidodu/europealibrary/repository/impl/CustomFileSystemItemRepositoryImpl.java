@@ -158,7 +158,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     private QFileExtensionProjection createFileExtensionProjection(QFileSystemItem fileSystemItem) {
         return new QFileExtensionProjection(
                 fileSystemItem.extension, Expressions.as(fileSystemItem.extension.count(), "cnt"),
-                calculateNextCursorByFileExtensionSubQuery(fileSystemItem));
+                Expressions.as(fileSystemItem.id.min(), "minId")
+        );
     }
 
     @Override
