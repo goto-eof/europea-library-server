@@ -12,12 +12,13 @@ import com.andreidodu.europealibrary.repository.CategoryRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,8 +28,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Transactional
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CursoredFileSystemServiceImpl extends CursoredServiceCommon implements CursoredFileSystemService {
     private final FileSystemItemRepository fileSystemItemRepository;
@@ -134,6 +135,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_LANGUAGES})
+    @Transactional(timeout = 3000, propagation = Propagation.REQUIRED)
     public List<ItemAndFrequencyDTO> retrieveAllLanguages() {
         return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrieveLanguagesInfo());
     }
@@ -141,6 +143,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHERS})
+    @Transactional(timeout = 3000, propagation = Propagation.REQUIRED)
     public List<ItemAndFrequencyDTO> retrieveAllPublishers() {
         return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishersInfo());
     }

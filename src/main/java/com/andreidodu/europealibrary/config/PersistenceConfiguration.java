@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,40 +24,16 @@ import java.util.Objects;
 public class PersistenceConfiguration {
     private final BatchDbConfig batchDbConfig;
 
+    @Value("${com.andreidodu.europea-library.transaction-timeout-seconds}")
+    private Integer transactionTimeoutSeconds;
+
     @Primary
     @Bean("transactionManager")
     public HibernateTransactionManager transactionManager() {
-        return new HibernateTransactionManager(Objects.requireNonNull(sessionFactory().getObject()));
+        HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(Objects.requireNonNull(sessionFactory().getObject()));
+        hibernateTransactionManager.setDefaultTimeout(this.transactionTimeoutSeconds);
+        return hibernateTransactionManager;
     }
-//
-//    @Bean("transactionManager")
-//    public JpaTransactionManager transactionManager() {
-//        return new JpaTransactionManager(Objects.requireNonNull(sessionFactory().getObject()));
-//    }
-//
-//    @Bean("dataSourceTransactionManager")
-//    public DataSourceTransactionManager dataSourceTransactionManager() {
-//        return new DataSourceTransactionManager(dataSource());
-//    }
-
-//    @Bean("jdbcTransactionManager")
-//    public JdbcTransactionManager jdbcTransactionManager() {
-//        return new JdbcTransactionManager(secondDataSource());
-//    }
-
-//    @Bean("jpaTransactionManager")
-//    public JpaTransactionManager jpaTransactionManager(EntityManagerFactory entityManagerFactory) {
-//        JpaTransactionManager jpaTransactionManager = new JpaTransactionManager();
-//        jpaTransactionManager.setDataSource(dataSource());
-//        jpaTransactionManager.setEntityManagerFactory(entityManagerFactory);
-//        return jpaTransactionManager;
-//    }
-//
-
-//    @Bean("resourcelessTransactionManager")
-//    public ResourcelessTransactionManager resourcelessTransactionManager() {
-//        return new ResourcelessTransactionManager();
-//    }
 
     @Bean(name = "entityManagerFactory")
     public LocalSessionFactoryBean sessionFactory() {
@@ -71,7 +48,6 @@ public class PersistenceConfiguration {
         return new JdbcTemplate(dataSource());
     }
 
-
     @Bean("dataSource")
     public DataSource dataSource() {
         return DataSourceBuilder.create()
@@ -81,12 +57,4 @@ public class PersistenceConfiguration {
                 .build();
     }
 
-//    @Bean("secondDataSource")
-//    public DataSource secondDataSource() {
-//        return DataSourceBuilder.create()
-//                .url(batchDbConfig.getUrl())
-//                .username(batchDbConfig.getUsername())
-//                .password(batchDbConfig.getPassword())
-//                .build();
-//    }
 }
