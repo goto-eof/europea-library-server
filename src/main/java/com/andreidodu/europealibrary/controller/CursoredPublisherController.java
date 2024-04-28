@@ -1,10 +1,6 @@
 package com.andreidodu.europealibrary.controller;
 
-import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorDTO;
 import com.andreidodu.europealibrary.dto.ItemAndFrequencyDTO;
-import com.andreidodu.europealibrary.dto.TagDTO;
-import com.andreidodu.europealibrary.service.LanguageService;
 import com.andreidodu.europealibrary.service.impl.CursoredFileSystemServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

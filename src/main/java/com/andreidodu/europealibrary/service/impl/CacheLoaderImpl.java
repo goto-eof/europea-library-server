@@ -5,6 +5,8 @@ import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
 import com.andreidodu.europealibrary.service.CacheLoader;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;
+import com.andreidodu.europealibrary.service.LanguageService;
+import com.andreidodu.europealibrary.service.PublisherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -27,10 +29,10 @@ public class CacheLoaderImpl implements CacheLoader {
         log.info("loading cache");
 
         reloadExtensionsInCache();
-
         reloadCategoriesInCache();
-
         reloadTagsInCache();
+        reloadLanguagesInCache();
+        reloadPublishersInCache();
 
         log.info("cache loaded");
     }
@@ -57,5 +59,18 @@ public class CacheLoaderImpl implements CacheLoader {
         while (response.getNextCursor() != null) {
             response = this.categoryService.retrieveAllCategories(new CommonCursoredRequestDTO(response.getNextCursor(), ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE));
         }
+    }
+
+
+    private void reloadLanguagesInCache() {
+        Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_LANGUAGES))
+                .ifPresent(Cache::clear);
+        this.cursoredFileSystemService.retrieveAllLanguages();
+    }
+
+    private void reloadPublishersInCache() {
+        Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_PUBLISHERS))
+                .ifPresent(Cache::clear);
+        this.cursoredFileSystemService.retrieveAllPublishers();
     }
 }
