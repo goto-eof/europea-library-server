@@ -11,6 +11,7 @@ import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.andreidodu.europealibrary.util.LimitUtil;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.alias.Alias;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -166,7 +167,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(projection)
                 .from(fileSystemItem)
-                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.language)
+                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.language, Expressions.numberPath(Long.class, "minId"))
                 .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
                 .having(fileSystemItem.fileMetaInfo.bookInfo.language.trim().length().gt(0))
                 .fetch();
@@ -230,7 +231,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
     private QItemAndFrequencyProjection createItemAndFrequencyProjectionByLanguage(QFileSystemItem fileSystemItem) {
         return new QItemAndFrequencyProjection(fileSystemItem.fileMetaInfo.bookInfo.language, Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.language.count(), "cnt"),
-                calculateNextCursorByLanguageSubQuery(fileSystemItem));
+                Expressions.as(calculateNextCursorByLanguageSubQuery(fileSystemItem), "minId"));
     }
 
     private Expression<Long> calculateNextCursorByLanguageSubQuery(QFileSystemItem parent) {
@@ -249,7 +250,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(projection)
                 .from(fileSystemItem)
-                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.publisher)
+                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.publisher, Expressions.numberPath(Long.class, "minId"))
                 .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
                 .having(fileSystemItem.fileMetaInfo.bookInfo.publisher.trim().length().gt(0))
                 .fetch();
@@ -257,7 +258,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
     private QItemAndFrequencyProjection createItemAndFrequencyByPublisherProjection(QFileSystemItem fileSystemItem) {
         return new QItemAndFrequencyProjection(fileSystemItem.fileMetaInfo.bookInfo.publisher, Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.publisher.count(), "cnt"),
-                calculateNextCursorByPublisherSubQuery(fileSystemItem));
+                Expressions.as(calculateNextCursorByPublisherSubQuery(fileSystemItem), "minId"));
     }
 
     private Expression<Long> calculateNextCursorByPublisherSubQuery(QFileSystemItem parent) {

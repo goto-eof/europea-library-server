@@ -21,7 +21,7 @@ public class CursoredLanguageController {
     private final CursoredFileSystemServiceImpl service;
 
     @GetMapping
-    public ResponseEntity<List<ItemAndFrequencyDTO>> retrieveLanguagesCursored() {
+    public ResponseEntity<List<ItemAndFrequencyDTO>> retrieveLanguages() {
         return ResponseEntity.ok(this.service.retrieveAllLanguages());
     }
 }
