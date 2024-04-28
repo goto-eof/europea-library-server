@@ -60,7 +60,7 @@ Before running the software as Spring Boot application it is necessary to follow
         ```
         openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key-old.pem -out private-key.pem -nocrypt
         ```
-        - replace the existing certificates in `src/main/resources/certs` with those that you generated
+        - move your certificates in `src/main/resources/certs` (you should have a `private-key.pem` and a `public-key.pem` file)
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your PostgreSQL running instance a database named `europea_library`
     - run the project from your IDE or execute from the root of the project
       ```
