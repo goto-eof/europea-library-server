@@ -99,6 +99,8 @@ the job is already running then it will continue to process files and no other j
 - explore e-books by category;
 - explore e-books by tag;
 - explore e-books by file type;
+- explore e-books by language;
+- explore e-books by publisher;
 - view book information;
 - download e-books;
 - search by title, author, publisher, ISBN and published date;
