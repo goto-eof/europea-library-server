@@ -50,7 +50,7 @@ Before running the software as Spring Boot application it is necessary to follow
     - generate certificates for encrypting and decrypting our JWT tokens:
         - Generate a Private Key (RSA):
         ```
-        openssl genpkey -algorithm RSA -out private-key.pem
+        openssl genpkey -algorithm RSA -out private-key-old.pem
         ```
         - Extract the Public Key from the Private Key by running:
         ```
@@ -58,7 +58,7 @@ Before running the software as Spring Boot application it is necessary to follow
         ```
         - Then convert it to the appropriate PCKS format and replace the old one
         ```
-        openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key.pem -out private-key.pem -nocrypt
+        openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key-old.pem -out private-key.pem -nocrypt
         ```
         - replace the existing certificates in `src/main/resources/certs` with those that you generated
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your PostgreSQL running instance a database named `europea_library`
