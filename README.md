@@ -62,7 +62,24 @@ Before running the software as Spring Boot application it is necessary to follow
         ```
         - replace the existing certificates in `src/main/resources/certs` with those that you generated
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your PostgreSQL running instance a database named `europea_library`
-    - run the project as Spring Boot application
+    - run the project from your IDE or execute from the root of the project
+      ```
+      ./gradlew bootJar
+      ```
+      in order to create the jar file
+    - then create a file called start.sh
+      ```
+      #!/bin/bash
+      /bin/java -Dspring.config.location=application.yml -jar europea-library.jar
+      ```
+    - make it executable:
+      ```
+      chmod +x start.sh
+      ```
+    - run Europea Library jar
+      ```
+      ./start.sh
+      ```
 
 ## How the application works?
 
