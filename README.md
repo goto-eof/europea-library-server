@@ -23,7 +23,7 @@
 
 # Europea Library (server - Work In Progress)
 
-A library web application that allows to index, edit, retrieve information about books from file metadata/web (by using
+A library web application that allows to index, edit, explore, retrieve information about books from file metadata/web (by using
 multi-threading), search and download e-books (need to be authenticated in order to be able to download). The front-end project can be
 found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can be
 cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
