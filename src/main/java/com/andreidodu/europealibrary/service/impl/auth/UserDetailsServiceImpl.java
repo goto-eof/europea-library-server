@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.service.auth;
+package com.andreidodu.europealibrary.service.impl.auth;
 
 
 import com.andreidodu.europealibrary.mapper.AuthUserMapper;

@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.service.auth;
+package com.andreidodu.europealibrary.service.impl.auth;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.dto.auth.*;
@@ -8,6 +8,7 @@ import com.andreidodu.europealibrary.mapper.UserMapper;
 import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
 import com.andreidodu.europealibrary.repository.auth.UserRepository;
+import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
 import com.andreidodu.europealibrary.util.StringUtil;
 import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +35,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AuthenticationAndRegistrationService {
+public class AuthenticationAndRegistrationServiceImpl implements AuthenticationAndRegistrationService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationAndRegistrationService.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationAndRegistrationServiceImpl.class);
     private final JwtEncoder jwtEncoder;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -44,6 +45,7 @@ public class AuthenticationAndRegistrationService {
     private final UserMapper userMapper;
     private final AuthorityMapper authorityMapper;
 
+    @Override
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
         Authentication authentication =
                 authenticationManager
@@ -85,7 +87,7 @@ public class AuthenticationAndRegistrationService {
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-
+    @Override
     public UserDTO getMe(String username) {
         User user = this.userRepository.findByUsername(username)
                 .orElseThrow();
@@ -96,6 +98,7 @@ public class AuthenticationAndRegistrationService {
         return userDTO;
     }
 
+    @Override
     public AuthResponseDTO register(RegistrationRequestDTO registrationRequestDTO) {
         validateInput(registrationRequestDTO);
         validateUserAlreadyExists(registrationRequestDTO);

@@ -4,7 +4,7 @@ import com.andreidodu.europealibrary.dto.auth.AuthRequestDTO;
 import com.andreidodu.europealibrary.dto.auth.AuthResponseDTO;
 import com.andreidodu.europealibrary.dto.auth.RegistrationRequestDTO;
 import com.andreidodu.europealibrary.dto.auth.UserDTO;
-import com.andreidodu.europealibrary.service.auth.AuthenticationAndRegistrationService;
+import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
