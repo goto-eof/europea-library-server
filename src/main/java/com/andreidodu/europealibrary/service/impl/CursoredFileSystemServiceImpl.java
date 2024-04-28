@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.constants.CacheConst;
+import com.andreidodu.europealibrary.constants.PersistenceConst;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
@@ -135,7 +136,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_LANGUAGES})
-    @Transactional(timeout = 3000, propagation = Propagation.REQUIRED)
+    @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES, propagation = Propagation.REQUIRED)
     public List<ItemAndFrequencyDTO> retrieveAllLanguages() {
         return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrieveLanguagesInfo());
     }
@@ -143,7 +144,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHERS})
-    @Transactional(timeout = 3000, propagation = Propagation.REQUIRED)
+    @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES, propagation = Propagation.REQUIRED)
     public List<ItemAndFrequencyDTO> retrieveAllPublishers() {
         return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishersInfo());
     }
