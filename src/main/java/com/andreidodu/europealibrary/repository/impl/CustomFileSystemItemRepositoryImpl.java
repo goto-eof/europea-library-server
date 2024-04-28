@@ -156,7 +156,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     private QFileExtensionProjection createFileExtensionProjection(QFileSystemItem fileSystemItem) {
-        return new QFileExtensionProjection(fileSystemItem.extension, Expressions.as(fileSystemItem.extension.count(), "cnt"),
+        return new QFileExtensionProjection(
+                fileSystemItem.extension, Expressions.as(fileSystemItem.extension.count(), "cnt"),
                 calculateNextCursorByFileExtensionSubQuery(fileSystemItem));
     }
 
@@ -231,7 +232,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
     private QItemAndFrequencyProjection createItemAndFrequencyProjectionByLanguage(QFileSystemItem fileSystemItem) {
         return new QItemAndFrequencyProjection(fileSystemItem.fileMetaInfo.bookInfo.language, Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.language.count(), "cnt"),
-                Expressions.as(calculateNextCursorByLanguageSubQuery(fileSystemItem), "minId"));
+                Expressions.as(fileSystemItem.id.min(), "minId"));
     }
 
     private Expression<Long> calculateNextCursorByLanguageSubQuery(QFileSystemItem parent) {
@@ -257,8 +258,11 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     private QItemAndFrequencyProjection createItemAndFrequencyByPublisherProjection(QFileSystemItem fileSystemItem) {
-        return new QItemAndFrequencyProjection(fileSystemItem.fileMetaInfo.bookInfo.publisher, Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.publisher.count(), "cnt"),
-                Expressions.as(calculateNextCursorByPublisherSubQuery(fileSystemItem), "minId"));
+        return new QItemAndFrequencyProjection(
+                fileSystemItem.fileMetaInfo.bookInfo.publisher,
+                Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.publisher.count(), "cnt"),
+                Expressions.as(fileSystemItem.id.min(), "minId")
+        );
     }
 
     private Expression<Long> calculateNextCursorByPublisherSubQuery(QFileSystemItem parent) {
