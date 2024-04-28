@@ -32,7 +32,7 @@ com:
   andreidodu:
     europea-library:
       transaction-timeout-seconds: 60
-      qr-code-path: /your/path/here
+      qr-code-path: /your/path
       default-admin-username: admin
       default-admin-email: admin@admin.com
       default-admin-password: Password_1
@@ -48,7 +48,7 @@ com:
       job:
         indexer:
           # the directory that contains all your e-book which need to be indexed
-          e-books-directory: "/your/path/to/e-books/directory"
+          e-books-directory: "/your/path/e-books/directory"
           avoid-duplicate-meta-info: true
           step-indexer:
             ignore-empty-directories: true
@@ -104,13 +104,9 @@ google:
     query-url: https://www.googleapis.com/books/v1/volumes
     api_key:
 
-
-
-
-
 logging:
   file:
-    name: /home/andrei/Desktop/europea-library.log
+    name: /tour/path/europea-library.log
   level:
     com:
       andreidodu: ERROR
@@ -122,13 +118,13 @@ logging:
     nl:
       siegmann:
         epublib: OFF
+logging.level.org.hibernate: ERROR #info
+logging.level.org.hibernate.SQL: ERROR #debug
+logging.level.org.hibernate.orm.jdbc.bind: ERROR # trace
+logging.level.org.hibernate.stat: ERROR # debug
+logging.level.org.hibernate.SQL_SLOW: ERROR # info
+logging.level.org.hibernate.cache: ERROR #debug
 
-#logging.level.org.hibernate: ERROR #info
-#logging.level.org.hibernate.SQL: ERROR #debug
-#logging.level.org.hibernate.orm.jdbc.bind: ERROR # trace
-#logging.level.org.hibernate.stat: ERROR # debug
-#logging.level.org.hibernate.SQL_SLOW: ERROR # info
-#logging.level.org.hibernate.cache: ERROR #debug
 rsa:
   private-key: classpath:certs/private-key.pem
   public-key: classpath:certs/public-key.pem
