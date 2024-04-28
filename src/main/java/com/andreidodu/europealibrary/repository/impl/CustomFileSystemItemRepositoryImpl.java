@@ -168,7 +168,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(projection)
                 .from(fileSystemItem)
-                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.language, Expressions.numberPath(Long.class, "minId"))
+                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.language)
                 .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
                 .having(fileSystemItem.fileMetaInfo.bookInfo.language.trim().length().gt(0))
                 .fetch();
@@ -251,7 +251,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(projection)
                 .from(fileSystemItem)
-                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.publisher, Expressions.numberPath(Long.class, "minId"))
+                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.publisher)
                 .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
                 .having(fileSystemItem.fileMetaInfo.bookInfo.publisher.trim().length().gt(0))
                 .fetch();
