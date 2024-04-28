@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
@@ -32,10 +33,12 @@ public class JobFlowConfig {
     private final Step metaInfoTagAssociatorStep;
     private final Step categoryWriterStep;
     private final Step bookInfoCategoryAssociatorStep;
+    private final JobExecutionListener indexerJobExecutionListener;
 
     @Bean("indexerJob")
     public Job indexerJob() {
         return new JobBuilder("indexerJob", jobRepository)
+                .listener(indexerJobExecutionListener)
                 .start(initializationStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(fileIndexerAndCataloguerStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(fileSystemItemHashStep)

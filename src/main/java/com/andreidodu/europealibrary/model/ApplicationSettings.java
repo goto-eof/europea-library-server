@@ -12,11 +12,6 @@ import lombok.Setter;
 @Table(name = "el_application_settings")
 public class ApplicationSettings {
 
-    public ApplicationSettings(Long id, Boolean applicationLock) {
-        this.id = id;
-        this.applicationLock = applicationLock;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
