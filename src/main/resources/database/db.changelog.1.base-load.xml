@@ -261,8 +261,15 @@
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="version" type="INT"/>
         </createTable>
+    </changeSet>
 
-
+    <changeSet id="2024-04-28-001" author="Andrei Dodu">
+        <createTable tableName="${tablePrefix}application_settings">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_application_settings"/>
+            </column>
+            <column name="application_lock" type="boolean" defaultValueBoolean="false"/>
+        </createTable>
     </changeSet>
 
 </databaseChangeLog>
