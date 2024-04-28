@@ -45,6 +45,15 @@ public class CursoredFileController {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByTagId(cursorRequestDTO));
     }
 
+    @PostMapping("/cursored/language")
+    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByLanguage(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByLanguage(cursorRequestDTO));
+    }
+
+    @PostMapping("/cursored/publisher")
+    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublisher(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublisher(cursorRequestDTO));
+    }
 
     @PostMapping("/cursored/extension")
     public ResponseEntity<CursoredFileExtensionDTO> retrieveCursoredByFileExtension(@RequestBody CursorTypeRequestDTO cursorTypeRequestDTO) {
@@ -63,7 +72,7 @@ public class CursoredFileController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.set("Content-Disposition", "attachment; filename=\"" + download.getFileName()+"\"");
+        headers.set("Content-Disposition", "attachment; filename=\"" + download.getFileName() + "\"");
 
         return ResponseEntity.ok()
                 .headers(headers)

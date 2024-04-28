@@ -6,10 +6,7 @@ import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
-import com.andreidodu.europealibrary.mapper.CategoryMapper;
-import com.andreidodu.europealibrary.mapper.FileExtensionMapper;
-import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
-import com.andreidodu.europealibrary.mapper.TagMapper;
+import com.andreidodu.europealibrary.mapper.*;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.CategoryRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
@@ -35,6 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CursoredFileSystemServiceImpl extends CursoredServiceCommon implements CursoredFileSystemService {
     private final FileSystemItemRepository fileSystemItemRepository;
+    private final ItemAndFrequencyMapper itemAndFrequencyMapper;
     private final FileSystemItemMapper fileSystemItemMapper;
     private final FileExtensionMapper fileExtensionMapper;
     private final CategoryRepository categoryRepository;
@@ -135,6 +133,19 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     }
 
     @Override
+    @Cacheable(cacheNames = {CacheConst.CACHE_NAME_LANGUAGES})
+    public List<ItemAndFrequencyDTO> retrieveAllLanguages() {
+        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrieveLanguagesInfo());
+    }
+
+
+    @Override
+    @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHERS})
+    public List<ItemAndFrequencyDTO> retrieveAllPublishers() {
+        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishersInfo());
+    }
+
+    @Override
     public DownloadDTO retrieveResourceForDownload(Long fileSystemId) {
         return this.fileSystemItemRepository.findById(fileSystemId)
                 .map(fileSystemItem -> {
@@ -168,5 +179,35 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .ifPresent(result::setNextCursor);
         result.setQuery(searchFileSystemItemRequestDTO);
         return result;
+    }
+
+    @Override
+    public GenericCursoredResponseDTO<String> retrieveByLanguage(GenericCursorRequestDTO<String> cursorRequestDTO) {
+        Optional.ofNullable(cursorRequestDTO.getParent())
+                .orElseThrow(() -> new EntityNotFoundException("Invalid parent"));
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredLanguage(cursorRequestDTO);
+        GenericCursoredResponseDTO<String> cursoredTagDTO = new GenericCursoredResponseDTO<String>();
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        cursoredTagDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
+        cursoredTagDTO.setParent(cursorRequestDTO.getParent());
+        return cursoredTagDTO;
+    }
+
+    @Override
+    public GenericCursoredResponseDTO<String> retrieveByPublisher(GenericCursorRequestDTO<String> cursorRequestDTO) {
+        Optional.ofNullable(cursorRequestDTO.getParent())
+                .orElseThrow(() -> new EntityNotFoundException("Invalid parent"));
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredPublisher(cursorRequestDTO);
+        GenericCursoredResponseDTO<String> cursoredTagDTO = new GenericCursoredResponseDTO<String>();
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        cursoredTagDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
+        cursoredTagDTO.setParent(cursorRequestDTO.getParent());
+        return cursoredTagDTO;
     }
 }

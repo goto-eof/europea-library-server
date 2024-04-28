@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.CursorTypeRequestDTO;
+import com.andreidodu.europealibrary.dto.GenericCursorRequestDTO;
 import com.andreidodu.europealibrary.dto.SearchFileSystemItemRequestDTO;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
@@ -109,7 +110,6 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .limit(numberOfResults + 1)
                 .orderBy(fileSystemItem.id.asc())
                 .fetch();
-
     }
 
 
@@ -158,6 +158,116 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         return new QFileExtensionProjection(fileSystemItem.extension, Expressions.as(fileSystemItem.extension.count(), "cnt"),
                 calculateNextCursorByFileExtensionSubQuery(fileSystemItem));
     }
+
+    @Override
+    public List<ItemAndFrequencyProjection> retrieveLanguagesInfo() {
+        QFileSystemItem fileSystemItem = new QFileSystemItem("outerFSI");
+        QItemAndFrequencyProjection projection = createItemAndFrequencyProjectionByLanguage(fileSystemItem);
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(projection)
+                .from(fileSystemItem)
+                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.language)
+                .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
+                .having(fileSystemItem.fileMetaInfo.bookInfo.language.trim().length().gt(0))
+                .fetch();
+    }
+
+    @Override
+    public List<FileSystemItem> retrieveChildrenByCursoredLanguage(GenericCursorRequestDTO<String> cursorRequestDTO) {
+        Objects.requireNonNull(cursorRequestDTO.getParent());
+
+        String parent = cursorRequestDTO.getParent();
+        Long cursorId = cursorRequestDTO.getNextCursor();
+
+        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+
+        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
+
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.language.eq(parent));
+        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        if (cursorRequestDTO.getNextCursor() != null) {
+            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
+        }
+
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(fileSystemItem)
+                .from(fileSystemItem)
+                .where(booleanBuilder)
+                .limit(numberOfResults + 1)
+                .orderBy(fileSystemItem.id.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<FileSystemItem> retrieveChildrenByCursoredPublisher(GenericCursorRequestDTO<String> cursorRequestDTO) {
+        Objects.requireNonNull(cursorRequestDTO.getParent());
+
+        String parent = cursorRequestDTO.getParent();
+        Long cursorId = cursorRequestDTO.getNextCursor();
+
+        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+
+        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
+
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publisher.eq(parent));
+        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        if (cursorRequestDTO.getNextCursor() != null) {
+            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
+        }
+
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(fileSystemItem)
+                .from(fileSystemItem)
+                .where(booleanBuilder)
+                .limit(numberOfResults + 1)
+                .orderBy(fileSystemItem.id.asc())
+                .fetch();
+    }
+
+    private QItemAndFrequencyProjection createItemAndFrequencyProjectionByLanguage(QFileSystemItem fileSystemItem) {
+        return new QItemAndFrequencyProjection(fileSystemItem.fileMetaInfo.bookInfo.language, Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.language.count(), "cnt"),
+                calculateNextCursorByLanguageSubQuery(fileSystemItem));
+    }
+
+    private Expression<Long> calculateNextCursorByLanguageSubQuery(QFileSystemItem parent) {
+        QFileSystemItem innerFileSystemItem = new QFileSystemItem("innerFSI");
+        return JPAExpressions
+                .select(innerFileSystemItem.id.min())
+                .from(innerFileSystemItem)
+                .where(innerFileSystemItem.fileMetaInfo.bookInfo.language.eq(parent.fileMetaInfo.bookInfo.language));
+    }
+
+
+    @Override
+    public List<ItemAndFrequencyProjection> retrievePublishersInfo() {
+        QFileSystemItem fileSystemItem = new QFileSystemItem("outerFSI");
+        QItemAndFrequencyProjection projection = createItemAndFrequencyByPublisherProjection(fileSystemItem);
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(projection)
+                .from(fileSystemItem)
+                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.publisher)
+                .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
+                .having(fileSystemItem.fileMetaInfo.bookInfo.publisher.trim().length().gt(0))
+                .fetch();
+    }
+
+    private QItemAndFrequencyProjection createItemAndFrequencyByPublisherProjection(QFileSystemItem fileSystemItem) {
+        return new QItemAndFrequencyProjection(fileSystemItem.fileMetaInfo.bookInfo.publisher, Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.publisher.count(), "cnt"),
+                calculateNextCursorByPublisherSubQuery(fileSystemItem));
+    }
+
+    private Expression<Long> calculateNextCursorByPublisherSubQuery(QFileSystemItem parent) {
+        QFileSystemItem innerFileSystemItem = new QFileSystemItem("innerFSI");
+        return JPAExpressions
+                .select(innerFileSystemItem.id.min())
+                .from(innerFileSystemItem)
+                .where(innerFileSystemItem.fileMetaInfo.bookInfo.publisher.eq(parent.fileMetaInfo.bookInfo.publisher));
+    }
+
 
     private Expression<Long> calculateNextCursorByFileExtensionSubQuery(QFileSystemItem parent) {
         QFileSystemItem innerFileSystemItem = new QFileSystemItem("innerFSI");
