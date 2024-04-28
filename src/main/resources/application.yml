@@ -106,7 +106,7 @@ google:
 
 logging:
   file:
-    name: /tour/path/europea-library.log
+    name: /your/path/europea-library.log
   level:
     com:
       andreidodu: ERROR
