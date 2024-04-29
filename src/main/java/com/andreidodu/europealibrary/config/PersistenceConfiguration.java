@@ -24,14 +24,14 @@ import java.util.Objects;
 public class PersistenceConfiguration {
     private final BatchDbConfig batchDbConfig;
 
-    @Value("${com.andreidodu.europea-library.transaction-timeout-seconds}")
-    private Integer transactionTimeoutSeconds;
+    @Value("${com.andreidodu.europea-library.transaction-timeout-milliseconds}")
+    private Integer transactionTimeoutMilliseconds;
 
     @Primary
     @Bean("transactionManager")
     public HibernateTransactionManager transactionManager() {
         HibernateTransactionManager hibernateTransactionManager = new HibernateTransactionManager(Objects.requireNonNull(sessionFactory().getObject()));
-        hibernateTransactionManager.setDefaultTimeout(this.transactionTimeoutSeconds);
+        hibernateTransactionManager.setDefaultTimeout(this.transactionTimeoutMilliseconds);
         return hibernateTransactionManager;
     }
 

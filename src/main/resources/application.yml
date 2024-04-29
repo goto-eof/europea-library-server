@@ -31,7 +31,7 @@ server:
 com:
   andreidodu:
     europea-library:
-      transaction-timeout-seconds: 60
+      transaction-timeout-milliseconds: 60000
       qr-code-path: /your/path
       default-admin-username: admin
       default-admin-email: admin@admin.com
