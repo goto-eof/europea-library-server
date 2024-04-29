@@ -136,7 +136,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_LANGUAGES})
-    @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES, propagation = Propagation.REQUIRED)
+    @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES_SECONDS, propagation = Propagation.REQUIRED)
     public List<ItemAndFrequencyDTO> retrieveAllLanguages() {
         return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrieveLanguagesInfo());
     }
@@ -144,7 +144,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHERS})
-    @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES, propagation = Propagation.REQUIRED)
+    @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES_SECONDS, propagation = Propagation.REQUIRED)
     public List<ItemAndFrequencyDTO> retrieveAllPublishers() {
         return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishersInfo());
     }

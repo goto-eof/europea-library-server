@@ -1,5 +1,5 @@
 package com.andreidodu.europealibrary.constants;
 
 public interface PersistenceConst {
-    int TIMEOUT_DEMANDING_QUERIES = 3000;
+    int TIMEOUT_DEMANDING_QUERIES_SECONDS = 600;
 }
