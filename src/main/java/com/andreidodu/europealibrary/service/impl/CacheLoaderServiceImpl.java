@@ -3,7 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.service.CacheLoader;
+import com.andreidodu.europealibrary.service.CacheLoaderService;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CacheLoaderImpl implements CacheLoader {
+public class CacheLoaderServiceImpl implements CacheLoaderService {
     private final CursoredFileSystemService cursoredFileSystemService;
     private final CategoryServiceImpl categoryService;
     private final TagServiceImpl tagService;

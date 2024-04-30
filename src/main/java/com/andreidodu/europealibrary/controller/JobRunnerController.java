@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.controller;
 
+import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.service.JobService;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +24,20 @@ public class JobRunnerController {
                 .build();
     }
 
+    @AllowOnlyAdministrator
     @GetMapping("/indexer/run")
     public ResponseEntity<OperationStatusDTO> run() throws Exception {
         jobService.runJobAsync();
         return ResponseEntity.ok(buildJobStartedResponse());
     }
 
+    @AllowOnlyAdministrator
     @GetMapping("/indexer/isRunning")
     public ResponseEntity<OperationStatusDTO> isRunning() {
         return ResponseEntity.ok(this.jobService.isRunning());
     }
 
+    @AllowOnlyAdministrator
     @GetMapping("/indexer/stop")
     public ResponseEntity<OperationStatusDTO> stop() {
         return ResponseEntity.ok(this.jobService.stop());

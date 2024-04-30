@@ -5,7 +5,7 @@ import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
 import com.andreidodu.europealibrary.repository.auth.RoleRepository;
 import com.andreidodu.europealibrary.repository.auth.UserRepository;
-import com.andreidodu.europealibrary.service.CacheLoader;
+import com.andreidodu.europealibrary.service.CacheLoaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PostApplicationRunUtil {
-    private final CacheLoader cacheLoader;
+    private final CacheLoaderService cacheLoaderService;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final RoleRepository roleRepository;
@@ -28,7 +28,7 @@ public class PostApplicationRunUtil {
     private String defaultAdminPassword;
 
     public void loadCache() {
-        this.cacheLoader.reload();
+        this.cacheLoaderService.reload();
     }
 
     public void addDefaultUsersAndRolesIfNecessary() {

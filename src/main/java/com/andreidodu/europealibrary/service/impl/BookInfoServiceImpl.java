@@ -10,7 +10,7 @@ import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.service.BookInfoService;
-import com.andreidodu.europealibrary.service.CacheLoader;
+import com.andreidodu.europealibrary.service.CacheLoaderService;
 import com.andreidodu.europealibrary.service.CategoryService;
 import com.andreidodu.europealibrary.service.TagService;
 import jakarta.transaction.Transactional;
@@ -31,7 +31,7 @@ public class BookInfoServiceImpl implements BookInfoService {
     private final BookInfoRepository bookInfoRepository;
     private final FileMetaInfoRepository repository;
     private final CategoryService categoryService;
-    private final CacheLoader cacheLoader;
+    private final CacheLoaderService cacheLoaderService;
     private final TagService tagService;
 
     private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
@@ -106,7 +106,7 @@ public class BookInfoServiceImpl implements BookInfoService {
     public OperationStatusDTO bulkLanguageRename(RenameDTO renameDTO) {
         int count = this.bookInfoRepository.renameLanguage(renameDTO.getOldName(), renameDTO.getNewName());
         if (count > 0) {
-            this.cacheLoader.reloadLanguagesInCache();
+            this.cacheLoaderService.reloadLanguagesInCache();
         }
         return new OperationStatusDTO(count > 0, "language renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
     }
@@ -127,7 +127,7 @@ public class BookInfoServiceImpl implements BookInfoService {
     public OperationStatusDTO bulkPublisherRename(RenameDTO renameDTO) {
         int count = this.bookInfoRepository.renamePublisher(renameDTO.getOldName(), renameDTO.getNewName());
         if (count > 0) {
-            this.cacheLoader.reloadPublishersInCache();
+            this.cacheLoaderService.reloadPublishersInCache();
         }
         return new OperationStatusDTO(count > 0, "publisher renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
     }
@@ -136,7 +136,7 @@ public class BookInfoServiceImpl implements BookInfoService {
     public OperationStatusDTO bulkPublishedDateRename(RenameDTO renameDTO) {
         int count = this.bookInfoRepository.renamePublishedDate(renameDTO.getOldName(), renameDTO.getNewName());
         if (count > 0) {
-            this.cacheLoader.reloadPublishedDatesInCache();
+            this.cacheLoaderService.reloadPublishedDatesInCache();
         }
         return new OperationStatusDTO(count > 0, "published date renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
 

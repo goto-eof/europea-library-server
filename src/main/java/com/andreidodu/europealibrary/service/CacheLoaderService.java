@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.service;
 
-public interface CacheLoader {
+public interface CacheLoaderService {
     void reload();
 
     void reloadExtensionsInCache();
