@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.service.impl.auth;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
+import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.auth.*;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.AuthorityMapper;
@@ -30,6 +31,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -109,6 +111,34 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
 
         User savedUser = this.userRepository.save(user);
         return this.login(new AuthRequestDTO(registrationRequestDTO.getUsername(), registrationRequestDTO.getPassword()));
+    }
+
+    @Override
+    public OperationStatusDTO changePassword(String name, ChangePasswordRequestDTO changePasswordRequestDTO) {
+        Assert.notNull(changePasswordRequestDTO, "payload could not be empty");
+        Assert.notNull(changePasswordRequestDTO.getOldPassword(), "old password could not be empty");
+        Assert.notNull(changePasswordRequestDTO.getNewPassword(), "new password could not be empty");
+
+        if (changePasswordRequestDTO.getOldPassword().equals(changePasswordRequestDTO.getNewPassword())) {
+            return new OperationStatusDTO(false, "passwords matches");
+        }
+
+        Optional<User> userOptional = this.userRepository.findByUsername(name);
+
+        if (userOptional.isEmpty()) {
+            return new OperationStatusDTO(false, "username does not exists");
+        }
+
+        User user = userOptional.get();
+
+        if (!this.passwordEncoder.matches(changePasswordRequestDTO.getOldPassword(), user.getPassword())) {
+            return new OperationStatusDTO(false, "invalid old password");
+        }
+
+        user.setPassword(this.passwordEncoder.encode(changePasswordRequestDTO.getNewPassword()));
+        this.userRepository.save(user);
+
+        return new OperationStatusDTO(true, "password changed");
     }
 
     private void validateUserAlreadyExists(RegistrationRequestDTO registrationRequestDTO) {

@@ -1,9 +1,7 @@
 package com.andreidodu.europealibrary.service;
 
-import com.andreidodu.europealibrary.dto.auth.AuthRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.AuthResponseDTO;
-import com.andreidodu.europealibrary.dto.auth.RegistrationRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.UserDTO;
+import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.auth.*;
 
 public interface AuthenticationAndRegistrationService {
     AuthResponseDTO login(AuthRequestDTO authRequestDTO);
@@ -11,4 +9,6 @@ public interface AuthenticationAndRegistrationService {
     UserDTO getMe(String username);
 
     AuthResponseDTO register(RegistrationRequestDTO registrationRequestDTO);
+
+    OperationStatusDTO changePassword(String name, ChangePasswordRequestDTO changePasswordRequestDTO);
 }

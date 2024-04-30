@@ -35,13 +35,15 @@ public class CacheLoaderImpl implements CacheLoader {
         log.info("cache loaded");
     }
 
-    private void reloadExtensionsInCache() {
+    @Override
+    public void reloadExtensionsInCache() {
         Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_EXTENSIONS))
                 .ifPresent(Cache::clear);
         this.cursoredFileSystemService.getAllExtensions();
     }
 
-    private void reloadTagsInCache() {
+    @Override
+    public void reloadTagsInCache() {
         Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_TAGS))
                 .ifPresent(Cache::clear);
         var response = this.tagService.retrieveAllTags(new CommonCursoredRequestDTO());
@@ -50,7 +52,8 @@ public class CacheLoaderImpl implements CacheLoader {
         }
     }
 
-    private void reloadCategoriesInCache() {
+    @Override
+    public void reloadCategoriesInCache() {
         Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_CATEGORIES))
                 .ifPresent(Cache::clear);
         var response = this.categoryService.retrieveAllCategories(new CommonCursoredRequestDTO());
@@ -59,14 +62,15 @@ public class CacheLoaderImpl implements CacheLoader {
         }
     }
 
-
-    private void reloadLanguagesInCache() {
+    @Override
+    public void reloadLanguagesInCache() {
         Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_LANGUAGES))
                 .ifPresent(Cache::clear);
         this.cursoredFileSystemService.retrieveAllLanguages();
     }
 
-    private void reloadPublishersInCache() {
+    @Override
+    public void reloadPublishersInCache() {
         Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_PUBLISHERS))
                 .ifPresent(Cache::clear);
         this.cursoredFileSystemService.retrieveAllPublishers();

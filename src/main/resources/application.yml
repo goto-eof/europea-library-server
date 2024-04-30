@@ -31,6 +31,7 @@ server:
 com:
   andreidodu:
     europea-library:
+      allowed-urls-when-job-is-running: /api/v1/job/indexer/stop,/api/v1/job/indexer/isRunning,/api/v1/auth/login,/api/v1/auth/me,/api/v1/auth/register,/api/v1/auth/changePassword
       transaction-timeout-milliseconds: 60000
       qr-code-path: /your/path
       default-admin-username: admin

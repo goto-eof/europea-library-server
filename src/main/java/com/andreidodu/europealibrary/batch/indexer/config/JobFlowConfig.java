@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.config;
 
+import com.andreidodu.europealibrary.constants.JobConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
@@ -37,7 +38,7 @@ public class JobFlowConfig {
 
     @Bean("indexerJob")
     public Job indexerJob() {
-        return new JobBuilder("indexerJob", jobRepository)
+        return new JobBuilder(JobConst.JOB_INDEXER_NAME, jobRepository)
                 .listener(indexerJobExecutionListener)
                 .start(initializationStep)
                 .on(ExitStatus.COMPLETED.getExitCode()).to(fileIndexerAndCataloguerStep)

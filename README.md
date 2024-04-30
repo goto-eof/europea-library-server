@@ -94,7 +94,7 @@ otherwise an HTTP 404 status is returned). Moreover, the indexer job starts ever
 the job is already running then it will continue to process files and no other job will run.
 
 ## Features
-- index large digital books collection quickly;
+- index and catalog large digital books collection quickly;
 - explore e-books by directory;
 - explore e-books by category;
 - explore e-books by tag;
@@ -106,7 +106,9 @@ the job is already running then it will continue to process files and no other j
 - search by title, author, publisher, ISBN and published date;
 - edit e-book information (only administrator is able to do this);
 - generate e-book URL QR Code;
-- login/register to the system (2 categories of user: ADMINISTRATOR and USER).
+- login/register to the system and change password (2 categories of user: ADMINISTRATOR and USER);
+- bulk category/tag/language/publisher name change  (only administrator is able to do this);
+- control panel (administration for admin, profile and security for all users).
 
 ## Job steps
 

@@ -1,9 +1,7 @@
 package com.andreidodu.europealibrary.controller;
 
-import com.andreidodu.europealibrary.dto.auth.AuthRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.AuthResponseDTO;
-import com.andreidodu.europealibrary.dto.auth.RegistrationRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.UserDTO;
+import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.auth.*;
 import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +39,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegistrationRequestDTO registrationRequestDTO) {
         return ResponseEntity.ok(this.authenticationAndRegistrationService.register(registrationRequestDTO));
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<OperationStatusDTO> changePassword(@Valid @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO, Authentication authentication) {
+        return ResponseEntity.ok(this.authenticationAndRegistrationService.changePassword(authentication.getName(), changePasswordRequestDTO));
     }
 }

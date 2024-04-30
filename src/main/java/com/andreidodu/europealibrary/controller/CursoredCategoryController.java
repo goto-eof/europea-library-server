@@ -1,9 +1,9 @@
 package com.andreidodu.europealibrary.controller;
 
-import com.andreidodu.europealibrary.dto.CategoryDTO;
-import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorDTO;
+import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
+import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,5 +22,11 @@ public class CursoredCategoryController {
     @PostMapping
     public ResponseEntity<CursorDTO<CategoryDTO>> retrieveCategories(@RequestBody CommonCursoredRequestDTO commonCursoredRequestDTO) {
         return ResponseEntity.ok(this.categoryService.retrieveAllCategories(commonCursoredRequestDTO));
+    }
+
+    @AllowOnlyAdministrator
+    @PostMapping("/rename")
+    public ResponseEntity<OperationStatusDTO> bulkCategoryRename(@Valid @RequestBody RenameDTO renameDTO) {
+        return ResponseEntity.ok(this.categoryService.bulkRename(renameDTO));
     }
 }

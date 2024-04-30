@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FileExtensionDTO {
-    private String extension;
+    private String name;
     private Long occurrence;
     private Long nextCursor;
 }

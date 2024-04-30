@@ -1,10 +1,11 @@
 package com.andreidodu.europealibrary.controller;
 
-import com.andreidodu.europealibrary.dto.JobStatusDTO;
-import com.andreidodu.europealibrary.service.JobRunnerService;
+import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.service.JobService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,18 +14,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/job")
 @RequiredArgsConstructor
 public class JobRunnerController {
-    final private JobRunnerService jobRunnerService;
+    final private JobService jobService;
 
-    private static JobStatusDTO buildJobStartedResponse() {
-        return JobStatusDTO.builder()
+    private static OperationStatusDTO buildJobStartedResponse() {
+        return OperationStatusDTO.builder()
                 .message("Job started")
-                .isRunning(true)
+                .status(true)
                 .build();
     }
 
-    @RequestMapping("/indexer/run")
-    public ResponseEntity<JobStatusDTO> handle() throws Exception {
-        jobRunnerService.runJobAsync();
+    @GetMapping("/indexer/run")
+    public ResponseEntity<OperationStatusDTO> run() throws Exception {
+        jobService.runJobAsync();
         return ResponseEntity.ok(buildJobStartedResponse());
+    }
+
+    @GetMapping("/indexer/isRunning")
+    public ResponseEntity<OperationStatusDTO> isRunning() {
+        return ResponseEntity.ok(this.jobService.isRunning());
+    }
+
+    @GetMapping("/indexer/stop")
+    public ResponseEntity<OperationStatusDTO> stop() {
+        return ResponseEntity.ok(this.jobService.stop());
     }
 }

@@ -2,14 +2,16 @@ package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.constants.CacheConst;
-import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorDTO;
-import com.andreidodu.europealibrary.dto.TagDTO;
+import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.TagMapper;
 import com.andreidodu.europealibrary.model.Tag;
+import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
+import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.service.TagService;
 import com.andreidodu.europealibrary.util.LimitUtil;
+import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,6 +29,7 @@ import java.util.Optional;
 public class TagServiceImpl extends CursoredServiceCommon implements TagService {
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
+    private final FileMetaInfoRepository fileMetaInfoRepository;
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_TAGS})
@@ -63,4 +66,49 @@ public class TagServiceImpl extends CursoredServiceCommon implements TagService 
         return tag;
     }
 
+    @Override
+    public OperationStatusDTO bulkRename(RenameDTO renameDTO) {
+        Assert.notNull(renameDTO, "null payload not allowed");
+        Assert.notNull(renameDTO.getNewName(), "null newName not allowed");
+        Assert.notNull(renameDTO.getOldName(), "null oldName not allowed");
+
+        if (renameDTO.getNewName().equals(renameDTO.getOldName())) {
+            return new OperationStatusDTO(true, "renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
+        }
+
+        Optional<Tag> oldTagOptional = this.tagRepository.findByNameIgnoreCase(renameDTO.getOldName().trim().toLowerCase());
+        Optional<Tag> newTagOptional = this.tagRepository.findByNameIgnoreCase(renameDTO.getNewName().trim().toLowerCase());
+
+        Tag oldTag = oldTagOptional.orElseThrow(() -> new ValidationException("Invalid old tag name"));
+        Tag newTag = newTagOptional.orElseGet(() -> createTag(renameDTO.getNewName()));
+
+        int count = this.updateTagReference(oldTag, newTag);
+        return new OperationStatusDTO(count > 0, "renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
+    }
+
+
+    private int updateTagReference(Tag oldTag, Tag newTag) {
+        int[] count = new int[1];
+
+        this.fileMetaInfoRepository.retrieveFileMetaInfoContainingTag(oldTag)
+                .forEach(fileMetaInfoEntity -> {
+                    fileMetaInfoEntity.getTagList().remove(oldTag);
+                    if (!fileMetaInfoEntity.getTagList().contains(newTag)) {
+                        fileMetaInfoEntity.getTagList().add(newTag);
+                    }
+                    this.fileMetaInfoRepository.save(fileMetaInfoEntity);
+                    count[0]++;
+                });
+
+        this.tagRepository.delete(oldTag);
+
+        return count[0];
+    }
+
+
+    private Tag createTag(String name) {
+        Tag tag = new Tag();
+        tag.setName(name.trim().toLowerCase());
+        return this.tagRepository.save(tag);
+    }
 }
