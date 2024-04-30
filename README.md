@@ -102,7 +102,7 @@ the job is already running then it will continue to process files and no other j
 - explore e-books by language;
 - explore e-books by publisher;
 - view book information;
-- download e-books;
+- download e-books (only authenticated users are able to do this);
 - search by title, author, publisher, ISBN and published date;
 - edit e-book information (only administrator is able to do this);
 - generate e-book URL QR Code;
