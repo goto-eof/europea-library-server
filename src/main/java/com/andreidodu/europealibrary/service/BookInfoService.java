@@ -18,4 +18,6 @@ public interface BookInfoService {
     OperationStatusDTO bulkLanguageRename(RenameDTO renameDTO);
 
     OperationStatusDTO bulkPublisherRename(RenameDTO renameDTO);
+
+    OperationStatusDTO bulkPublishedDateRename(RenameDTO renameDTO);
 }

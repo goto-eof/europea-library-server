@@ -132,5 +132,15 @@ public class BookInfoServiceImpl implements BookInfoService {
         return new OperationStatusDTO(count > 0, "publisher renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
     }
 
+    @Override
+    public OperationStatusDTO bulkPublishedDateRename(RenameDTO renameDTO) {
+        int count = this.bookInfoRepository.renamePublishedDate(renameDTO.getOldName(), renameDTO.getNewName());
+        if (count > 0) {
+            this.cacheLoader.reloadPublishedDatesInCache();
+        }
+        return new OperationStatusDTO(count > 0, "published date renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
+
+    }
+
 
 }

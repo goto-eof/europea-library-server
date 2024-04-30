@@ -231,6 +231,24 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .fetch();
     }
 
+    @Override
+    public List<ItemAndFrequencyProjection> retrievePublishedDatesInfo() {
+        QFileSystemItem fileSystemItem = new QFileSystemItem("outerFSI");
+        QItemAndFrequencyProjection projection = createItemAndFrequencyProjectionByPublishedDate(fileSystemItem);
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(projection)
+                .from(fileSystemItem)
+                .groupBy(fileSystemItem.fileMetaInfo.bookInfo.publishedDate)
+                .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
+                .having(fileSystemItem.fileMetaInfo.bookInfo.publishedDate.trim().length().gt(0))
+                .fetch();
+    }
+
+    private QItemAndFrequencyProjection createItemAndFrequencyProjectionByPublishedDate(QFileSystemItem fileSystemItem) {
+        return new QItemAndFrequencyProjection(fileSystemItem.fileMetaInfo.bookInfo.publishedDate, Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.publishedDate.count(), "cnt"),
+                Expressions.as(fileSystemItem.id.min(), "minId"));
+    }
+
     private QItemAndFrequencyProjection createItemAndFrequencyProjectionByLanguage(QFileSystemItem fileSystemItem) {
         return new QItemAndFrequencyProjection(fileSystemItem.fileMetaInfo.bookInfo.language, Expressions.as(fileSystemItem.fileMetaInfo.bookInfo.language.count(), "cnt"),
                 Expressions.as(fileSystemItem.id.min(), "minId"));
@@ -369,4 +387,33 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .filter(item -> !item.trim().isEmpty())
                 .ifPresent(title -> booleanBuilder.and(fileSystemItem.fileMetaInfo.title.containsIgnoreCase(title)));
     }
+
+    @Override
+    public List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO) {
+        Objects.requireNonNull(cursorRequestDTO.getParent());
+
+        String parent = cursorRequestDTO.getParent();
+        Long cursorId = cursorRequestDTO.getNextCursor();
+
+        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+
+        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
+
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publishedDate.eq(parent));
+        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        if (cursorRequestDTO.getNextCursor() != null) {
+            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
+        }
+
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(fileSystemItem)
+                .from(fileSystemItem)
+                .where(booleanBuilder)
+                .limit(numberOfResults + 1)
+                .orderBy(fileSystemItem.id.asc())
+                .fetch();
+    }
+
 }

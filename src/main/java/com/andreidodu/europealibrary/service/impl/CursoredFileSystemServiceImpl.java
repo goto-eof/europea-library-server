@@ -214,4 +214,27 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
         cursoredTagDTO.setParent(cursorRequestDTO.getParent());
         return cursoredTagDTO;
     }
+
+    @Override
+    @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHED_DATES})
+    @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES_SECONDS, propagation = Propagation.REQUIRED)
+    public List<ItemAndFrequencyDTO> retrieveAllPublishedDates() {
+        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishedDatesInfo());
+    }
+
+    @Override
+    public GenericCursoredResponseDTO<String> retrieveByPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO) {
+        Optional.ofNullable(cursorRequestDTO.getParent())
+                .orElseThrow(() -> new EntityNotFoundException("Invalid parent"));
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredPublishedDate(cursorRequestDTO);
+        GenericCursoredResponseDTO<String> cursoredTagDTO = new GenericCursoredResponseDTO<String>();
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        cursoredTagDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
+        cursoredTagDTO.setParent(cursorRequestDTO.getParent());
+        return cursoredTagDTO;
+    }
+
 }

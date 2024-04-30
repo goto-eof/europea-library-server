@@ -31,4 +31,8 @@ public interface CustomFileSystemItemRepository {
     List<FileSystemItem> retrieveChildrenByCursoredLanguage(GenericCursorRequestDTO<String> cursorRequestDTO);
 
     List<FileSystemItem> retrieveChildrenByCursoredPublisher(GenericCursorRequestDTO<String> cursorRequestDTO);
+
+    List<ItemAndFrequencyProjection> retrievePublishedDatesInfo();
+
+    List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
 }

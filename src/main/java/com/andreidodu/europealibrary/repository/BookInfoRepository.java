@@ -19,4 +19,8 @@ public interface BookInfoRepository extends TransactionalRepository<BookInfo, Lo
     @Modifying
     @Query("update BookInfo bi set bi.publisher = :newName where bi.publisher = :oldName")
     int renamePublisher(String oldName, String newName);
+
+    @Modifying
+    @Query("update BookInfo bi set bi.publishedDate = :newName where bi.publishedDate = :oldName")
+    int renamePublishedDate(String oldName, String newName);
 }

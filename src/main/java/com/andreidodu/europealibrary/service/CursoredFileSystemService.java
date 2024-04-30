@@ -34,4 +34,8 @@ public interface CursoredFileSystemService {
     GenericCursoredResponseDTO<String> retrieveByLanguage(GenericCursorRequestDTO<String> cursorRequestDTO);
 
     GenericCursoredResponseDTO<String> retrieveByPublisher(GenericCursorRequestDTO<String> cursorRequestDTO);
+
+    List<ItemAndFrequencyDTO> retrieveAllPublishedDates();
+
+    GenericCursoredResponseDTO<String> retrieveByPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
 }

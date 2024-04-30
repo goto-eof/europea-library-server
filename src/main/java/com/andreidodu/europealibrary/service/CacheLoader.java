@@ -12,4 +12,6 @@ public interface CacheLoader {
     void reloadLanguagesInCache();
 
     void reloadPublishersInCache();
+
+    void reloadPublishedDatesInCache();
 }

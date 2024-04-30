@@ -50,6 +50,11 @@ public class CursoredFileController {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByLanguage(cursorRequestDTO));
     }
 
+    @PostMapping("/cursored/publishedDate")
+    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublishedDate(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublishedDate(cursorRequestDTO));
+    }
+
     @PostMapping("/cursored/publisher")
     public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublisher(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublisher(cursorRequestDTO));

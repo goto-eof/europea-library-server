@@ -6,4 +6,5 @@ public interface CacheConst {
     String CACHE_NAME_CATEGORIES = "categories";
     String CACHE_NAME_LANGUAGES = "languages";
     String CACHE_NAME_PUBLISHERS = "publishers";
+    String CACHE_NAME_PUBLISHED_DATES = "published_dates";
 }

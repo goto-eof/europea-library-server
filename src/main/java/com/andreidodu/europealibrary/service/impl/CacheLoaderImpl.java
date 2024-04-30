@@ -31,6 +31,7 @@ public class CacheLoaderImpl implements CacheLoader {
         reloadTagsInCache();
         reloadLanguagesInCache();
         reloadPublishersInCache();
+        reloadPublishedDatesInCache();
 
         log.info("cache loaded");
     }
@@ -74,5 +75,12 @@ public class CacheLoaderImpl implements CacheLoader {
         Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_PUBLISHERS))
                 .ifPresent(Cache::clear);
         this.cursoredFileSystemService.retrieveAllPublishers();
+    }
+
+    @Override
+    public void reloadPublishedDatesInCache() {
+        Optional.ofNullable(cacheManager.getCache(CacheConst.CACHE_NAME_PUBLISHED_DATES))
+                .ifPresent(Cache::clear);
+        this.cursoredFileSystemService.retrieveAllPublishedDates();
     }
 }
