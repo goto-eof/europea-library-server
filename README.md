@@ -23,8 +23,10 @@
 
 # Europea Library (server - Work In Progress)
 
-A library web application that allows to index, edit, explore, retrieve information about books from file metadata/web (by using
-multi-threading), search and download e-books (need to be authenticated in order to be able to download). The front-end project can be
+A library web application that allows to index, edit, explore, retrieve information about books from file metadata/web (
+by using
+multi-threading), search and download e-books (need to be authenticated in order to be able to download). The front-end
+project can be
 found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can be
 cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
 
@@ -65,17 +67,19 @@ Before running the software as Spring Boot application it is necessary to follow
         rm private-key-old.pem
         ```
         - Now you should have a `private-key.pem` and a `public-key.pem` file in `src/main/resources/certs`
-    - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your PostgreSQL running instance a database named `europea_library`
-    - run the project from your IDE or execute from the root of the project
+    - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your
+      PostgreSQL running instance a database named `europea_library`
+    - run the project from your IDE
+    - or execute the following command from the root of the project in order to create the jar file
       ```
       ./gradlew bootJar
       ```
-      in order to create the jar file
     - then create a file called `start.sh`
       ```
       #!/bin/bash
-      /bin/java -Dspring.config.location=application.yml -jar europea-library.jar
+      /bin/java -Dspring.config.location=application.yml -jar europea-library-X.X.X.jar
       ```
+      where X.X.X is the application version
     - make it executable:
       ```
       chmod +x start.sh
@@ -98,6 +102,7 @@ otherwise an HTTP 404 status is returned). Moreover, the indexer job starts ever
 the job is already running then it will continue to process files and no other job will run.
 
 ## Features
+
 - index and catalog large digital books collection quickly;
 - explore e-books by directory;
 - explore e-books by category;
