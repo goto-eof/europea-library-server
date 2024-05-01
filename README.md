@@ -64,7 +64,7 @@ Before running the software as Spring Boot application it is necessary to follow
         ```
         rm private-key-old.pem
         ```
-        - move your certificates in `src/main/resources/certs` (you should have a `private-key.pem` and a `public-key.pem` file)
+        - Now you should have a `private-key.pem` and a `public-key.pem` file in `src/main/resources/certs`
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your PostgreSQL running instance a database named `europea_library`
     - run the project from your IDE or execute from the root of the project
       ```
