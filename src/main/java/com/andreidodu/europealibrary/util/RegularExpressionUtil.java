@@ -34,7 +34,7 @@ public class RegularExpressionUtil {
     }
 
     public Optional<String> extractYear(String content) {
-        return extractByPattern(content, Pattern.compile(RegexConst.YEAR));
+        return extractByPattern(content, RegexConst.PATTERN_COMPILED_YEAR);
     }
 
 }
