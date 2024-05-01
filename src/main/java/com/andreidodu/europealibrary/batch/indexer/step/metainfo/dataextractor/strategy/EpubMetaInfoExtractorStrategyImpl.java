@@ -11,6 +11,7 @@ import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.util.EpubUtil;
 import com.andreidodu.europealibrary.util.FileUtil;
+import com.andreidodu.europealibrary.util.RegularExpressionUtil;
 import com.andreidodu.europealibrary.util.StringUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -48,6 +49,8 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     private final FileUtil fileUtil;
     private final OtherMetaInfoExtractorStrategyImpl otherMetaInfoExtractorStrategy;
     private final TmpAssociationService tmpAssociationService;
+    private final RegularExpressionUtil regularExpressionUtil;
+
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.disable-epub-metadata-extractor}")
     private boolean disableEpubMetadataExtractor;
     @Value("${com.andreidodu.europea-library.job.indexer.step-meta-info-writer.disable-isbn-extractor}")
@@ -264,7 +267,12 @@ public class EpubMetaInfoExtractorStrategyImpl implements MetaInfoExtractorStrat
     }
 
     private Optional<String> extractPublishedDate(List<Date> dates) {
-        return dates.stream().filter(date -> date.getEvent() == null).map(Date::getValue).findFirst();
+        return dates.stream()
+                .filter(date -> date.getEvent() == null)
+                .map(Date::getValue)
+                .map(fullDate -> this.regularExpressionUtil.extractYear(fullDate)
+                        .orElse(fullDate))
+                .findFirst();
     }
 
     private String getFirstAvailable(List<String> list) {

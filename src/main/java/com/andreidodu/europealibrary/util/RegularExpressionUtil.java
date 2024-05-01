@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.util;
 
+import com.andreidodu.europealibrary.constants.RegexConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -32,5 +33,8 @@ public class RegularExpressionUtil {
         return Optional.empty();
     }
 
+    public Optional<String> extractYear(String content) {
+        return extractByPattern(content, Pattern.compile(RegexConst.YEAR));
+    }
 
 }
