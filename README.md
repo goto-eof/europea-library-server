@@ -47,7 +47,7 @@ Before running the software as Spring Boot application it is necessary to follow
       default-admin-password: password
       ```
     - edit the `qr-code-path` property in order to allow to generate QR Codes for each e-book;
-    - generate certificates for encrypting and decrypting our JWT tokens:
+    - generate certificates for encrypting and decrypting our JWT tokens in `src/main/resources/certs`:
         - Generate a Private Key (RSA):
         ```
         openssl genpkey -algorithm RSA -out private-key-old.pem
@@ -56,7 +56,7 @@ Before running the software as Spring Boot application it is necessary to follow
         ```
         openssl rsa -pubout -in private-key-old.pem -out public-key.pem
         ```
-        - Then convert it to the appropriate PCKS format and replace the old one
+        - Then convert it to the appropriate PCKS format
         ```
         openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key-old.pem -out private-key.pem -nocrypt
         ```
