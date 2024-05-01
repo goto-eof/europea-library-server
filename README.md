@@ -54,11 +54,15 @@ Before running the software as Spring Boot application it is necessary to follow
         ```
         - Extract the Public Key from the Private Key by running:
         ```
-        openssl rsa -pubout -in private-key.pem -out public-key.pem
+        openssl rsa -pubout -in private-key-old.pem -out public-key.pem
         ```
         - Then convert it to the appropriate PCKS format and replace the old one
         ```
         openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key-old.pem -out private-key.pem -nocrypt
+        ```
+        - Remove the old `.pem` file
+        ```
+        rm private-key-old.pem
         ```
         - move your certificates in `src/main/resources/certs` (you should have a `private-key.pem` and a `public-key.pem` file)
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your PostgreSQL running instance a database named `europea_library`
