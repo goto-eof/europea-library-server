@@ -41,8 +41,18 @@ public class AuthController {
         return ResponseEntity.ok(this.authenticationAndRegistrationService.register(registrationRequestDTO));
     }
 
-    @PostMapping("/changePassword")
+    @PostMapping("/password/change")
     public ResponseEntity<OperationStatusDTO> changePassword(@Valid @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO, Authentication authentication) {
         return ResponseEntity.ok(this.authenticationAndRegistrationService.changePassword(authentication.getName(), changePasswordRequestDTO));
+    }
+
+    @PostMapping("/password/recover")
+    public ResponseEntity<OperationStatusDTO> sendPasswordRecoveryEmail(@Valid @RequestBody PasswordRecoveryRequestDTO passwordRecoveryRequestDTO) {
+        return ResponseEntity.ok(this.authenticationAndRegistrationService.sendPasswordRecoveryEmail(passwordRecoveryRequestDTO.getEmail()));
+    }
+
+    @PostMapping("/password/recover/change")
+    public ResponseEntity<OperationStatusDTO> recoveryChangePassword(@Valid @RequestBody RecoveryChangePasswordRequestDTO recoveryChangePasswordRequestDTO, Authentication authentication) {
+        return ResponseEntity.ok(this.authenticationAndRegistrationService.recoveryChangePassword(authentication.getName(), recoveryChangePasswordRequestDTO));
     }
 }

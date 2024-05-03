@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties("batch-db")
+@ConfigurationProperties("com.andreidodu.europea-library.batch-db")
 public class BatchDbConfig {
     private String url;
     private String username;

@@ -234,6 +234,8 @@
             <column name="password" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
+            <column name="recovery_key" type="VARCHAR(100)"/>
+            <column name="recovery_expiration" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="enabled" defaultValueBoolean="false" type="boolean">
                 <constraints nullable="false"/>
             </column>

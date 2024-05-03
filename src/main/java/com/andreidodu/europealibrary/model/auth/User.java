@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -34,6 +35,12 @@ public class User extends ModelCommon {
 
     @Column(name = "enabled")
     private Boolean enabled;
+
+    @Column(name = "recovery_key")
+    private String recoveryKey;
+
+    @Column(name = "recovery_expiration")
+    private LocalDateTime recoveryExpiration;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST})
     private List<Authority> authorityList;

@@ -5,13 +5,13 @@ plugins {
 }
 
 ext {
-    set('springCloudVersion', "2023.0.0")
+    springCloudVersion = '2023.0.0'
     queryDslVersion = '5.1.0'
     lombokVersion = '1.18.30'
     jakartaPersistenceApi = '3.2.0-M2'
 }
 group = 'com.andreidodu'
-version = '7.0.0'
+version = '8.0.0'
 
 java {
     sourceCompatibility = '17'
@@ -32,8 +32,6 @@ repositories {
 
 dependencies {
 
-    //compileOnly "com.querydsl:querydsl-sql:${queryDslVersion}"
-    //implementation "com.querydsl:querydsl-core:${queryDslVersion}"
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api:${jakartaPersistenceApi}"
@@ -69,6 +67,10 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.3'
     implementation 'com.google.zxing:javase:3.5.3'
     implementation('org.springframework.boot:spring-boot-starter-validation')
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.freemarker:freemarker:2.3.32'
+    implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.5'
+
 
     testImplementation 'org.springframework.batch:spring-batch-test:5.1.1'
     testCompileOnly "com.querydsl:querydsl-sql:${queryDslVersion}"

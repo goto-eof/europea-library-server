@@ -44,7 +44,7 @@ public class GoogleBookMetaInfoRetrieverStrategy implements MetaInfoRetrieverStr
     private final BookInfoRepository bookInfoRepository;
     private final TmpAssociationService tmpAssociationService;
 
-    @Value("${google.books.api_key}")
+    @Value("${com.andreidodu.europea-library.google.books.api_key}")
     private String googleBooksApiKey;
     @PersistenceContext
     private EntityManager entityManager;

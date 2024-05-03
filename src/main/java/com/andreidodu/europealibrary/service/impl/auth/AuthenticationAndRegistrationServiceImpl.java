@@ -10,6 +10,7 @@ import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
 import com.andreidodu.europealibrary.repository.auth.UserRepository;
 import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
+import com.andreidodu.europealibrary.service.EmailSenderService;
 import com.andreidodu.europealibrary.util.StringUtil;
 import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final AuthorityMapper authorityMapper;
+    private final EmailSenderService emailSenderService;
 
     @Override
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
@@ -139,6 +141,19 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         this.userRepository.save(user);
 
         return new OperationStatusDTO(true, "password changed");
+    }
+
+    @Override
+    public OperationStatusDTO sendPasswordRecoveryEmail(String email) {
+        // generate unique hash recovery string or retrieve the not expired one
+        // send email
+        // return true
+        return null;
+    }
+
+    @Override
+    public OperationStatusDTO recoveryChangePassword(String name, RecoveryChangePasswordRequestDTO recoveryChangePasswordRequestDTO) {
+        return null;
     }
 
     private void validateUserAlreadyExists(RegistrationRequestDTO registrationRequestDTO) {
