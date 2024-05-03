@@ -209,7 +209,6 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         Assert.notNull(passwordResetRequestDTO.getResetToken(), "token could not be empty");
         Assert.notNull(passwordResetRequestDTO.getPassword(), "password could not be empty");
 
-
         User user = this.userRepository.findByResetToken(passwordResetRequestDTO.getResetToken())
                 .orElseThrow(() -> new ValidationException("user not found"));
 
