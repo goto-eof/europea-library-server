@@ -14,4 +14,6 @@ public interface UserRepository extends TransactionalRepository<User, Long> {
     boolean existsByEmail(String email);
 
     Optional<User> findByEmail(String email);
+
+    Optional<User> findByResetToken(String resetToken);
 }

@@ -16,6 +16,7 @@ import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,6 +51,30 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
     private final UserMapper userMapper;
     private final AuthorityMapper authorityMapper;
     private final EmailSenderService emailSenderService;
+
+    @Value("${com.andreidodu.europea-library.password.reset.minutes-to-wait-for-another-attempt}")
+    private int timeToWaitForAnotherAttempt;
+
+    @Value("${com.andreidodu.europea-library.password.reset.mail.from}")
+    private String passwordresetMailFrom;
+
+    // TODO create a template with FreeMarker and send it
+    @Value("${com.andreidodu.europea-library.password.reset.mail.title}")
+    private String passwordResetMailTitle;
+
+    // TODO create a template with FreeMarker and send it
+    @Value("${com.andreidodu.europea-library.password.reset.mail.body}")
+    private String passwordResetMailBody;
+
+    @Value("${com.andreidodu.europea-library.client.url}")
+    private String clientUrl;
+
+    @Value("${com.andreidodu.europea-library.client.reset-password-endpoint}")
+    private String clientResetPasswordEndpoint;
+
+    @Value("${com.andreidodu.europea-library.password.reset.token.ttl.minutes}")
+    private int passwordResetTokenTtlMinutes;
+
 
     @Override
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
@@ -153,36 +178,50 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         User user = userOptional.orElseThrow(() -> new ValidationException("User does not exists"));
 
         LocalDateTime recoveryRequestLocalDateTime = user.getRecoveryRequestTimestamp();
-        if (recoveryRequestLocalDateTime != null && ChronoUnit.MINUTES.between(recoveryRequestLocalDateTime, LocalDateTime.now()) < 1) {
-            return new OperationStatusDTO(false, "It is necessary to wait at least 1 minute");
+        if (recoveryRequestLocalDateTime != null && ChronoUnit.MINUTES.between(recoveryRequestLocalDateTime, LocalDateTime.now()) < timeToWaitForAnotherAttempt) {
+            return new OperationStatusDTO(false, "It is necessary to wait at least " + timeToWaitForAnotherAttempt + " minute/s");
         }
 
         String recoveryKey = generateRandomUUID();
 
         updateUsersRecoveryKey(user, recoveryKey);
 
-        this.emailSenderService.sendPasswordRecoveryEmail("Europea Library Password Recovery Link", "andrei@andrei.it", email, "Hello, this is your one-shot key: " + recoveryKey);
+        this.emailSenderService.sendPasswordRecoveryEmail(passwordResetMailTitle, passwordresetMailFrom, email, passwordResetMailBody + " " + clientUrl + clientResetPasswordEndpoint + "/" + recoveryKey);
 
         return new OperationStatusDTO(true, "email sent");
     }
 
     private static String generateRandomUUID() {
         UUID uuid = UUID.randomUUID();
-        String recoveryKey = uuid.toString();
-        return recoveryKey;
+        return uuid.toString();
     }
 
     private void updateUsersRecoveryKey(User user, String recoveryKey) {
         LocalDateTime now = LocalDateTime.now();
-        user.setRecoveryKey(recoveryKey);
+        user.setResetToken(recoveryKey);
         user.setRecoveryRequestTimestamp(now);
-        user.setRecoveryExpirationTimestamp(now.minusMinutes(1));
         userRepository.save(user);
     }
 
     @Override
-    public OperationStatusDTO recoveryChangePassword(String name, RecoveryChangePasswordRequestDTO recoveryChangePasswordRequestDTO) {
-        return null;
+    public OperationStatusDTO passwordReset(PasswordResetRequestDTO passwordResetRequestDTO) {
+        Assert.notNull(passwordResetRequestDTO, "payload could not be empty");
+        Assert.notNull(passwordResetRequestDTO.getResetToken(), "token could not be empty");
+        Assert.notNull(passwordResetRequestDTO.getPassword(), "password could not be empty");
+
+
+        User user = this.userRepository.findByResetToken(passwordResetRequestDTO.getResetToken())
+                .orElseThrow(() -> new ValidationException("user not found"));
+
+        LocalDateTime recoveryRequestLocalDateTime = user.getRecoveryRequestTimestamp();
+        if (recoveryRequestLocalDateTime != null && ChronoUnit.MINUTES.between(recoveryRequestLocalDateTime, LocalDateTime.now()) > passwordResetTokenTtlMinutes) {
+            return new OperationStatusDTO(false, "Reset token expired");
+        }
+
+        user.setPassword(this.passwordEncoder.encode(passwordResetRequestDTO.getPassword()));
+        this.userRepository.save(user);
+
+        return new OperationStatusDTO(true, "password updated successfully");
     }
 
     private void validateUserAlreadyExists(RegistrationRequestDTO registrationRequestDTO) {

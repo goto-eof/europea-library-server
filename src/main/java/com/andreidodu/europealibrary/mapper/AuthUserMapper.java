@@ -13,8 +13,7 @@ public abstract class AuthUserMapper {
 
     @Mapping(ignore = true, target = "id")
     @Mapping(ignore = true, target = "email")
-    @Mapping(ignore = true, target = "recoveryKey")
-    @Mapping(ignore = true, target = "recoveryExpirationTimestamp")
+    @Mapping(ignore = true, target = "resetToken")
     public abstract User toModel(AuthUserDTO dto);
 
     @Mapping(ignore = true, target = "authorities")

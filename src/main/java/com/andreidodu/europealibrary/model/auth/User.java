@@ -36,13 +36,10 @@ public class User extends ModelCommon {
     @Column(name = "enabled")
     private Boolean enabled;
 
-    @Column(name = "recovery_key")
-    private String recoveryKey;
+    @Column(name = "reset_password_token")
+    private String resetToken;
 
-    @Column(name = "recovery_expiration_timestamp")
-    private LocalDateTime recoveryExpirationTimestamp;
-
-    @Column(name = "recovery_request_timestamp")
+    @Column(name = "reset_password_request_timestamp")
     private LocalDateTime recoveryRequestTimestamp;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST})

@@ -234,9 +234,8 @@
             <column name="password" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="recovery_key" type="VARCHAR(100)"/>
-            <column name="recovery_expiration_timestamp" type="DATETIME"/>
-            <column name="recovery_request_timestamp" type="DATETIME"/>
+            <column name="reset_password_token" type="VARCHAR(100)"/>
+            <column name="reset_password_request_timestamp" type="DATETIME"/>
             <column name="enabled" defaultValueBoolean="false" type="boolean">
                 <constraints nullable="false"/>
             </column>

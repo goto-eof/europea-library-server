@@ -8,11 +8,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RecoveryChangePasswordRequestDTO extends AuthRequestDTO {
+public class PasswordResetRequestDTO {
 
     @Size(min = 10, max = 200)
-    private String recoveryString;
+    private String resetToken;
 
     @Pattern(regexp = RegexConst.PASSWORD)
-    private String newPassword;
+    private String password;
 }
