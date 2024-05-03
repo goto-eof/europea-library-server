@@ -127,7 +127,8 @@ how it works.
 
 ## Technologies
 
-Java • Spring Boot • Spring Batch • Spring Security • Spring JPA • Queryds • Hibernate • Feign • Liquibase • PostgreSQL
+Java • Spring Boot • Spring Batch • Spring Security • Spring Email Starter • Apache FreeMarker • Spring JPA • Queryds •
+Hibernate • Feign • Liquibase • PostgreSQL
 • Docker • epublib • pdfbox • Google ZXing
 
 ## External services
