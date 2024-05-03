@@ -39,8 +39,11 @@ public class User extends ModelCommon {
     @Column(name = "recovery_key")
     private String recoveryKey;
 
-    @Column(name = "recovery_expiration")
-    private LocalDateTime recoveryExpiration;
+    @Column(name = "recovery_expiration_timestamp")
+    private LocalDateTime recoveryExpirationTimestamp;
+
+    @Column(name = "recovery_request_timestamp")
+    private LocalDateTime recoveryRequestTimestamp;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST})
     private List<Authority> authorityList;

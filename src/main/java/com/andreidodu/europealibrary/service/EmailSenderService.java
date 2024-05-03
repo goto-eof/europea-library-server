@@ -5,5 +5,5 @@ import org.springframework.scheduling.annotation.Async;
 
 public interface EmailSenderService {
     @Async
-    OperationStatusDTO sendPasswordRecoveryEmail(String title, String mailTo, String message);
+    OperationStatusDTO sendPasswordRecoveryEmail(String title, String mailFrom, String mailTo, String message);
 }

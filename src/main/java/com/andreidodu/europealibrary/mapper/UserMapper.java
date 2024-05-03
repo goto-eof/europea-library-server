@@ -13,8 +13,8 @@ public abstract class UserMapper {
 
     @Mapping(ignore = true, target = "password")
     @Mapping(ignore = true, target = "enabled")
-    @Mapping(ignore = true, target = "recoveryExpiration")
     @Mapping(ignore = true, target = "recoveryKey")
+    @Mapping(ignore = true, target = "recoveryExpirationTimestamp")
     public abstract User toModel(UserDTO dto);
 
     public abstract UserDTO toDTO(User model);

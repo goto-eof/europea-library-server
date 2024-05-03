@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +19,7 @@ public class AuthUserDTO implements UserDetails {
     private String username;
     private String password;
     private boolean enabled;
+    private LocalDateTime recoveryRequestTimestamp;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

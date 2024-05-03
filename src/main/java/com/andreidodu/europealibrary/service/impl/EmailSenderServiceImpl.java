@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.service.impl;
 
-import com.andreidodu.europealibrary.config.EmailConfigurationProperties;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.service.EmailSenderService;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +15,13 @@ import org.springframework.stereotype.Service;
 public class EmailSenderServiceImpl implements EmailSenderService {
 
     final private JavaMailSender javaMailSender;
-    final private EmailConfigurationProperties emailConfigurationProperties;
 
     @Async
     @Override
-    public OperationStatusDTO sendPasswordRecoveryEmail(String title, String mailTo, String message) {
+    public OperationStatusDTO sendPasswordRecoveryEmail(String title, String mailFrom, String mailTo, String message) {
         log.debug("sending email to: {}", mailTo);
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom(emailConfigurationProperties.getUsername());
+        simpleMailMessage.setFrom(mailFrom);
         simpleMailMessage.setSubject(title);
         simpleMailMessage.setTo(mailTo);
         simpleMailMessage.setText(message);
