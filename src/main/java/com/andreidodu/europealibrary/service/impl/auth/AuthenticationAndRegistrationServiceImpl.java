@@ -29,10 +29,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -145,10 +147,37 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
 
     @Override
     public OperationStatusDTO sendPasswordRecoveryEmail(String email) {
-        // generate unique hash recovery string or retrieve the not expired one
-        // send email
-        // return true
-        return null;
+        Assert.notNull(email, "email could not be empty");
+
+        Optional<User> userOptional = this.userRepository.findByEmail(email);
+        User user = userOptional.orElseThrow(() -> new ValidationException("User does not exists"));
+
+        LocalDateTime recoveryRequestLocalDateTime = user.getRecoveryRequestTimestamp();
+        if (recoveryRequestLocalDateTime != null && ChronoUnit.MINUTES.between(recoveryRequestLocalDateTime, LocalDateTime.now()) < 1) {
+            return new OperationStatusDTO(false, "It is necessary to wait at least 1 minute");
+        }
+
+        String recoveryKey = generateRandomUUID();
+
+        updateUsersRecoveryKey(user, recoveryKey);
+
+        this.emailSenderService.sendPasswordRecoveryEmail("Europea Library Password Recovery Link", "andrei@andrei.it", email, "Hello, this is your one-shot key: " + recoveryKey);
+
+        return new OperationStatusDTO(true, "email sent");
+    }
+
+    private static String generateRandomUUID() {
+        UUID uuid = UUID.randomUUID();
+        String recoveryKey = uuid.toString();
+        return recoveryKey;
+    }
+
+    private void updateUsersRecoveryKey(User user, String recoveryKey) {
+        LocalDateTime now = LocalDateTime.now();
+        user.setRecoveryKey(recoveryKey);
+        user.setRecoveryRequestTimestamp(now);
+        user.setRecoveryExpirationTimestamp(now.minusMinutes(1));
+        userRepository.save(user);
     }
 
     @Override

@@ -9,6 +9,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -18,15 +21,22 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
     @Async
     @Override
-    public OperationStatusDTO sendPasswordRecoveryEmail(String title, String mailFrom, String mailTo, String message) {
+    public Future<OperationStatusDTO> sendPasswordRecoveryEmail(String title, String mailFrom, String mailTo, String message) {
         log.debug("sending email to: {}", mailTo);
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(mailFrom);
         simpleMailMessage.setSubject(title);
         simpleMailMessage.setTo(mailTo);
         simpleMailMessage.setText(message);
-        this.javaMailSender.send(simpleMailMessage);
+
+        try {
+            this.javaMailSender.send(simpleMailMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.debug("mail sent");
+            return CompletableFuture.completedFuture(new OperationStatusDTO(false, "Mail NOT sent"));
+        }
         log.debug("mail sent");
-        return new OperationStatusDTO(true, "Mail sent");
+        return CompletableFuture.completedFuture(new OperationStatusDTO(true, "Mail sent"));
     }
 }
