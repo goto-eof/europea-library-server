@@ -1,14 +1,15 @@
 package com.andreidodu.europealibrary.util;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
-import com.andreidodu.europealibrary.model.auth.Authority;
-import com.andreidodu.europealibrary.model.auth.User;
-import com.andreidodu.europealibrary.repository.auth.RoleRepository;
-import com.andreidodu.europealibrary.repository.auth.UserRepository;
+import com.andreidodu.europealibrary.model.security.Authority;
+import com.andreidodu.europealibrary.model.security.User;
+import com.andreidodu.europealibrary.repository.security.RoleRepository;
+import com.andreidodu.europealibrary.repository.security.UserRepository;
 import com.andreidodu.europealibrary.service.CacheLoaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class PostApplicationRunUtil {
     private final CacheLoaderService cacheLoaderService;
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder bCryptPasswordEncoder;
     private final RoleRepository roleRepository;
     @Value("${com.andreidodu.europea-library.default-admin-username}")
     private String defaultAdminUsername;

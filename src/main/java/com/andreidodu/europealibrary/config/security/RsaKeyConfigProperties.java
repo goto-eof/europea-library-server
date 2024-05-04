@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.config.auth;
+package com.andreidodu.europealibrary.config.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

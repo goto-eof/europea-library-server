@@ -27,11 +27,15 @@ public abstract class FileSystemItemMapper {
 
     @Mapping(ignore = true, target = "childrenList")
     @Mapping(ignore = true, target = "parent")
+    @Mapping(source = "fileMetaInfo.bookInfo.averageRating", target = "averageRating")
+    @Mapping(source = "fileMetaInfo.bookInfo.ratingsCount", target = "ratingsCount")
     public abstract FileSystemItemDTO toDTOWithoutChildrenAndParent(FileSystemItem model);
 
     @Named(value = "parentToDTO")
     @Mapping(ignore = true, target = "childrenList")
     @Mapping(target = "parent", source = "parent", qualifiedByName = "parentToDTO")
+    @Mapping(source = "fileMetaInfo.bookInfo.averageRating", target = "averageRating")
+    @Mapping(source = "fileMetaInfo.bookInfo.ratingsCount", target = "ratingsCount")
     public abstract FileSystemItemDTO toDTOParent(FileSystemItem model);
 
     @Named("toDTOWithChildAndParent")

@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary;
 
-import com.andreidodu.europealibrary.config.auth.RsaKeyConfigProperties;
+import com.andreidodu.europealibrary.config.security.RsaKeyConfigProperties;
 import com.andreidodu.europealibrary.util.PostApplicationRunUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;

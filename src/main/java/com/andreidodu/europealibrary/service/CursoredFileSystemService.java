@@ -38,4 +38,7 @@ public interface CursoredFileSystemService {
     List<ItemAndFrequencyDTO> retrieveAllPublishedDates();
 
     GenericCursoredResponseDTO<String> retrieveByPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
+
+    GenericCursoredResponseDTO<String>  readDirectoryByRating(CursorRequestDTO cursorRequestDTO);
+
 }

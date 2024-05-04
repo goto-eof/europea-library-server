@@ -1,8 +1,7 @@
-package com.andreidodu.europealibrary.dto.auth;
+package com.andreidodu.europealibrary.dto.security;
 
 import com.andreidodu.europealibrary.constants.RegexConst;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 

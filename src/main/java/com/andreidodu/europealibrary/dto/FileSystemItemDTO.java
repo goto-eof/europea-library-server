@@ -7,5 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FileSystemItemDTO extends CommonFileSystemItemDTO {
-
+    private Double averageRating;
+    private Long ratingsCount;
 }

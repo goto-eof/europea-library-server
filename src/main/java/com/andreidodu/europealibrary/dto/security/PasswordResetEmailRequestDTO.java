@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.dto.auth;
+package com.andreidodu.europealibrary.dto.security;
 
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

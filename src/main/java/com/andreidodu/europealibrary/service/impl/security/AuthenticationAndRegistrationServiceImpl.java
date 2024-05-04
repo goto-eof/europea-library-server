@@ -1,13 +1,13 @@
-package com.andreidodu.europealibrary.service.impl.auth;
+package com.andreidodu.europealibrary.service.impl.security;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.auth.*;
+import com.andreidodu.europealibrary.dto.security.*;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.AuthorityMapper;
-import com.andreidodu.europealibrary.model.auth.Authority;
-import com.andreidodu.europealibrary.model.auth.User;
-import com.andreidodu.europealibrary.repository.auth.UserRepository;
+import com.andreidodu.europealibrary.model.security.Authority;
+import com.andreidodu.europealibrary.model.security.User;
+import com.andreidodu.europealibrary.repository.security.UserRepository;
 import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
 import com.andreidodu.europealibrary.service.EmailSenderService;
 import com.andreidodu.europealibrary.util.StringUtil;

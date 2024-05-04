@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.model.auth;
+package com.andreidodu.europealibrary.model.security;
 
 import com.andreidodu.europealibrary.model.common.ModelCommon;
 import com.fasterxml.jackson.annotation.JsonIgnore;

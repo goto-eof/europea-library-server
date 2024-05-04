@@ -1,13 +1,13 @@
 package com.andreidodu.europealibrary.resource;
 
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.auth.AuthRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.AuthResponseDTO;
-import com.andreidodu.europealibrary.dto.auth.ChangePasswordRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.PasswordResetEmailRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.PasswordResetRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.RegistrationRequestDTO;
-import com.andreidodu.europealibrary.dto.auth.UserDTO;
+import com.andreidodu.europealibrary.dto.security.AuthRequestDTO;
+import com.andreidodu.europealibrary.dto.security.AuthResponseDTO;
+import com.andreidodu.europealibrary.dto.security.ChangePasswordRequestDTO;
+import com.andreidodu.europealibrary.dto.security.PasswordResetEmailRequestDTO;
+import com.andreidodu.europealibrary.dto.security.PasswordResetRequestDTO;
+import com.andreidodu.europealibrary.dto.security.RegistrationRequestDTO;
+import com.andreidodu.europealibrary.dto.security.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

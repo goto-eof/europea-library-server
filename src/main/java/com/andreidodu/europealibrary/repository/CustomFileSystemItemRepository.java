@@ -10,6 +10,7 @@ import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.model.ItemAndFrequencyProjection;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CustomFileSystemItemRepository {
     List<FileSystemItem> retrieveChildrenByCursor(CursorRequestDTO cursorRequestDTO);
@@ -35,4 +36,6 @@ public interface CustomFileSystemItemRepository {
     List<ItemAndFrequencyProjection> retrievePublishedDatesInfo();
 
     List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
+
+    List<FileSystemItem> retrieveChildrenByCursoredRating(CursorRequestDTO cursorRequestDTO);
 }

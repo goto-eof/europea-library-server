@@ -89,4 +89,9 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
         return ResponseEntity.ok(cursoredFileSystemService.search(searchFileSystemItemRequestDTO));
     }
 
+    @Override
+    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByRating(CursorRequestDTO cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.readDirectoryByRating(cursorRequestDTO));
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.service;
 
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.auth.*;
+import com.andreidodu.europealibrary.dto.security.*;
 
 public interface AuthenticationAndRegistrationService {
     AuthResponseDTO login(AuthRequestDTO authRequestDTO);

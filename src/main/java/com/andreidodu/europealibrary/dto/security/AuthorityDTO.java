@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.dto.auth;
+package com.andreidodu.europealibrary.dto.security;
 
 
 import lombok.Getter;

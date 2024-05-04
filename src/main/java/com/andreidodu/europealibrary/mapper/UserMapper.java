@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.mapper;
 
-import com.andreidodu.europealibrary.dto.auth.UserDTO;
-import com.andreidodu.europealibrary.model.auth.User;
+import com.andreidodu.europealibrary.dto.security.UserDTO;
+import com.andreidodu.europealibrary.model.security.User;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

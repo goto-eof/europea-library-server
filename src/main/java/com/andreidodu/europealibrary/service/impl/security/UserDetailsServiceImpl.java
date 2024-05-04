@@ -1,8 +1,8 @@
-package com.andreidodu.europealibrary.service.impl.auth;
+package com.andreidodu.europealibrary.service.impl.security;
 
 
 import com.andreidodu.europealibrary.mapper.AuthUserMapper;
-import com.andreidodu.europealibrary.repository.auth.UserRepository;
+import com.andreidodu.europealibrary.repository.security.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

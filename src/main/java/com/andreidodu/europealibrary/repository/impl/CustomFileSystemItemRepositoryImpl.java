@@ -416,4 +416,27 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .fetch();
     }
 
+    @Override
+    public List<FileSystemItem> retrieveChildrenByCursoredRating(CursorRequestDTO cursorRequestDTO) {
+        Long cursorId = cursorRequestDTO.getNextCursor();
+
+        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+
+        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        if (cursorId != null) {
+            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
+        }
+
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(fileSystemItem)
+                .from(fileSystemItem)
+                .where(booleanBuilder)
+                .limit(numberOfResults + 1)
+                .orderBy(fileSystemItem.fileMetaInfo.bookInfo.averageRating.desc())
+                .fetch();
+    }
+
 }

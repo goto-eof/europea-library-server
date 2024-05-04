@@ -237,4 +237,30 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
         return cursoredTagDTO;
     }
 
+    @Override
+    public GenericCursoredResponseDTO<String> readDirectoryByRating(CursorRequestDTO cursorRequestDTO) {
+        return Optional.ofNullable(cursorRequestDTO.getParentId())
+                .map(id -> this.manageCaseListByRatingIdProvided(cursorRequestDTO))
+                .orElse(manageCaseListByRatingNoIdProvided());
+    }
+
+    private GenericCursoredResponseDTO<String> manageCaseListByRatingIdProvided(CursorRequestDTO cursorRequestDTO) {
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredRating(cursorRequestDTO);
+        GenericCursoredResponseDTO<String> cursoredTagDTO = new GenericCursoredResponseDTO<>();
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        cursoredTagDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+                .ifPresent(cursoredTagDTO::setNextCursor);
+        cursoredTagDTO.setParent("by rating");
+        return cursoredTagDTO;
+    }
+
+    private GenericCursoredResponseDTO<String> manageCaseListByRatingNoIdProvided() {
+        var cursoredRequest = new CursorRequestDTO();
+        cursoredRequest.setLimit(ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        return this.manageCaseListByRatingIdProvided(cursoredRequest);
+    }
+
 }

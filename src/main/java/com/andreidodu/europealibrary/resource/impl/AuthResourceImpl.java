@@ -2,7 +2,7 @@ package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.resource.AuthResource;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.auth.*;
+import com.andreidodu.europealibrary.dto.security.*;
 import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

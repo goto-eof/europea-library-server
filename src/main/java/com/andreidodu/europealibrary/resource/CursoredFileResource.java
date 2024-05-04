@@ -61,4 +61,8 @@ public interface CursoredFileResource {
 
     @PostMapping("/cursored/search")
     ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(@RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
+
+    @PostMapping("/cursored/rating")
+    ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByRating(@RequestBody CursorRequestDTO cursorRequestDTO);
+
 }

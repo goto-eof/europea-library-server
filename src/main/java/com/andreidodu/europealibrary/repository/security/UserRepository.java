@@ -1,8 +1,7 @@
-package com.andreidodu.europealibrary.repository.auth;
+package com.andreidodu.europealibrary.repository.security;
 
-import com.andreidodu.europealibrary.model.auth.User;
+import com.andreidodu.europealibrary.model.security.User;
 import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
