@@ -430,12 +430,14 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
 
+        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.averageRating.isNotNull());
+
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
                 .from(fileSystemItem)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
-                .orderBy(fileSystemItem.fileMetaInfo.bookInfo.averageRating.desc())
+                .orderBy(fileSystemItem.fileMetaInfo.bookInfo.averageRating.desc(), fileSystemItem.fileMetaInfo.bookInfo.ratingsCount.desc())
                 .fetch();
     }
 
