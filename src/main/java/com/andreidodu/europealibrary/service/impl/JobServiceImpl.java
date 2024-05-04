@@ -54,7 +54,25 @@ public class JobServiceImpl implements JobService {
     @Override
     public OperationStatusDTO isRunning() {
         final boolean isLocked = this.applicationSettingsService.isApplicationLocked();
-        return new OperationStatusDTO(isLocked, isLocked ? "job is running" : "job is not running");
+        String stepName = "";
+        if (isLocked) {
+            stepName = this.jobExplorer.findJobInstancesByJobName(JobConst.JOB_INDEXER_NAME, 0, 1000000)
+                    .stream()
+                    .map(jobInstance -> this.jobExplorer.getJobExecutions(jobInstance)
+                            .stream()
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .map(jobExecution -> jobExecution.getStepExecutions()
+                                    .stream()
+                                    .filter(step -> step.getStatus().isRunning())
+                                    .map(StepExecution::getStepName)
+                                    .findFirst()
+                                    .orElseGet(() -> ""))
+                            .orElseGet(() -> ""))
+                    .findFirst()
+                    .orElseGet(() -> "");
+        }
+        return new OperationStatusDTO(isLocked, isLocked ? "Job is running. Current step: " + stepName : "job is not running");
     }
 
     @Override
