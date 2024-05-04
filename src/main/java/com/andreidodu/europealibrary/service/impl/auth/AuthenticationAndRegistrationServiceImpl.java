@@ -5,14 +5,12 @@ import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.auth.*;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.AuthorityMapper;
-import com.andreidodu.europealibrary.mapper.UserMapper;
 import com.andreidodu.europealibrary.model.auth.Authority;
 import com.andreidodu.europealibrary.model.auth.User;
 import com.andreidodu.europealibrary.repository.auth.UserRepository;
 import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
 import com.andreidodu.europealibrary.service.EmailSenderService;
 import com.andreidodu.europealibrary.util.StringUtil;
-import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +46,6 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
-    private final UserMapper userMapper;
     private final AuthorityMapper authorityMapper;
     private final EmailSenderService emailSenderService;
 
@@ -144,9 +141,9 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
 
     @Override
     public OperationStatusDTO changePassword(String name, ChangePasswordRequestDTO changePasswordRequestDTO) {
-        Assert.notNull(changePasswordRequestDTO, "payload could not be empty");
-        Assert.notNull(changePasswordRequestDTO.getOldPassword(), "old password could not be empty");
-        Assert.notNull(changePasswordRequestDTO.getNewPassword(), "new password could not be empty");
+        assertNotEmpty(changePasswordRequestDTO, "payload could not be empty");
+        assertNotEmpty(changePasswordRequestDTO.getOldPassword(), "old password could not be empty");
+        assertNotEmpty(changePasswordRequestDTO.getNewPassword(), "new password could not be empty");
 
         if (changePasswordRequestDTO.getOldPassword().equals(changePasswordRequestDTO.getNewPassword())) {
             return new OperationStatusDTO(false, "passwords matches");
@@ -172,7 +169,7 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
 
     @Override
     public OperationStatusDTO sendPasswordRecoveryEmail(String email) {
-        Assert.notNull(email, "email could not be empty");
+        assertNotEmpty(email, "email could not be empty");
 
         Optional<User> userOptional = this.userRepository.findByEmail(email);
         User user = userOptional.orElseThrow(() -> new ValidationException("User does not exists"));
@@ -184,7 +181,7 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
 
         String recoveryKey = generateRandomUUID();
 
-        updateUsersRecoveryKey(user, recoveryKey);
+        updateUsersResetToken(user, recoveryKey);
 
         this.emailSenderService.sendPasswordRecoveryEmail(passwordResetMailTitle, passwordresetMailFrom, email, passwordResetMailBody + " " + clientUrl + clientResetPasswordEndpoint + "/" + recoveryKey);
 
@@ -196,7 +193,7 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         return uuid.toString();
     }
 
-    private void updateUsersRecoveryKey(User user, String recoveryKey) {
+    private void updateUsersResetToken(User user, String recoveryKey) {
         LocalDateTime now = LocalDateTime.now();
         user.setResetToken(recoveryKey);
         user.setRecoveryRequestTimestamp(now);
@@ -205,12 +202,12 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
 
     @Override
     public OperationStatusDTO passwordReset(PasswordResetRequestDTO passwordResetRequestDTO) {
-        Assert.notNull(passwordResetRequestDTO, "payload could not be empty");
-        Assert.notNull(passwordResetRequestDTO.getResetToken(), "token could not be empty");
-        Assert.notNull(passwordResetRequestDTO.getPassword(), "password could not be empty");
+        assertNotEmpty(passwordResetRequestDTO, "payload could not be empty");
+        assertNotEmpty(passwordResetRequestDTO.getResetToken(), "token could not be empty");
+        assertNotEmpty(passwordResetRequestDTO.getPassword(), "password could not be empty");
 
         User user = this.userRepository.findByResetToken(passwordResetRequestDTO.getResetToken())
-                .orElseThrow(() -> new ValidationException("user not found"));
+                .orElseThrow(() -> new ValidationException("token does not exists"));
 
         LocalDateTime recoveryRequestLocalDateTime = user.getRecoveryRequestTimestamp();
         if (recoveryRequestLocalDateTime != null && ChronoUnit.MINUTES.between(recoveryRequestLocalDateTime, LocalDateTime.now()) > passwordResetTokenTtlMinutes) {
@@ -218,6 +215,7 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         }
 
         user.setPassword(this.passwordEncoder.encode(passwordResetRequestDTO.getPassword()));
+        user.setResetToken(null);
         this.userRepository.save(user);
 
         return new OperationStatusDTO(true, "password updated successfully");
@@ -252,9 +250,22 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
     }
 
     private static void validateInput(RegistrationRequestDTO registrationRequestDTO) {
-        Assert.notNull(registrationRequestDTO, "payload could not be empty");
-        Assert.notNull(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getUsername()), "username could not be empty");
-        Assert.notNull(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getEmail()), "email could not be empty");
-        Assert.notNull(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getPassword()), "password could not be empty");
+        assertNotEmpty(registrationRequestDTO, "payload could not be empty");
+        assertNotEmpty(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getUsername()), "username could not be empty");
+        assertNotEmpty(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getEmail()), "email could not be empty");
+        assertNotEmpty(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getPassword()), "password could not be empty");
+    }
+
+
+    public static <T> void assertNotEmpty(T t, String message) {
+        if (t == null) {
+            throw new ValidationException(message);
+        }
+    }
+
+    public static <T extends String> void assertNotEmpty(T t, String message) {
+        if (t == null || t.trim().equalsIgnoreCase("")) {
+            throw new ValidationException(message);
+        }
     }
 }

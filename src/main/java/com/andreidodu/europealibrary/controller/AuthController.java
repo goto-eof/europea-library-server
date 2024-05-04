@@ -43,7 +43,12 @@ public class AuthController {
 
     @PostMapping("/password/change")
     public ResponseEntity<OperationStatusDTO> changePassword(@Valid @RequestBody ChangePasswordRequestDTO changePasswordRequestDTO, Authentication authentication) {
-        return ResponseEntity.ok(this.authenticationAndRegistrationService.changePassword(authentication.getName(), changePasswordRequestDTO));
+        return Optional.ofNullable(authentication)
+                .map(auth -> {
+                    OperationStatusDTO operationStatusDTO = this.authenticationAndRegistrationService.changePassword(authentication.getName(), changePasswordRequestDTO);
+                    return ResponseEntity.ok(operationStatusDTO);
+                })
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     @PostMapping("/password/reset/sendEmail")
