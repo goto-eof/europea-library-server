@@ -116,6 +116,7 @@ the job is already running then it will continue to process files and no other j
 - edit e-book information (only administrator is able to do this);
 - generate e-book URL QR Code;
 - login/register to the system and change password (2 categories of user: ADMINISTRATOR and USER);
+- password reset
 - bulk category/tag/language/publisher name change  (only administrator is able to do this);
 - control panel (administration for admin, profile and security for all users).
 
