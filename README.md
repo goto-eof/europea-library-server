@@ -21,7 +21,7 @@
                                                                           SERVER
 ```
 
-# Europea Library (server - Work In Progress)
+# Europea Library (server)
 
 A library web application that allows to index, edit, explore, retrieve information about books from file metadata/web (
 by using
