@@ -133,8 +133,7 @@ how it works.
 ## Technologies
 
 Java • Spring Boot • Spring Batch • Spring Security • Spring Email Starter • Apache FreeMarker • Spring JPA • Queryds •
-Hibernate • Feign • Liquibase • PostgreSQL
-• Docker • epublib • pdfbox • Google ZXing
+Hibernate • Feign • Liquibase • PostgreSQL • Swagger (OpenAPI) • Docker • epublib • pdfbox • Google ZXing
 
 ## External services
 
