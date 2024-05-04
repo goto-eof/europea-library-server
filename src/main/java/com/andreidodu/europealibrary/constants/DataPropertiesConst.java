@@ -9,4 +9,6 @@ public interface DataPropertiesConst {
     int BOOK_INFO_PUBLISHER_MAX_LENGTH = 100;
     int BOOK_INFO_PUBLISHED_DATE_MAX_LENGTH = 50;
     int FILE_META_INFO_TITLE_MAX_LENGTH = 512;
+
+
 }

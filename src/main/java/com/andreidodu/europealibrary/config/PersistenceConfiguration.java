@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.config;
 
+import com.andreidodu.europealibrary.constants.PersistenceConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -19,7 +20,7 @@ import java.util.Objects;
 @Configuration
 @EnableJpaAuditing
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = {"com.andreidodu.europealibrary.repository"})
+@EnableJpaRepositories(basePackages = {PersistenceConst.JPA_REPOSITORIES_PACKAGE})
 @RequiredArgsConstructor
 public class PersistenceConfiguration {
     private final BatchDbConfig batchDbConfig;
