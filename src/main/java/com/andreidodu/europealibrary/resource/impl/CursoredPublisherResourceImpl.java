@@ -1,9 +1,10 @@
-package com.andreidodu.europealibrary.controller;
+package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.ItemAndFrequencyDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.RenameDTO;
+import com.andreidodu.europealibrary.resource.CursoredPublisherResource;
 import com.andreidodu.europealibrary.service.BookInfoService;
 import com.andreidodu.europealibrary.service.impl.CursoredFileSystemServiceImpl;
 import jakarta.validation.Valid;
@@ -16,21 +17,19 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/publishedDate")
 @RequiredArgsConstructor
-public class CursoredPublishedDateController {
-    private final CursoredFileSystemServiceImpl cursoredFileSystemService;
+public class CursoredPublisherResourceImpl implements CursoredPublisherResource {
+    private final CursoredFileSystemServiceImpl service;
     private final BookInfoService bookInfoService;
 
 
-    @GetMapping
-    public ResponseEntity<List<ItemAndFrequencyDTO>> retrievePublishedDateCursored() {
-        return ResponseEntity.ok(this.cursoredFileSystemService.retrieveAllPublishedDates());
+    @Override
+    public ResponseEntity<List<ItemAndFrequencyDTO>> retrievePublishersCursored() {
+        return ResponseEntity.ok(this.service.retrieveAllPublishers());
     }
 
-    @AllowOnlyAdministrator
-    @PostMapping("/rename")
-    public ResponseEntity<OperationStatusDTO> bulkPublishedDateRename(@Valid @RequestBody RenameDTO renameDTO) {
-        return ResponseEntity.ok(this.bookInfoService.bulkPublishedDateRename(renameDTO));
+    @Override
+    public ResponseEntity<OperationStatusDTO> bulkPublisherRename(@Valid @RequestBody RenameDTO renameDTO) {
+        return ResponseEntity.ok(this.bookInfoService.bulkPublisherRename(renameDTO));
     }
 }

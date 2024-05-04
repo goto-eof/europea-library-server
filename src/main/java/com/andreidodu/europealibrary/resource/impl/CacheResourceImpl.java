@@ -1,7 +1,8 @@
-package com.andreidodu.europealibrary.controller;
+package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.resource.CacheResource;
 import com.andreidodu.europealibrary.service.CacheLoaderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,13 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/cache")
 @RequiredArgsConstructor
-public class CacheController {
+public class CacheResourceImpl implements CacheResource {
     final private CacheLoaderService cacheLoaderService;
 
-    @AllowOnlyAdministrator
-    @GetMapping("/reload")
+    @Override
     public ResponseEntity<OperationStatusDTO> reloadCache() throws Exception {
         this.cacheLoaderService.reload();
         return ResponseEntity.ok(new OperationStatusDTO(true, "cache reloaded"));

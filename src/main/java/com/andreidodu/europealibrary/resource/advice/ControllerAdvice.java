@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.controller.advice;
+package com.andreidodu.europealibrary.resource.advice;
 
 import com.andreidodu.europealibrary.dto.HttpErrorDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;

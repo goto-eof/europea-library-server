@@ -101,6 +101,10 @@ completed all steps, the API becomes available for queries, so that the client a
 otherwise an HTTP 404 status is returned). Moreover, the indexer job starts every night at 11:00 PM (configurable). If
 the job is already running then it will continue to process files and no other job will run.
 
+# API documentation
+
+The API documentation can be accessed here: http://localhost:8081/swagger-ui/index.html
+
 ## Features
 
 - index and catalog large digital books collection quickly;

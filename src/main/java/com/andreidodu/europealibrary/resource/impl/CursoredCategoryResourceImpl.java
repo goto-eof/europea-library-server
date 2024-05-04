@@ -1,7 +1,8 @@
-package com.andreidodu.europealibrary.controller;
+package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.resource.CursoredCategoryResource;
 import com.andreidodu.europealibrary.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,18 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/category")
 @RequiredArgsConstructor
-public class CursoredCategoryController {
+public class CursoredCategoryResourceImpl implements CursoredCategoryResource {
     private final CategoryService categoryService;
 
-    @PostMapping
+    @Override
     public ResponseEntity<CursorDTO<CategoryDTO>> retrieveCategories(@RequestBody CommonCursoredRequestDTO commonCursoredRequestDTO) {
         return ResponseEntity.ok(this.categoryService.retrieveAllCategories(commonCursoredRequestDTO));
     }
 
-    @AllowOnlyAdministrator
-    @PostMapping("/rename")
+    @Override
     public ResponseEntity<OperationStatusDTO> bulkCategoryRename(@Valid @RequestBody RenameDTO renameDTO) {
         return ResponseEntity.ok(this.categoryService.bulkRename(renameDTO));
     }

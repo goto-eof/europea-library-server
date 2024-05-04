@@ -43,9 +43,11 @@ spring:
   servlet:
     multipart:
       enabled: false
-
 server:
   port: 8081
+springdoc:
+  api-docs:
+    path: "/api-docs"
 com:
   andreidodu:
     europea-library:

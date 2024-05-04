@@ -1,7 +1,8 @@
-package com.andreidodu.europealibrary.controller;
+package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAuthenticatedUsers;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.resource.CursoredFileResource;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,63 +16,61 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v2/file")
 @RequiredArgsConstructor
-public class CursoredFileController {
+public class CursoredFileResourceImpl implements CursoredFileResource {
     final private CursoredFileSystemService cursoredFileSystemService;
 
-    @GetMapping("/{fileSystemItemId}")
+    @Override
     public ResponseEntity<FileSystemItemDTO> get(@PathVariable Long fileSystemItemId) {
         return ResponseEntity.ok(cursoredFileSystemService.get(fileSystemItemId));
     }
 
-    @PostMapping("/cursored")
+    @Override
     public ResponseEntity<CursoredFileSystemItemDTO> retrieveCursored(@RequestBody CursorRequestDTO cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.readDirectory(cursorRequestDTO));
     }
 
-    @GetMapping("/cursored")
+    @Override
     public ResponseEntity<CursoredFileSystemItemDTO> retrieveCursoredRoot() {
         return ResponseEntity.ok(cursoredFileSystemService.readDirectory());
     }
 
-    @PostMapping("/cursored/category")
+    @Override
     public ResponseEntity<CursoredCategoryDTO> retrieveByCategoryId(@RequestBody CursorRequestDTO cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByCategoryId(cursorRequestDTO));
     }
 
-    @PostMapping("/cursored/tag")
+    @Override
     public ResponseEntity<CursoredTagDTO> retrieveByTagId(@RequestBody CursorRequestDTO cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByTagId(cursorRequestDTO));
     }
 
-    @PostMapping("/cursored/language")
+    @Override
     public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByLanguage(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByLanguage(cursorRequestDTO));
     }
 
-    @PostMapping("/cursored/publishedDate")
+    @Override
     public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublishedDate(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublishedDate(cursorRequestDTO));
     }
 
-    @PostMapping("/cursored/publisher")
+    @Override
     public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublisher(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublisher(cursorRequestDTO));
     }
 
-    @PostMapping("/cursored/extension")
+    @Override
     public ResponseEntity<CursoredFileExtensionDTO> retrieveCursoredByFileExtension(@RequestBody CursorTypeRequestDTO cursorTypeRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByFileExtension(cursorTypeRequestDTO));
     }
 
-    @GetMapping("/extension")
+    @Override
     public ResponseEntity<List<FileExtensionDTO>> retrieveFileExtensions() {
         return ResponseEntity.ok(cursoredFileSystemService.getAllExtensions());
     }
 
-    @AllowOnlyAuthenticatedUsers
-    @GetMapping(path = "/download/{fileSystemItemId}")
+    @Override
     public ResponseEntity<InputStreamResource> download(@PathVariable Long fileSystemItemId) {
         DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(fileSystemItemId);
 
@@ -85,7 +84,7 @@ public class CursoredFileController {
                 .body(download.getInputStreamResource());
     }
 
-    @PostMapping("/cursored/search")
+    @Override
     public ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(@RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.search(searchFileSystemItemRequestDTO));
     }
