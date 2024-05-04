@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.resource.impl;
 
-import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAuthenticatedUsers;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.resource.CursoredFileResource;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;

@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.resource;
 
-import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
+import com.andreidodu.europealibrary.annotation.security.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

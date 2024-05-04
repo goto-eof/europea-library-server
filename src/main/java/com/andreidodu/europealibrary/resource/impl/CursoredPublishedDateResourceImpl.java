@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.resource.impl;
 
-import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.ItemAndFrequencyDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.RenameDTO;

@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.annotation.auth;
+package com.andreidodu.europealibrary.annotation.security;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('" + AuthConst.AUTHORITY_SCOPE_ADMINISTRATOR + "')")
-public @interface AllowOnlyAdministrator {
+@PreAuthorize("hasAnyAuthority('" + AuthConst.AUTHORITY_SCOPE_USER + "','" + AuthConst.AUTHORITY_SCOPE_ADMINISTRATOR + "')")
+public @interface AllowOnlyAuthenticatedUsers {
 }

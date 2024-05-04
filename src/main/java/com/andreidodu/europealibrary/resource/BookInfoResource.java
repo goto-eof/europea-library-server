@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.resource;
 
-import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAdministrator;
+import com.andreidodu.europealibrary.annotation.security.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;

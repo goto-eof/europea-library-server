@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.resource;
 
-import com.andreidodu.europealibrary.annotation.auth.AllowOnlyAuthenticatedUsers;
+import com.andreidodu.europealibrary.annotation.security.AllowOnlyAuthenticatedUsers;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.CursorTypeRequestDTO;
 import com.andreidodu.europealibrary.dto.CursoredCategoryDTO;
