@@ -1,0 +1,156 @@
+spring:
+  mail:
+    port: 25
+    # this is a test server, please change it
+    host: smtp.freesmtpservers.com
+    protocol: smtp
+    defaultEncoding: UTF-8
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: false
+          auth: false
+          socketFactory:
+            fallback: false
+          ssl:
+            enable: false
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+  mvc:
+    dispatch-options-request: true
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5439/europea_library
+    username: postgres
+    password: postgres
+    testOnBorrow: true
+    timeBetweenEvictionRunsMillis: 60000
+    validationQuery: SELECT 1
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:/database/db.changelog.xml
+    enabled: true
+  servlet:
+    multipart:
+      enabled: false
+
+server:
+  port: 8081
+com:
+  andreidodu:
+    europea-library:
+      rsa:
+        private-key: classpath:certs/private-key.pem
+        public-key: classpath:certs/public-key.pem
+      allowed-urls-when-job-is-running: /api/v1/job/indexer/stop,/api/v1/job/indexer/isRunning,/api/v1/auth/login,/api/v1/auth/me,/api/v1/auth/register,/api/v1/auth/changePassword
+      transaction-timeout-milliseconds: 60000
+      qr-code-path: /your/path
+      default-admin-username: admin
+      default-admin-email: admin@admin.com
+      default-admin-password: Password_1
+      core-pool-size: 6
+      max-pool-size: 12
+      batch-db:
+        url: jdbc:postgresql://localhost:5439/europea_library
+        username: postgres
+        password: postgres
+      google:
+        books:
+          query-url: https://www.googleapis.com/books/v1/volumes
+          api_key:
+      client:
+        url: http://localhost:4200
+        view-book-info-endpoint: /file-info
+        reset-password-endpoint: /password/reset
+      password:
+        reset:
+          minutes-to-wait-for-another-attempt: 1
+          token:
+            ttl:
+              minutes: 3600
+          mail:
+            from: europea@library.application
+            title: Europea Library Password Reset Link
+            body: "Hello, click on the following link in order to reset your Europea Library password:"
+      task:
+        indexer:
+          cron:
+            expression: "0 0 0 * * ?"
+      job:
+        indexer:
+          # the directory that contains all your e-book which need to be indexed
+          e-books-directory: "/your/path/e-books/directory"
+          avoid-duplicate-meta-info: true
+          step-indexer:
+            ignore-empty-directories: true
+            force-load-meta-info-from-web: false
+            override-meta-info: false
+            # will be skipped by strategy
+            do-not-extract-metadata-from-file-extensions:
+            # file will be skipped and not stored on db
+            skip-file-extensions:
+            # file will be taken in consideration and stored on db
+            allow-file-extensions:
+            # disables the strategy
+            disable-epub-metadata-extractor: false
+            # disables the strategy
+            disable-pdf-metadata-extractor: false
+            batch-size: 100
+          step-parent-associator-step:
+            batch-size: 100
+          step-file-hash-updater:
+            batch-size: 100
+          step-meta-info-writer:
+            disable-isbn-extractor: false
+            batch-size: 100
+          step-tag-writer:
+            batch-size: 100
+          meta-info-tag-associator:
+            batch-size: 100
+          step-ext-meta-info-writer:
+            high-matching-level: true
+            batch-size: 1
+          book-info-category-associator:
+            batch-size: 100
+          step-category-writer:
+            batch-size: 100
+          step-step-updater:
+            batch-size: 100
+          step-fmi-obsolete-deleter:
+            batch-size: 100
+          step-fsi-obsolete-deleter:
+            batch-size: 100
+          step-tag-obsolete-deleter:
+            batch-size: 100
+          step-category-obsolete-deleter:
+            batch-size: 100
+logging:
+  file:
+    name: /your/path/europea-library.log
+  level:
+    com:
+      andreidodu: ERROR
+    org:
+      springframework: INFO
+      apache:
+        pdfbox: OFF
+        fontbox: OFF
+    nl:
+      siegmann:
+        epublib: OFF
+logging.level.org.hibernate: ERROR #info
+logging.level.org.hibernate.SQL: ERROR #debug
+logging.level.org.hibernate.orm.jdbc.bind: ERROR # trace
+logging.level.org.hibernate.stat: ERROR # debug
+logging.level.org.hibernate.SQL_SLOW: ERROR # info
+logging.level.org.hibernate.cache: ERROR #debug

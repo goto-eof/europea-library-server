@@ -64,6 +64,7 @@ public class JobServiceImpl implements JobService {
                 .anyMatch(jobInstance -> this.jobExplorer.getJobExecutions(jobInstance)
                         .stream().filter(Objects::nonNull)
                         .anyMatch(this::stopJobIfIsRunning));
+        this.applicationSettingsService.unlockApplication();
         return new OperationStatusDTO(result, result ? "Job stopped" : "Job not running");
     }
 
