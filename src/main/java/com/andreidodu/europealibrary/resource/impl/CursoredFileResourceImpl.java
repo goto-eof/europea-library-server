@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -75,7 +77,8 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.set("Content-Disposition", "attachment; filename=\"" + download.getFileName() + "\"");
+        String encodedFilename = URLEncoder.encode(download.getFileName(), StandardCharsets.UTF_8);
+        headers.set("Content-Disposition", "attachment; filename=\"" + encodedFilename + "\"");
 
         return ResponseEntity.ok()
                 .headers(headers)
