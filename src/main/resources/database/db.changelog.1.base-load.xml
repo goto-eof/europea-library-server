@@ -253,7 +253,7 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_authority_user"/>
             </column>
             <column name="user_id" type="BIGINT">
-                <constraints foreignKeyName="fk_user_id" references="el_user(id)" unique="true"
+                <constraints foreignKeyName="fk_user_id" references="${tablePrefix}user(id)" unique="true"
                              nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(100)">
@@ -272,6 +272,62 @@
             </column>
             <column name="application_lock" type="boolean" defaultValueBoolean="false"/>
         </createTable>
+    </changeSet>
+
+    <changeSet id="2024-05-05-001" author="Andrei Dodu">
+
+        <createSequence sequenceName="${tablePrefix}featured_file_system_item_seq" cycle="false" startValue="1"
+                        incrementBy="50"
+                        cacheSize="50"/>
+
+        <createTable tableName="${tablePrefix}featured_file_system_item">
+            <column name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}featured_file_system_item_seq">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_featured_file_system_item"/>
+            </column>
+            <column name="file_system_item_id" type="BIGINT">
+                <constraints foreignKeyName="fk_file_system_item_id" references="${tablePrefix}file_system_item(id)"
+                             unique="true"
+                             nullable="false"/>
+            </column>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+
+        </createTable>
+
+    </changeSet>
+
+    <changeSet id="2024-05-05-002" author="Andrei Dodu">
+
+        <createSequence sequenceName="${tablePrefix}post_seq" cycle="false" startValue="1"
+                        incrementBy="50"
+                        cacheSize="50"/>
+
+        <createTable tableName="${tablePrefix}post">
+            <column name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}post_seq">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_post"/>
+            </column>
+
+            <column name="identifier" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="title" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subtitle" type="VARCHAR(100)"/>
+            <column name="content" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+
+
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+
+        </createTable>
+
     </changeSet>
 
 </databaseChangeLog>

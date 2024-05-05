@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CursorRequestDTO extends CursorCommonRequestDTO implements Limitable {
+public class CursorRequestDTO extends CursorCommonRequestDTO {
     private Long parentId;
 }
