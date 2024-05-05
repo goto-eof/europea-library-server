@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.mapper;
 import com.andreidodu.europealibrary.dto.CursoredFileSystemItemDTO;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
+import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.*;
@@ -93,5 +94,12 @@ public abstract class FileSystemItemMapper {
 
     @Mapping(ignore = true, target = "nextCursor")
     public abstract void map(@MappingTarget CursoredFileSystemItemDTO cursoredFileSystemItemDTO, FileSystemItemDTO parent);
+
+
+
+    @Mapping(source = "fileMetaInfo.bookInfo.imageUrl", target = "imageUrl")
+    @Mapping(source = "fileMetaInfo.bookInfo.averageRating", target = "averageRating")
+    @Mapping(source = "fileMetaInfo.bookInfo.ratingsCount", target = "ratingsCount")
+    public abstract FileSystemItemHighlightDTO toHighlightDTO(FileSystemItem model);
 
 }

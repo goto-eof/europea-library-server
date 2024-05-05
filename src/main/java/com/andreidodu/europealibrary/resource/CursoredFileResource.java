@@ -43,13 +43,13 @@ public interface CursoredFileResource {
     ResponseEntity<CursoredTagDTO> retrieveByTagId(@RequestBody CursorRequestDTO cursorRequestDTO);
 
     @PostMapping("/cursored/language")
-    ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByLanguage(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByLanguage(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO);
 
     @PostMapping("/cursored/publishedDate")
-    ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublishedDate(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByPublishedDate(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO);
 
     @PostMapping("/cursored/publisher")
-    ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublisher(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByPublisher(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO);
 
     @PostMapping("/cursored/extension")
     ResponseEntity<CursoredFileExtensionDTO> retrieveCursoredByFileExtension(@RequestBody CursorTypeRequestDTO cursorTypeRequestDTO);
@@ -65,8 +65,8 @@ public interface CursoredFileResource {
     ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(@RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
 
     @PostMapping("/cursored/rating")
-    ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByRating(@RequestBody CursorRequestDTO cursorRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByRating(@RequestBody CursorRequestDTO cursorRequestDTO);
 
     @PostMapping(path = "/cursored/downloadCount")
-    ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO);
 }

@@ -2,6 +2,8 @@ package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
+import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
+import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
 import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
@@ -30,8 +32,8 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
     private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
-    public GenericCursoredResponseDTO<String> retrieveCursored(CursorRequestDTO cursorRequestDTO) {
-        GenericCursoredResponseDTO<String> responseDTO = new GenericCursoredResponseDTO<>();
+    public GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursored(CursorRequestDTO cursorRequestDTO) {
+        GenericCursoredResponseDTO<String, FileSystemItemDTO> responseDTO = new GenericCursoredResponseDTO<>();
         responseDTO.setParent("Featured");
         List<FileSystemItem> children = this.featuredFileSystemRepository.retrieveCursored(cursorRequestDTO);
         List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
@@ -76,5 +78,19 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
             return new OperationStatusDTO(true, "yes");
         }
         return new OperationStatusDTO(false, "no");
+    }
+
+    @Override
+    public GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredHighlight(CursorRequestDTO cursorRequestDTO) {
+        GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> responseDTO = new GenericCursoredResponseDTO<>();
+        responseDTO.setParent("FeaturedHighlight");
+        List<FileSystemItem> children = this.featuredFileSystemRepository.retrieveCursored(cursorRequestDTO);
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        responseDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toHighlightDTO)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+                .ifPresent(responseDTO::setNextCursor);
+        return responseDTO;
     }
 }

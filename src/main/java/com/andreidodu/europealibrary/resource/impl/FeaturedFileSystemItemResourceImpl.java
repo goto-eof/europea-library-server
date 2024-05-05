@@ -1,6 +1,8 @@
 package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
+import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
+import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
 import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.resource.FeaturedFileSystemItemResource;
@@ -17,8 +19,13 @@ public class FeaturedFileSystemItemResourceImpl implements FeaturedFileSystemIte
     private final FeaturedFileSystemItemService featuredFileSystemItemService;
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursored(CursorRequestDTO cursorRequestDTO) {
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(CursorRequestDTO cursorRequestDTO) {
         return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursored(cursorRequestDTO));
+    }
+
+    @Override
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(CursorRequestDTO cursorRequestDTO) {
+        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursoredHighlight(cursorRequestDTO));
     }
 
     @Override

@@ -7,8 +7,8 @@ import java.util.List;
 
 @Getter
 @Setter
-public class GenericCursoredResponseDTO<T> {
+public class GenericCursoredResponseDTO<T, U> {
     private T parent;
-    private List<FileSystemItemDTO> childrenList;
+    private List<U> childrenList;
     private Long nextCursor;
 }

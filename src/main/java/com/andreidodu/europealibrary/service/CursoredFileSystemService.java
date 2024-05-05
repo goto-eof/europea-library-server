@@ -31,15 +31,15 @@ public interface CursoredFileSystemService {
 
     SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> search(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
 
-    GenericCursoredResponseDTO<String> retrieveByLanguage(GenericCursorRequestDTO<String> cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByLanguage(GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String> retrieveByPublisher(GenericCursorRequestDTO<String> cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublisher(GenericCursorRequestDTO<String> cursorRequestDTO);
 
     List<ItemAndFrequencyDTO> retrieveAllPublishedDates();
 
-    GenericCursoredResponseDTO<String> retrieveByPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String>  readDirectoryByRating(CursorRequestDTO cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO>  readDirectoryByRating(CursorRequestDTO cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO);
 }

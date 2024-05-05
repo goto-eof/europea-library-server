@@ -45,17 +45,17 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByLanguage(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByLanguage(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByLanguage(cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublishedDate(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByPublishedDate(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublishedDate(cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveByPublisher(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByPublisher(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublisher(cursorRequestDTO));
     }
 
@@ -89,12 +89,12 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByRating(CursorRequestDTO cursorRequestDTO) {
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByRating(CursorRequestDTO cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.readDirectoryByRating(cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCount(commonCursoredRequestDTO));
     }
 

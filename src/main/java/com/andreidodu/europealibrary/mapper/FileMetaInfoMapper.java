@@ -1,8 +1,10 @@
 package com.andreidodu.europealibrary.mapper;
 
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
+import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
 import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
+import com.andreidodu.europealibrary.model.FileSystemItem;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,4 +24,5 @@ public abstract class FileMetaInfoMapper {
     @Mapping(ignore = true, target = "bookInfo")
     @Mapping(ignore = true, target = "tagList")
     public abstract void map(@MappingTarget FileMetaInfo target, FileMetaInfoBookDTO source);
+
 }
