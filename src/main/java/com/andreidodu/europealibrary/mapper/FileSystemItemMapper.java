@@ -96,10 +96,10 @@ public abstract class FileSystemItemMapper {
     public abstract void map(@MappingTarget CursoredFileSystemItemDTO cursoredFileSystemItemDTO, FileSystemItemDTO parent);
 
 
-
     @Mapping(source = "fileMetaInfo.bookInfo.imageUrl", target = "imageUrl")
     @Mapping(source = "fileMetaInfo.bookInfo.averageRating", target = "averageRating")
     @Mapping(source = "fileMetaInfo.bookInfo.ratingsCount", target = "ratingsCount")
+    @Mapping(source = "fileMetaInfo.title", target = "title")
     public abstract FileSystemItemHighlightDTO toHighlightDTO(FileSystemItem model);
 
 }

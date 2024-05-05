@@ -22,7 +22,6 @@ public interface FeaturedFileSystemItemResource {
     @PostMapping(path = "/cursored/highlight")
     ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(@Valid @RequestBody CursorRequestDTO cursorRequestDTO);
 
-
     @AllowOnlyAdministrator
     @GetMapping(path = "/isFeatured/{fileSystemItemId}")
     ResponseEntity<OperationStatusDTO> isFeatured(@PathVariable Long fileSystemItemId);

@@ -85,11 +85,11 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
         GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> responseDTO = new GenericCursoredResponseDTO<>();
         responseDTO.setParent("FeaturedHighlight");
         List<FileSystemItem> children = this.featuredFileSystemRepository.retrieveCursored(cursorRequestDTO);
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit());
         responseDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toHighlightDTO)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+        super.calculateNextId(children, cursorRequestDTO.getLimit())
                 .ifPresent(responseDTO::setNextCursor);
         return responseDTO;
     }
