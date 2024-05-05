@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.resource;
 
 import com.andreidodu.europealibrary.annotation.security.AllowOnlyAuthenticatedUsers;
+import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.CursorTypeRequestDTO;
 import com.andreidodu.europealibrary.dto.CursoredCategoryDTO;
@@ -13,6 +14,7 @@ import com.andreidodu.europealibrary.dto.GenericCursorRequestDTO;
 import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
 import com.andreidodu.europealibrary.dto.SearchFileSystemItemRequestDTO;
 import com.andreidodu.europealibrary.dto.SearchResultDTO;
+import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,4 +67,6 @@ public interface CursoredFileResource {
     @PostMapping("/cursored/rating")
     ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByRating(@RequestBody CursorRequestDTO cursorRequestDTO);
 
+    @PostMapping(path = "/cursored/downloadCount")
+    ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO);
 }

@@ -93,4 +93,9 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
         return ResponseEntity.ok(cursoredFileSystemService.readDirectoryByRating(cursorRequestDTO));
     }
 
+    @Override
+    public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCount(commonCursoredRequestDTO));
+    }
+
 }

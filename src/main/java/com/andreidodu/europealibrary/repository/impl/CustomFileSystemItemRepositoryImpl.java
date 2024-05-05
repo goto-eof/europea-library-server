@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.repository.impl;
 
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
+import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
 import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.dto.CursorTypeRequestDTO;
 import com.andreidodu.europealibrary.dto.GenericCursorRequestDTO;
@@ -11,7 +12,6 @@ import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.andreidodu.europealibrary.util.LimitUtil;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.alias.Alias;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -438,6 +438,28 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
                 .orderBy(fileSystemItem.fileMetaInfo.bookInfo.averageRating.desc(), fileSystemItem.fileMetaInfo.bookInfo.ratingsCount.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<FileSystemItem> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonRequestDTO) {
+        Long cursorId = commonRequestDTO.getNextCursor();
+        int numberOfResults = LimitUtil.calculateLimit(commonRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+
+        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        if (cursorId != null) {
+            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
+        }
+
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(fileSystemItem)
+                .from(fileSystemItem)
+                .where(booleanBuilder)
+                .limit(numberOfResults + 1)
+                .orderBy(fileSystemItem.downloadCount.desc())
                 .fetch();
     }
 

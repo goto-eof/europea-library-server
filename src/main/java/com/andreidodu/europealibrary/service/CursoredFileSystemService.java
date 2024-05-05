@@ -41,4 +41,5 @@ public interface CursoredFileSystemService {
 
     GenericCursoredResponseDTO<String>  readDirectoryByRating(CursorRequestDTO cursorRequestDTO);
 
+    GenericCursoredResponseDTO<String> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO);
 }

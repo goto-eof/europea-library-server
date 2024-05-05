@@ -246,6 +246,20 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElse(manageCaseListByRatingNoIdProvided());
     }
 
+    @Override
+    public GenericCursoredResponseDTO<String> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+        GenericCursoredResponseDTO<String> responseDTO = new GenericCursoredResponseDTO<>();
+        responseDTO.setParent("DownloadCount");
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveCursoredByDownloadCount(commonCursoredRequestDTO);
+        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        responseDTO.setChildrenList(childrenList.stream()
+                .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+                .ifPresent(responseDTO::setNextCursor);
+        return responseDTO;
+    }
+
     private GenericCursoredResponseDTO<String> manageCaseListByRatingIdProvided(CursorRequestDTO cursorRequestDTO) {
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredRating(cursorRequestDTO);
         GenericCursoredResponseDTO<String> cursoredTagDTO = new GenericCursoredResponseDTO<>();
