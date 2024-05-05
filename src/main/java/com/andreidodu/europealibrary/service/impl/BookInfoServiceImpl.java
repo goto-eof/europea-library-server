@@ -223,8 +223,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         bi = Scalr.resize(bi, BOOK_COVER_IMAGE_TARGET_WIDTH);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(bi, "jpg", baos);
-        byte[] bytes = baos.toByteArray();
-        return bytes;
+        return baos.toByteArray();
     }
 
 
