@@ -108,16 +108,17 @@ The API documentation can be accessed here: http://localhost:8081/swagger-ui/ind
 ## Features
 
 - index and catalog large digital books collection quickly;
-- explore e-books by directory/top rated/category/tag/file type/language/publisher;
+- explore e-books by directory/top rated/featured/category/tag/file type/language/publisher;
 - view book information;
 - download e-books (only authenticated users are able to do this);
 - search by title, author, publisher, ISBN and published date;
-- edit e-book information (only administrator is able to do this);
+- edit e-book information, including change book cover image (only administrator is able to do this);
 - generate e-book URL QR Code;
 - login/register to the system and change password (2 categories of user: ADMINISTRATOR and USER);
 - password reset
 - bulk category/tag/language/publisher name change  (only administrator is able to do this);
 - control panel (administration for admin, profile and security for all users).
+- customizable Home Page
 
 ## Job steps
 
