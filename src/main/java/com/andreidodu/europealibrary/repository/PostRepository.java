@@ -4,5 +4,8 @@ import com.andreidodu.europealibrary.model.FeaturedFileSystemItem;
 import com.andreidodu.europealibrary.model.Post;
 import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
 
+import java.util.Optional;
+
 public interface PostRepository extends TransactionalRepository<Post, Long> {
+    Optional<Post> findByIdentifier(String identifier);
 }
