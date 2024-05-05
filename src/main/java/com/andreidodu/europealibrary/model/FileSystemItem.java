@@ -74,4 +74,7 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     @Column(name = "record_status")
     private Integer recordStatus;
 
+    @OneToOne(mappedBy = "fileSystemItem", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
+    private FeaturedFileSystemItem featuredFileSystemItem;
+
 }
