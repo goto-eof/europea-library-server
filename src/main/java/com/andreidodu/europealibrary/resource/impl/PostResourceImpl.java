@@ -17,19 +17,16 @@ public class PostResourceImpl implements PostResource {
     private final PostService postService;
 
     @Override
-    @AllowOnlyAdministrator
     public ResponseEntity<PostDTO> get(Long postId) {
         return ResponseEntity.ok(this.postService.get(postId));
     }
 
     @Override
-    @AllowOnlyAdministrator
     public ResponseEntity<PostDTO> getByIdentifier(String identifier) {
         return ResponseEntity.ok(this.postService.getByIdentifier(identifier));
     }
 
     @Override
-    @AllowOnlyAdministrator
     public ResponseEntity<PostDTO> create(@Valid PostDTO postDTO) {
         return ResponseEntity.ok(this.postService.create(postDTO));
     }
