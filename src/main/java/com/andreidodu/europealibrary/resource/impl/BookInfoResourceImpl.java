@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -53,6 +54,11 @@ public class BookInfoResourceImpl implements BookInfoResource {
     @Override
     public ResponseEntity<OperationStatusDTO> unlock(@PathVariable Long fileMetaInfoId) throws Exception {
         return ResponseEntity.ok(this.bookInfoService.unlock(fileMetaInfoId));
+    }
+
+    @Override
+    public ResponseEntity<OperationStatusDTO> uploadBookCover(Long fileMetaInfoId, MultipartFile file) {
+        return ResponseEntity.ok(this.bookInfoService.uploadBookCover(fileMetaInfoId, file));
     }
 
 }

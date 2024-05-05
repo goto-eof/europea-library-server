@@ -42,7 +42,9 @@ spring:
     enabled: true
   servlet:
     multipart:
-      enabled: false
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 5MB
 server:
   port: 8081
 springdoc:
@@ -51,6 +53,7 @@ springdoc:
 com:
   andreidodu:
     europea-library:
+      book-covers-directory: /your/path/here
       rsa:
         private-key: classpath:certs/private-key.pem
         public-key: classpath:certs/public-key.pem
@@ -74,6 +77,9 @@ com:
         url: http://localhost:4200
         view-book-info-endpoint: /file-info
         reset-password-endpoint: /password/reset
+      server:
+        url: http://localhost:8081
+        book-cover-path: /book-cover
       password:
         reset:
           minutes-to-wait-for-another-attempt: 1

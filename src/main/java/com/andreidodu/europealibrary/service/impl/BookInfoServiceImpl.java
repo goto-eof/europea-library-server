@@ -17,9 +17,22 @@ import com.andreidodu.europealibrary.service.TagService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.imgscalr.Scalr;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,6 +47,17 @@ public class BookInfoServiceImpl implements BookInfoService {
     private final CategoryService categoryService;
     private final CacheLoaderService cacheLoaderService;
     private final TagService tagService;
+
+    private final static int BOOK_COVER_IMAGE_TARGET_WIDTH = 250;
+
+    @Value("${com.andreidodu.europea-library.book-covers-directory}")
+    private String bookCoversDirectory;
+
+    @Value("${com.andreidodu.europea-library.server.url}")
+    private String serverUrl;
+
+    @Value("${com.andreidodu.europea-library.server.book-cover-path}")
+    private String bookCoverPath;
 
     private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
         if (id == null || !id.equals(dto.getId())) {
@@ -162,6 +186,45 @@ public class BookInfoServiceImpl implements BookInfoService {
             return new OperationStatusDTO(true, "item locked");
         }
         return new OperationStatusDTO(false, "item already locked");
+    }
+
+    @Override
+    public OperationStatusDTO uploadBookCover(Long metaInfoId, MultipartFile file) {
+        try {
+            String filename = saveBookCoverFile(file);
+            updateFileMetaInfoImageUrl(metaInfoId, filename);
+            return new OperationStatusDTO(true, "file saved successfully");
+        } catch (Exception e) {
+            return new OperationStatusDTO(false, "error while trying to save the file");
+        }
+    }
+
+    private void updateFileMetaInfoImageUrl(Long metaInfoId, String filename) {
+        String imageUrl = this.serverUrl + this.bookCoverPath + "/" + filename;
+        FileMetaInfo fileMetaInfo = this.repository.findById(metaInfoId)
+                .orElseThrow(() -> new EntityNotFoundException("entity not found"));
+        fileMetaInfo.getBookInfo().setImageUrl(imageUrl);
+        fileMetaInfo.getBookInfo().setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
+        this.repository.save(fileMetaInfo);
+    }
+
+    private String saveBookCoverFile(MultipartFile file) throws IOException {
+        UUID uuid = UUID.randomUUID();
+        String filename = uuid + "." + file.getOriginalFilename() + ".jpg";
+        Path fileNameAndPath = Paths.get(this.bookCoversDirectory, filename);
+        byte[] bytes = resizeImage(file);
+        Files.write(fileNameAndPath, bytes);
+        return filename;
+    }
+
+    private static byte[] resizeImage(MultipartFile file) throws IOException {
+        InputStream is = new ByteArrayInputStream(file.getBytes());
+        BufferedImage bi = ImageIO.read(is);
+        bi = Scalr.resize(bi, BOOK_COVER_IMAGE_TARGET_WIDTH);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bi, "jpg", baos);
+        byte[] bytes = baos.toByteArray();
+        return bytes;
     }
 
 
