@@ -27,8 +27,8 @@ public class QRCodeServiceImpl implements QRCodeService {
 
 
     public static final String DEFAULT_CHARSET = "UTF-8";
-    public static final int HEIGHT = 150;
-    public static final int WIDTH = 150;
+    public static final int HEIGHT = 250;
+    public static final int WIDTH = 250;
 
     @Override
     public DownloadDTO generateOrLoadQRCode(String data, Long identifier)
