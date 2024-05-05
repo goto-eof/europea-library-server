@@ -58,6 +58,9 @@ public class BookInfo extends ModelCommon {
     @Column(name = "web_retrievement_status")
     private Integer webRetrievementStatus;
 
+    @Column(name = "manual_lock")
+    private Integer manualLock;
+
     @Column(name = "record_status")
     private Integer recordStatus;
 

@@ -33,4 +33,12 @@ public interface BookInfoResource {
     @AllowOnlyAdministrator
     @DeleteMapping("/id/{id}")
     ResponseEntity<OperationStatusDTO> delete(@PathVariable Long id) throws Exception;
+
+    @AllowOnlyAdministrator
+    @DeleteMapping("/lock/{id}")
+    ResponseEntity<OperationStatusDTO> lock(@PathVariable Long fileMetaInfoId) throws Exception;
+
+    @AllowOnlyAdministrator
+    @DeleteMapping("/unlock/{id}")
+    ResponseEntity<OperationStatusDTO> unlock(@PathVariable Long fileMetaInfoId) throws Exception;
 }

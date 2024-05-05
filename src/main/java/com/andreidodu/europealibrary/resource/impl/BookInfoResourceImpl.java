@@ -45,4 +45,14 @@ public class BookInfoResourceImpl implements BookInfoResource {
         return ResponseEntity.ok(operationStatusDTO);
     }
 
+    @Override
+    public ResponseEntity<OperationStatusDTO> lock(@PathVariable Long fileMetaInfoId) throws Exception {
+        return ResponseEntity.ok(this.bookInfoService.lock(fileMetaInfoId));
+    }
+
+    @Override
+    public ResponseEntity<OperationStatusDTO> unlock(@PathVariable Long fileMetaInfoId) throws Exception {
+        return ResponseEntity.ok(this.bookInfoService.unlock(fileMetaInfoId));
+    }
+
 }

@@ -25,4 +25,5 @@ public class FileMetaInfoBookDTO extends FileMetaInfoDTO {
     private List<Long> fileSystemItemIdList;
     private List<CategoryDTO> categoryList;
     private List<TagDTO> tagList;
+    private Integer manualLock;
 }

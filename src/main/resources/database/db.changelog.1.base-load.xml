@@ -123,6 +123,7 @@
             <column name="published_date" type="VARCHAR(50)"/>
             <column name="file_extraction_status" type="int"/>
             <column name="web_retrievement_status" type="int"/>
+            <column name="manual_lock" type="int" defaultValueNumeric="0"/>
             <column name="record_status" type="int"/>
             <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>

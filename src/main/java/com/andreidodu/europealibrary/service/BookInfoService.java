@@ -20,4 +20,8 @@ public interface BookInfoService {
     OperationStatusDTO bulkPublisherRename(RenameDTO renameDTO);
 
     OperationStatusDTO bulkPublishedDateRename(RenameDTO renameDTO);
+
+    OperationStatusDTO lock(Long fileMetaInfoId);
+
+    OperationStatusDTO unlock(Long fileMetaInfoId);
 }

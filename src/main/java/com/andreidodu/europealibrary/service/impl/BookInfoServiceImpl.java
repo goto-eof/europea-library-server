@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.service.impl;
 
+import com.andreidodu.europealibrary.constants.BookInfoConst;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
@@ -56,7 +57,7 @@ public class BookInfoServiceImpl implements BookInfoService {
         List<FileSystemItem> fileSystemItemList = this.fileSystemItemRepository.findAllById(dto.getFileSystemItemIdList());
         fileSystemItemList.forEach(fileSystemItem -> fileSystemItem.setFileMetaInfo(model));
         model.setFileSystemItemList(fileSystemItemList);
-
+        model.getBookInfo().setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
         FileMetaInfo newModel = this.repository.save(model);
         return this.fileMetaInfoBookMapper.toDTO(newModel);
     }
@@ -82,6 +83,7 @@ public class BookInfoServiceImpl implements BookInfoService {
                 .distinct()
                 .map(this.categoryService::createCategoryEntity)
                 .collect(Collectors.toList()));
+        model.getBookInfo().setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
         FileMetaInfo newModel = this.repository.save(model);
         return this.fileMetaInfoBookMapper.toDTO(newModel);
     }
@@ -122,7 +124,6 @@ public class BookInfoServiceImpl implements BookInfoService {
     }
 
 
-
     @Override
     public OperationStatusDTO bulkPublisherRename(RenameDTO renameDTO) {
         int count = this.bookInfoRepository.renamePublisher(renameDTO.getOldName(), renameDTO.getNewName());
@@ -140,6 +141,27 @@ public class BookInfoServiceImpl implements BookInfoService {
         }
         return new OperationStatusDTO(count > 0, "published date renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
 
+    }
+
+    @Override
+    public OperationStatusDTO lock(Long fileMetaInfoId) {
+        return changeManualLockValue(fileMetaInfoId, BookInfoConst.MANUAL_LOCK_LOCKED);
+    }
+
+    @Override
+    public OperationStatusDTO unlock(Long fileMetaInfoId) {
+        return changeManualLockValue(fileMetaInfoId, BookInfoConst.MANUAL_LOCK_UNLOCKED);
+    }
+
+    private OperationStatusDTO changeManualLockValue(Long fileMetaInfoId, int lockType) {
+        FileMetaInfo model = this.checkFileMetaInfoExistence(fileMetaInfoId);
+        Integer manualLock = model.getBookInfo().getManualLock();
+        if (manualLock == null || !manualLock.equals(lockType)) {
+            model.getBookInfo().setManualLock(lockType);
+            this.repository.save(model);
+            return new OperationStatusDTO(true, "item locked");
+        }
+        return new OperationStatusDTO(false, "item already locked");
     }
 
 
