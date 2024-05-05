@@ -23,6 +23,7 @@ public abstract class FileSystemItemMapper {
     @Mapping(ignore = true, target = "recordStatus")
     @Mapping(ignore = true, target = "fileMetaInfoId")
     @Mapping(ignore = true, target = "parentId")
+    @Mapping(ignore = true, target = "downloadCount")
     public abstract FileSystemItem toModel(FileDTO dto);
 
     @Mapping(ignore = true, target = "childrenList")
