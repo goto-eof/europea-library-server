@@ -68,4 +68,13 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
         this.featuredFileSystemRepository.delete(featuredFileSystemItemOptional.get());
         return new OperationStatusDTO(true, "Entity removed");
     }
+
+    @Override
+    public OperationStatusDTO isFeatured(Long fileSystemItemId) {
+        Optional<FeaturedFileSystemItem> featuredFileSystemItemOptional = this.featuredFileSystemRepository.findByFileSystemItem_id(fileSystemItemId);
+        if (featuredFileSystemItemOptional.isPresent()) {
+            return new OperationStatusDTO(true, "yes");
+        }
+        return new OperationStatusDTO(false, "no");
+    }
 }

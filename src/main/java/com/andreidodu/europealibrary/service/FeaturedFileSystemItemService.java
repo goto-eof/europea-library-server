@@ -11,4 +11,6 @@ public interface FeaturedFileSystemItemService {
     OperationStatusDTO addFeatured(Long fileSystemItemId);
 
     OperationStatusDTO removeFeatured(Long fileSystemItemId);
+
+    OperationStatusDTO isFeatured(Long fileSystemItemId);
 }

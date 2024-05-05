@@ -7,7 +7,6 @@ import com.andreidodu.europealibrary.resource.FeaturedFileSystemItemResource;
 import com.andreidodu.europealibrary.service.FeaturedFileSystemItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +19,11 @@ public class FeaturedFileSystemItemResourceImpl implements FeaturedFileSystemIte
     @Override
     public ResponseEntity<GenericCursoredResponseDTO<String>> retrieveCursored(CursorRequestDTO cursorRequestDTO) {
         return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursored(cursorRequestDTO));
+    }
+
+    @Override
+    public ResponseEntity<OperationStatusDTO> isFeatured(Long fileSystemItemId) {
+        return ResponseEntity.ok(featuredFileSystemItemService.isFeatured(fileSystemItemId));
     }
 
     @Override
