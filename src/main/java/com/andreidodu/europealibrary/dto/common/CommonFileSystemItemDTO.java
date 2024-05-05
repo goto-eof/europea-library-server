@@ -16,6 +16,7 @@ public class CommonFileSystemItemDTO extends CommonDTO {
     private LocalDateTime fileCreateDate;
     private LocalDateTime fileUpdateDate;
     private Boolean isDirectory;
+    private Long downloadCount;
     private FileSystemItemDTO parent;
     private Integer jobStep;
     private Integer jobStatus;

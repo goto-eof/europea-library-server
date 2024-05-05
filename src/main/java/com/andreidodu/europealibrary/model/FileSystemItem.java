@@ -43,6 +43,9 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     @Column(name = "is_directory")
     private Boolean isDirectory;
 
+    @Column(name = "download_count")
+    private Long downloadCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", updatable = false, insertable = false)
     private FileSystemItem parent;

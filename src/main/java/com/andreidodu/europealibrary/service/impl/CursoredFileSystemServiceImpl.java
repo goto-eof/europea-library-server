@@ -154,6 +154,8 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
         return this.fileSystemItemRepository.findById(fileSystemId)
                 .map(fileSystemItem -> {
                     try {
+                        fileSystemItem.setDownloadCount(fileSystemItem.getDownloadCount() + 1);
+                        this.fileSystemItemRepository.save(fileSystemItem);
                         File file = new File(fileSystemItem.getBasePath() + "/" + fileSystemItem.getName());
                         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
                         DownloadDTO downloadDTO = new DownloadDTO();

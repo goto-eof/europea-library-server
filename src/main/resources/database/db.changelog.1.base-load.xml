@@ -57,6 +57,9 @@
             <column name="is_directory" type="boolean">
                 <constraints nullable="false"/>
             </column>
+            <column name="download_count" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
             <column name="parent_id" type="BIGINT"/>
             <column name="job_step" type="int">
                 <constraints nullable="false"/>
