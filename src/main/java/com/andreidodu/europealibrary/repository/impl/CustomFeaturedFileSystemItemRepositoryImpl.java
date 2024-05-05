@@ -49,8 +49,7 @@ public class CustomFeaturedFileSystemItemRepositoryImpl extends CommonRepository
 
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
-                .from(featuredFileSystemItem)
-                .innerJoin(fileSystemItem)
+                .from(featuredFileSystemItem, fileSystemItem)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
                 .orderBy(featuredFileSystemItem.createdDate.desc())
