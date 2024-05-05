@@ -42,6 +42,7 @@ public class CustomFeaturedFileSystemItemRepositoryImpl extends CommonRepository
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        booleanBuilder.and(featuredFileSystemItem.fileSystemItem.id.eq(fileSystemItem.id));
         if (cursorId != null) {
             booleanBuilder.and(featuredFileSystemItem.id.goe(cursorId));
         }
