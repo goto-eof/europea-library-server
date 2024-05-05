@@ -137,7 +137,7 @@ Google Books API
 
 ## DB schema
 
-![db_schema](images/db_schema.png)
+![db_schema](images/db_schema_1.png)
 
 ## More
 
