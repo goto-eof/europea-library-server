@@ -8,6 +8,7 @@ import lombok.Setter;
 public class FileSystemItemHighlightDTO {
     private Long id;
     private String title;
+    private String description;
     private String imageUrl;
     private Double averageRating;
     private Long ratingsCount;

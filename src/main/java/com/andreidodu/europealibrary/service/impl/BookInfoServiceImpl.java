@@ -210,7 +210,7 @@ public class BookInfoServiceImpl implements BookInfoService {
 
     private String saveBookCoverFile(MultipartFile file) throws IOException {
         UUID uuid = UUID.randomUUID();
-        String filename = uuid + "." + file.getOriginalFilename() + ".jpg";
+        String filename = (uuid + "." + file.getOriginalFilename() + ".jpg").replace(" ", "_");
         Path fileNameAndPath = Paths.get(this.bookCoversDirectory, filename);
         byte[] bytes = resizeImage(file);
         Files.write(fileNameAndPath, bytes);

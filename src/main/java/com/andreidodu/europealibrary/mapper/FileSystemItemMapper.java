@@ -101,6 +101,7 @@ public abstract class FileSystemItemMapper {
     @Mapping(source = "fileMetaInfo.bookInfo.averageRating", target = "averageRating")
     @Mapping(source = "fileMetaInfo.bookInfo.ratingsCount", target = "ratingsCount")
     @Mapping(source = "fileMetaInfo.title", target = "title")
+    @Mapping(source = "fileMetaInfo.description", target = "description")
     public abstract FileSystemItemHighlightDTO toHighlightDTO(FileSystemItem model);
 
 }
