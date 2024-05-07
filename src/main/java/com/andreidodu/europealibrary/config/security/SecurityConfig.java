@@ -79,6 +79,7 @@ public class SecurityConfig {
                 Request.HttpMethod.HEAD.name(),
                 Request.HttpMethod.POST.name(),
                 Request.HttpMethod.PUT.name(),
+                Request.HttpMethod.PATCH.name(),
                 Request.HttpMethod.DELETE.name()));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setMaxAge(1800L);
