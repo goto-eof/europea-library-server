@@ -147,9 +147,9 @@ logging:
     name: /your/path/europea-library.log
   level:
     com:
-      andreidodu: ERROR
+      andreidodu: INFO
     org:
-      springframework: INFO
+      springframework: ERROR
       apache:
         pdfbox: OFF
         fontbox: OFF
