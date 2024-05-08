@@ -1,8 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.finalization;
 
 import com.andreidodu.europealibrary.batch.indexer.util.TaskletUtil;
-import com.andreidodu.europealibrary.constants.JobConst;
-import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
+import com.andreidodu.europealibrary.batch.indexer.constants.JobConst;
 import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import com.andreidodu.europealibrary.service.CacheLoaderService;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;

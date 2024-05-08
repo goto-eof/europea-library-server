@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.batch.indexer.step.initialization;
 
 import com.andreidodu.europealibrary.batch.indexer.util.TaskletUtil;
-import com.andreidodu.europealibrary.constants.JobConst;
+import com.andreidodu.europealibrary.batch.indexer.constants.JobConst;
 import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.batch.indexer.config;
 
-import com.andreidodu.europealibrary.constants.JobConst;
+import com.andreidodu.europealibrary.batch.indexer.constants.JobConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
