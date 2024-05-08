@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.resource;
 
+import com.andreidodu.europealibrary.annotation.security.AllowCalculatedAuthorities;
 import com.andreidodu.europealibrary.annotation.security.AllowOnlyAuthenticatedUsers;
 import com.andreidodu.europealibrary.dto.*;
 import jakarta.validation.Valid;
@@ -45,7 +46,7 @@ public interface CursoredFileResource {
     @GetMapping("/extension")
     ResponseEntity<List<FileExtensionDTO>> retrieveFileExtensions();
 
-    @AllowOnlyAuthenticatedUsers
+    @AllowCalculatedAuthorities
     @GetMapping(path = "/download/{fileSystemItemId}")
     ResponseEntity<InputStreamResource> download(@PathVariable Long fileSystemItemId);
 
