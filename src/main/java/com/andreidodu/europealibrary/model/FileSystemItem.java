@@ -77,4 +77,7 @@ public class FileSystemItem extends ModelCommon implements Identificable {
     @OneToOne(mappedBy = "fileSystemItem", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     private FeaturedFileSystemItem featuredFileSystemItem;
 
+    @OneToOne(mappedBy = "featuredFileSystemItem", fetch = FetchType.LAZY)
+    private ApplicationSettings applicationSettings;
+
 }

@@ -30,4 +30,12 @@ public interface FeaturedFileSystemItemResource {
     @PostMapping(path = "/remove/{fileSystemItemId}")
     ResponseEntity<OperationStatusDTO> removeFeatured(@PathVariable Long fileSystemItemId);
 
+    @GetMapping(path = "/highlight")
+    ResponseEntity<FileSystemItemHighlightDTO> retrieveHighlight();
+
+    @AllowOnlyAdministrator
+    @PostMapping(path = "/highlight/{fileSystemItemId}")
+    ResponseEntity<OperationStatusDTO> setFeatured(@PathVariable Long fileSystemItemId);
+
+
 }

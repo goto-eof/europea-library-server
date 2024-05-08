@@ -37,4 +37,8 @@ public class ApplicationSettings {
     @Column(name = "home_page_w_popular_books_enabled")
     private Boolean popularBooksWidgetEnabled;
 
+    @OneToOne
+    @JoinColumn(name = "featured_file_system_item_id", referencedColumnName = "id")
+    private FileSystemItem featuredFileSystemItem;
+
 }

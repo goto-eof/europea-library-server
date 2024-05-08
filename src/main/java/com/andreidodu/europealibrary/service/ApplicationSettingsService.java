@@ -1,6 +1,9 @@
 package com.andreidodu.europealibrary.service;
 
 import com.andreidodu.europealibrary.dto.ApplicationSettingsDTO;
+import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
+import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
+import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.model.ApplicationSettings;
 
 public interface ApplicationSettingsService {
@@ -15,4 +18,8 @@ public interface ApplicationSettingsService {
     ApplicationSettingsDTO update(ApplicationSettingsDTO applicationSettingsDTO);
 
     ApplicationSettings loadOrCreateDefaultApplicationSettings();
+
+    FileSystemItemHighlightDTO getFeatured();
+
+    OperationStatusDTO setFeatured(Long fileSystemItemId);
 }

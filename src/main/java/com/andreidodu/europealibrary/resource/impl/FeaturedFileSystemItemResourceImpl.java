@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.resource.FeaturedFileSystemItemResource;
+import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import com.andreidodu.europealibrary.service.FeaturedFileSystemItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class FeaturedFileSystemItemResourceImpl implements FeaturedFileSystemItemResource {
     private final FeaturedFileSystemItemService featuredFileSystemItemService;
+    private final ApplicationSettingsService applicationSettingsService;
 
     @Override
     public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO) {
@@ -37,6 +39,16 @@ public class FeaturedFileSystemItemResourceImpl implements FeaturedFileSystemIte
     @Override
     public ResponseEntity<OperationStatusDTO> removeFeatured(Long fileSystemItemId) {
         return ResponseEntity.ok(featuredFileSystemItemService.removeFeatured(fileSystemItemId));
+    }
+
+    @Override
+    public ResponseEntity<FileSystemItemHighlightDTO> retrieveHighlight() {
+        return ResponseEntity.ok(this.applicationSettingsService.getFeatured());
+    }
+
+    @Override
+    public ResponseEntity<OperationStatusDTO> setFeatured(Long fileSystemItemId) {
+        return ResponseEntity.ok(this.applicationSettingsService.setFeatured(fileSystemItemId));
     }
 
 }

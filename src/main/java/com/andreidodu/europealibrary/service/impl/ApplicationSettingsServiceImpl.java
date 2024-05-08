@@ -2,10 +2,16 @@ package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.constants.ApplicationSettingsConst;
 import com.andreidodu.europealibrary.dto.ApplicationSettingsDTO;
+import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
+import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
+import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.ApplicationSettingsMapper;
+import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
 import com.andreidodu.europealibrary.model.ApplicationSettings;
+import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.ApplicationSettingsRepository;
+import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,8 +23,10 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class ApplicationSettingsServiceImpl implements ApplicationSettingsService {
-    final private ApplicationSettingsMapper applicationSettingsMapper;
     final private ApplicationSettingsRepository applicationSettingsRepository;
+    final private ApplicationSettingsMapper applicationSettingsMapper;
+    private final FileSystemItemRepository fileSystemItemRepository;
+    final private FileSystemItemMapper fileSystemItemMapper;
 
     @Override
     public ApplicationSettingsDTO lockApplication() {
@@ -77,6 +85,24 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
             return this.applicationSettingsRepository.save(applicationSettings);
         }
         return applicationSettingsOptional.get();
+    }
+
+    @Override
+    public FileSystemItemHighlightDTO getFeatured() {
+        ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
+        FileSystemItem fileSystemItem = Optional.ofNullable(applicationSettings.getFeaturedFileSystemItem())
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+        return this.fileSystemItemMapper.toHighlightDTO(fileSystemItem);
+    }
+
+    @Override
+    public OperationStatusDTO setFeatured(Long fileSystemItemId) {
+        ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
+        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId)
+                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+        applicationSettings.setFeaturedFileSystemItem(fileSystemItem);
+        this.applicationSettingsRepository.save(applicationSettings);
+        return new OperationStatusDTO(true, "done");
     }
 
 }
