@@ -47,7 +47,12 @@ public class FeaturedFileSystemItemResourceImpl implements FeaturedFileSystemIte
     }
 
     @Override
-    public ResponseEntity<OperationStatusDTO> setFeatured(Long fileSystemItemId) {
+    public ResponseEntity<OperationStatusDTO> isHighlight(Long fileSystemItemId) {
+        return ResponseEntity.ok(this.applicationSettingsService.isFeatured(fileSystemItemId));
+    }
+
+    @Override
+    public ResponseEntity<OperationStatusDTO> setHighlight(Long fileSystemItemId) {
         return ResponseEntity.ok(this.applicationSettingsService.setFeatured(fileSystemItemId));
     }
 

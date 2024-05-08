@@ -22,4 +22,6 @@ public interface ApplicationSettingsService {
     FileSystemItemHighlightDTO getFeatured();
 
     OperationStatusDTO setFeatured(Long fileSystemItemId);
+
+    OperationStatusDTO isFeatured(Long fileSystemItemId);
 }

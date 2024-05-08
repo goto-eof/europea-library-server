@@ -105,4 +105,12 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
         return new OperationStatusDTO(true, "done");
     }
 
+    @Override
+    public OperationStatusDTO isFeatured(Long fileSystemItemId) {
+        ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
+        FileSystemItem fileSystemItem = applicationSettings.getFeaturedFileSystemItem();
+        boolean result = fileSystemItem != null && fileSystemItem.getId().equals(fileSystemItemId);
+        return new OperationStatusDTO(result, result ? "yes" : "no");
+    }
+
 }
