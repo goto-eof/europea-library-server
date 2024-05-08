@@ -10,6 +10,7 @@ public class ApplicationSettingsDTO {
     private Long id;
     private Boolean applicationLock;
 
+    private Long featuredFileSystemItemId;
     private Boolean customDescriptionEnabled;
     private Boolean protectedDownloadsEnabled;
     private Boolean featuredBooksWidgetEnabled;

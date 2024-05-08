@@ -1,11 +1,7 @@
 package com.andreidodu.europealibrary.mapper;
 
 import com.andreidodu.europealibrary.dto.ApplicationSettingsDTO;
-import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
-import com.andreidodu.europealibrary.dto.TagDTO;
 import com.andreidodu.europealibrary.model.ApplicationSettings;
-import com.andreidodu.europealibrary.model.FileMetaInfo;
-import com.andreidodu.europealibrary.model.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,6 +17,7 @@ public abstract class ApplicationSettingsMapper {
     @Mapping(ignore = true, target = "featuredFileSystemItem")
     public abstract ApplicationSettings toModel(ApplicationSettingsDTO dto);
 
+    @Mapping(target = "featuredFileSystemItemId", source = "featuredFileSystemItem.id")
     public abstract ApplicationSettingsDTO toDTO(ApplicationSettings model);
 
     public abstract List<ApplicationSettingsDTO> toDTO(List<ApplicationSettings> modelList);

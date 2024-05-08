@@ -98,9 +98,13 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
     @Override
     public OperationStatusDTO setFeatured(Long fileSystemItemId) {
         ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
-        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId)
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
-        applicationSettings.setFeaturedFileSystemItem(fileSystemItem);
+        if (fileSystemItemId != null) {
+            FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId)
+                    .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+            applicationSettings.setFeaturedFileSystemItem(fileSystemItem);
+        } else {
+            applicationSettings.setFeaturedFileSystemItem(null);
+        }
         this.applicationSettingsRepository.save(applicationSettings);
         return new OperationStatusDTO(true, "done");
     }
