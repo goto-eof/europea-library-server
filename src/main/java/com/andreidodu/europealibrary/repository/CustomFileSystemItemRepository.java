@@ -1,11 +1,7 @@
 package com.andreidodu.europealibrary.repository;
 
 
-import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorTypeRequestDTO;
-import com.andreidodu.europealibrary.dto.GenericCursorRequestDTO;
-import com.andreidodu.europealibrary.dto.SearchFileSystemItemRequestDTO;
+import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.model.FileExtensionProjection;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.model.ItemAndFrequencyProjection;
@@ -40,5 +36,7 @@ public interface CustomFileSystemItemRepository {
 
     List<FileSystemItem> retrieveChildrenByCursoredRating(CursorRequestDTO cursorRequestDTO);
 
-    List<FileSystemItem> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonRequestDTO);
+    List<FileSystemItem> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
+
+    List<FileSystemItem> retrieveNewCursored(CursorCommonRequestDTO cursorRequestDTO);
 }

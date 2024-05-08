@@ -39,7 +39,13 @@ public interface CursoredFileSystemService {
 
     GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO>  readDirectoryByRating(CursorRequestDTO cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> readDirectoryByRating(CursorRequestDTO cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
+
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveNewCursored(CursorCommonRequestDTO cursorRequestDTO);
+
+    GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveNewCursoredHighlight(CursorCommonRequestDTO cursorRequestDTO);
+
+    GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredByDownloadCountHighlight(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
 }

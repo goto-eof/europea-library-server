@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.model.security.Authority;
 import com.andreidodu.europealibrary.model.security.User;
 import com.andreidodu.europealibrary.repository.security.RoleRepository;
 import com.andreidodu.europealibrary.repository.security.UserRepository;
+import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import com.andreidodu.europealibrary.service.CacheLoaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +16,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PostApplicationRunUtil {
+    private final ApplicationSettingsService applicationSettingsService;
     private final CacheLoaderService cacheLoaderService;
-    private final UserRepository userRepository;
     private final PasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+
     @Value("${com.andreidodu.europea-library.default-admin-username}")
     private String defaultAdminUsername;
 
@@ -37,6 +40,11 @@ public class PostApplicationRunUtil {
             return;
         }
         createAdministratorUser();
+    }
+
+    public void createDefaultApplicationSettings() {
+        this.applicationSettingsService.loadOrCreateDefaultApplicationSettings();
+
     }
 
     private void createAdministratorUser() {

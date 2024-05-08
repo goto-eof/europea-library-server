@@ -1,11 +1,7 @@
 package com.andreidodu.europealibrary.resource;
 
 import com.andreidodu.europealibrary.annotation.security.AllowOnlyAdministrator;
-import com.andreidodu.europealibrary.dto.CursorRequestDTO;
-import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
-import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
-import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
-import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/v1/featured")
 public interface FeaturedFileSystemItemResource {
     @PostMapping(path = "/cursored")
-    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(@Valid @RequestBody CursorRequestDTO cursorRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(@Valid @RequestBody CursorCommonRequestDTO cursorCommonRequestDTO);
 
     @PostMapping(path = "/cursored/highlight")
-    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(@Valid @RequestBody CursorRequestDTO cursorRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(@Valid @RequestBody CursorCommonRequestDTO cursorCommonRequestDTO);
 
     @AllowOnlyAdministrator
     @GetMapping(path = "/isFeatured/{fileSystemItemId}")

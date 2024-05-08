@@ -38,8 +38,8 @@ public class CategoryServiceImpl extends CursoredServiceCommon implements Catego
         int limit = LimitUtil.calculateLimit(commonCursoredRequestDTO, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE);
         CursorDTO<CategoryDTO> cursoredResult = new CursorDTO<>();
         List<Category> categoryList = this.categoryRepository.retrieveCategoriesCursored(commonCursoredRequestDTO);
-        List<CategoryDTO> categoryListDTO = this.categoryMapper.toDTO(limit(categoryList, limit));
-        calculateNextId(categoryList, limit)
+        List<CategoryDTO> categoryListDTO = this.categoryMapper.toDTO(limit(categoryList, limit, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE));
+        calculateNextId(categoryList, limit, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE)
                 .ifPresent(cursoredResult::setNextCursor);
         cursoredResult.setItems(categoryListDTO);
         return cursoredResult;

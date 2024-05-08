@@ -2,11 +2,7 @@ package com.andreidodu.europealibrary.repository.impl;
 
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
-import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorTypeRequestDTO;
-import com.andreidodu.europealibrary.dto.GenericCursorRequestDTO;
-import com.andreidodu.europealibrary.dto.SearchFileSystemItemRequestDTO;
+import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
@@ -442,7 +438,35 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<FileSystemItem> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonRequestDTO) {
+    public List<FileSystemItem> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
+        Long cursorId = cursoredRequestByFileTypeDTO.getNextCursor();
+        int numberOfResults = LimitUtil.calculateLimit(cursoredRequestByFileTypeDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+
+        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+
+        if (cursorId != null) {
+            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
+        }
+
+        if (cursoredRequestByFileTypeDTO.getFileType() != null) {
+            booleanBuilder.and(fileSystemItem.extension.equalsIgnoreCase(cursoredRequestByFileTypeDTO.getFileType()));
+        }
+
+        return new JPAQuery<FileSystemItem>(entityManager)
+                .select(fileSystemItem)
+                .from(fileSystemItem)
+                .where(booleanBuilder)
+                .limit(numberOfResults + 1)
+                .orderBy(fileSystemItem.downloadCount.desc(), fileSystemItem.id.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<FileSystemItem> retrieveNewCursored(CursorCommonRequestDTO commonRequestDTO) {
         Long cursorId = commonRequestDTO.getNextCursor();
         int numberOfResults = LimitUtil.calculateLimit(commonRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
@@ -450,7 +474,6 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
-        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
         if (cursorId != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
@@ -460,7 +483,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .from(fileSystemItem)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
-                .orderBy(fileSystemItem.downloadCount.desc())
+                .orderBy(fileSystemItem.createdDate.desc(), fileSystemItem.id.desc())
                 .fetch();
     }
 

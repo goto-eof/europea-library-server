@@ -23,6 +23,7 @@ public class EuropeaLibraryApplication {
         PostApplicationRunUtil postApplicationRunUtil = context.getBean(PostApplicationRunUtil.class);
         postApplicationRunUtil.loadCache();
         postApplicationRunUtil.addDefaultUsersAndRolesIfNecessary();
+        postApplicationRunUtil.createDefaultApplicationSettings();
     }
 
 

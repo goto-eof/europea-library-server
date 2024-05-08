@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -60,11 +61,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid category id"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredCategoryId(cursorRequestDTO);
         CursoredCategoryDTO cursoredCategoryDTO = new CursoredCategoryDTO();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredCategoryDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredCategoryDTO::setNextCursor);
+        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredCategoryDTO::setNextCursor);
         this.categoryRepository.findById(cursorRequestDTO.getParentId())
                 .ifPresent(category -> cursoredCategoryDTO.setCategory(this.categoryMapper.toDTO(category)));
         return cursoredCategoryDTO;
@@ -76,11 +77,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid tag id"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredTagId(cursorRequestDTO);
         CursoredTagDTO cursoredTagDTO = new CursoredTagDTO();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredTagDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
+        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
         this.tagRepository.findById(cursorRequestDTO.getParentId())
                 .ifPresent(tag -> cursoredTagDTO.setTag(this.tagMapper.toDTO(tag)));
         return cursoredTagDTO;
@@ -92,8 +93,8 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
         cursoredFileSystemItemDTO.setParent(this.fileSystemItemMapper.toDTOWithoutChildrenAndParent(parent));
         this.fileSystemItemMapper.toParentDTORecursively(cursoredFileSystemItemDTO.getParent(), parent);
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursor(cursorRequestDTO);
-        cursoredFileSystemItemDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredFileSystemItemDTO::setNextCursor);
+        cursoredFileSystemItemDTO.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)));
+        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredFileSystemItemDTO::setNextCursor);
         return cursoredFileSystemItemDTO;
     }
 
@@ -124,11 +125,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid file extension"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredFileExtension(cursorTypeRequestDTO);
         CursoredFileExtensionDTO cursoredFileExtensionDTO = new CursoredFileExtensionDTO();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, cursorTypeRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredFileExtensionDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+        super.calculateNextId(children, cursorTypeRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
                 .ifPresent(cursoredFileExtensionDTO::setNextCursor);
         cursoredFileExtensionDTO.setExtension(cursorTypeRequestDTO.getExtension());
         return cursoredFileExtensionDTO;
@@ -180,8 +181,8 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     public SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> search(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
         SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> result = new SearchResultDTO<>();
         List<FileSystemItem> children = this.fileSystemItemRepository.search(searchFileSystemItemRequestDTO);
-        result.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+        result.setChildrenList(this.fileSystemItemMapper.toDTO(limit(children, searchFileSystemItemRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)));
+        super.calculateNextId(children, searchFileSystemItemRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
                 .ifPresent(result::setNextCursor);
         result.setQuery(searchFileSystemItemRequestDTO);
         return result;
@@ -193,11 +194,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid parent"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredLanguage(cursorRequestDTO);
         GenericCursoredResponseDTO<String, FileSystemItemDTO> cursoredTagDTO = new GenericCursoredResponseDTO<>();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredTagDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
+        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
         cursoredTagDTO.setParent(cursorRequestDTO.getParent());
         return cursoredTagDTO;
     }
@@ -208,11 +209,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid parent"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredPublisher(cursorRequestDTO);
         GenericCursoredResponseDTO<String, FileSystemItemDTO> cursoredTagDTO = new GenericCursoredResponseDTO<>();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredTagDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
+        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
         cursoredTagDTO.setParent(cursorRequestDTO.getParent());
         return cursoredTagDTO;
     }
@@ -230,11 +231,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .orElseThrow(() -> new EntityNotFoundException("Invalid parent"));
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredPublishedDate(cursorRequestDTO);
         GenericCursoredResponseDTO<String, FileSystemItemDTO> cursoredTagDTO = new GenericCursoredResponseDTO<>();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredTagDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
+        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE).ifPresent(cursoredTagDTO::setNextCursor);
         cursoredTagDTO.setParent(cursorRequestDTO.getParent());
         return cursoredTagDTO;
     }
@@ -247,15 +248,37 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     }
 
     @Override
-    public GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+    public GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
+        return this.genericRetrieveCursoredByDownloadCount(cursoredRequestByFileTypeDTO, fileSystemItemMapper::toDTOWithParentDTORecursively);
+    }
+
+    private <T> GenericCursoredResponseDTO<String, T> genericRetrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO, Function<FileSystemItem, T> toDTO) {
+        GenericCursoredResponseDTO<String, T> responseDTO = new GenericCursoredResponseDTO<>();
+        responseDTO.setParent("DownloadCount");
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveCursoredByDownloadCount(cursoredRequestByFileTypeDTO);
+        List<FileSystemItem> childrenList = limit(children, cursoredRequestByFileTypeDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        responseDTO.setChildrenList(childrenList.stream()
+                .map(toDTO)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, cursoredRequestByFileTypeDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+                .ifPresent(responseDTO::setNextCursor);
+        return responseDTO;
+    }
+
+    @Override
+    public GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredByDownloadCountHighlight(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
+        return this.genericRetrieveCursoredByDownloadCount(cursoredRequestByFileTypeDTO, fileSystemItemMapper::toHighlightDTO);
+    }
+
+    public <T> GenericCursoredResponseDTO<String, FileSystemItemDTO> genericRetrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
         GenericCursoredResponseDTO<String, FileSystemItemDTO> responseDTO = new GenericCursoredResponseDTO<>();
         responseDTO.setParent("DownloadCount");
-        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveCursoredByDownloadCount(commonCursoredRequestDTO);
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveCursoredByDownloadCount(cursoredRequestByFileTypeDTO);
+        List<FileSystemItem> childrenList = limit(children, cursoredRequestByFileTypeDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         responseDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+        super.calculateNextId(children, cursoredRequestByFileTypeDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
                 .ifPresent(responseDTO::setNextCursor);
         return responseDTO;
     }
@@ -263,11 +286,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     private GenericCursoredResponseDTO<String, FileSystemItemDTO> manageCaseListByRatingIdProvided(CursorRequestDTO cursorRequestDTO) {
         List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredRating(cursorRequestDTO);
         GenericCursoredResponseDTO<String, FileSystemItemDTO> cursoredTagDTO = new GenericCursoredResponseDTO<>();
-        List<FileSystemItem> childrenList = limit(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         cursoredTagDTO.setChildrenList(childrenList.stream()
                 .map(this.fileSystemItemMapper::toDTOWithParentDTORecursively)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
                 .ifPresent(cursoredTagDTO::setNextCursor);
         cursoredTagDTO.setParent("by rating");
         return cursoredTagDTO;
@@ -277,6 +300,29 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
         var cursoredRequest = new CursorRequestDTO();
         cursoredRequest.setLimit(ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         return this.manageCaseListByRatingIdProvided(cursoredRequest);
+    }
+
+    @Override
+    public GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveNewCursored(CursorCommonRequestDTO cursorRequestDTO) {
+        return this.genericRetrieveNewCursored(cursorRequestDTO, this.fileSystemItemMapper::toDTOWithParentDTORecursively);
+    }
+
+    @Override
+    public GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveNewCursoredHighlight(CursorCommonRequestDTO cursorRequestDTO) {
+        return this.genericRetrieveNewCursored(cursorRequestDTO, this.fileSystemItemMapper::toHighlightDTO);
+    }
+
+    public <T> GenericCursoredResponseDTO<String, T> genericRetrieveNewCursored(CursorCommonRequestDTO cursorRequestDTO, Function<FileSystemItem, T> toDTO) {
+        GenericCursoredResponseDTO<String, T> responseDTO = new GenericCursoredResponseDTO<>();
+        responseDTO.setParent("New");
+        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveNewCursored(cursorRequestDTO);
+        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        responseDTO.setChildrenList(childrenList.stream()
+                .map(toDTO)
+                .collect(Collectors.toList()));
+        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+                .ifPresent(responseDTO::setNextCursor);
+        return responseDTO;
     }
 
 }

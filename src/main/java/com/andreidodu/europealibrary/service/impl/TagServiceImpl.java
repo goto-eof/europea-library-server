@@ -38,8 +38,8 @@ public class TagServiceImpl extends CursoredServiceCommon implements TagService 
 
         CursorDTO<TagDTO> cursoredResult = new CursorDTO<>();
         List<Tag> tagList = this.tagRepository.retrieveTagsCursored(commonCursoredRequestDTO);
-        List<TagDTO> tagListDTO = this.tagMapper.toDTO(limit(tagList, limit));
-        calculateNextId(tagList, limit)
+        List<TagDTO> tagListDTO = this.tagMapper.toDTO(limit(tagList, limit, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE));
+        calculateNextId(tagList, limit, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE)
                 .ifPresent(cursoredResult::setNextCursor);
         cursoredResult.setItems(tagListDTO);
         return cursoredResult;

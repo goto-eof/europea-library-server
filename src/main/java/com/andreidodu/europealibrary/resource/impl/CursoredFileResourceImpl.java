@@ -97,8 +97,23 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCount(commonCursoredRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCount(cursoredRequestByFileTypeDTO));
+    }
+
+    @Override
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredByDownloadCountHighlight(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCountHighlight(cursoredRequestByFileTypeDTO));
+    }
+
+    @Override
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredNew(CursorCommonRequestDTO commonRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveNewCursored(commonRequestDTO));
+    }
+
+    @Override
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredNewHighlight(CursorCommonRequestDTO commonRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveNewCursoredHighlight(commonRequestDTO));
     }
 
 }

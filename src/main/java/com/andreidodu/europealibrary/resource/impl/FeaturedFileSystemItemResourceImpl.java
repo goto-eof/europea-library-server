@@ -1,10 +1,6 @@
 package com.andreidodu.europealibrary.resource.impl;
 
-import com.andreidodu.europealibrary.dto.CursorRequestDTO;
-import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
-import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
-import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
-import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.resource.FeaturedFileSystemItemResource;
 import com.andreidodu.europealibrary.service.FeaturedFileSystemItemService;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +15,13 @@ public class FeaturedFileSystemItemResourceImpl implements FeaturedFileSystemIte
     private final FeaturedFileSystemItemService featuredFileSystemItemService;
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(CursorRequestDTO cursorRequestDTO) {
-        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursored(cursorRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO) {
+        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursored(cursorCommonRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(CursorRequestDTO cursorRequestDTO) {
-        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursoredHighlight(cursorRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(CursorCommonRequestDTO cursorCommonRequestDTO) {
+        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursoredHighlight(cursorCommonRequestDTO));
     }
 
     @Override
@@ -42,4 +38,5 @@ public class FeaturedFileSystemItemResourceImpl implements FeaturedFileSystemIte
     public ResponseEntity<OperationStatusDTO> removeFeatured(Long fileSystemItemId) {
         return ResponseEntity.ok(featuredFileSystemItemService.removeFeatured(fileSystemItemId));
     }
+
 }

@@ -1,14 +1,12 @@
 package com.andreidodu.europealibrary.service;
 
-import com.andreidodu.europealibrary.dto.CursorRequestDTO;
-import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
-import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
-import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
-import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.*;
 
 public interface FeaturedFileSystemItemService {
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursored(CursorRequestDTO cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO);
+
+    GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredHighlight(CursorCommonRequestDTO cursorCommonRequestDTO);
 
     OperationStatusDTO addFeatured(Long fileSystemItemId);
 
@@ -16,5 +14,4 @@ public interface FeaturedFileSystemItemService {
 
     OperationStatusDTO isFeatured(Long fileSystemItemId);
 
-    GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredHighlight(CursorRequestDTO cursorRequestDTO);
 }

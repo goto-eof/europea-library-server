@@ -1,19 +1,7 @@
 package com.andreidodu.europealibrary.resource;
 
 import com.andreidodu.europealibrary.annotation.security.AllowOnlyAuthenticatedUsers;
-import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorTypeRequestDTO;
-import com.andreidodu.europealibrary.dto.CursoredCategoryDTO;
-import com.andreidodu.europealibrary.dto.CursoredFileExtensionDTO;
-import com.andreidodu.europealibrary.dto.CursoredFileSystemItemDTO;
-import com.andreidodu.europealibrary.dto.CursoredTagDTO;
-import com.andreidodu.europealibrary.dto.FileExtensionDTO;
-import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
-import com.andreidodu.europealibrary.dto.GenericCursorRequestDTO;
-import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
-import com.andreidodu.europealibrary.dto.SearchFileSystemItemRequestDTO;
-import com.andreidodu.europealibrary.dto.SearchResultDTO;
+import com.andreidodu.europealibrary.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -68,5 +56,15 @@ public interface CursoredFileResource {
     ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByRating(@RequestBody CursorRequestDTO cursorRequestDTO);
 
     @PostMapping(path = "/cursored/downloadCount")
-    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(CommonCursoredRequestDTO commonCursoredRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(@Valid @RequestBody CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
+
+    @PostMapping(path = "/cursored/downloadCount/highlight")
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredByDownloadCountHighlight(@Valid @RequestBody CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
+
+    @PostMapping(path = "/cursored/new")
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredNew(@Valid @RequestBody CursorCommonRequestDTO commonRequestDTO);
+
+    @PostMapping(path = "/cursored/new/highlight")
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredNewHighlight(@Valid @RequestBody CursorCommonRequestDTO commonRequestDTO);
+
 }

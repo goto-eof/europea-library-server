@@ -275,6 +275,24 @@
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_application_settings"/>
             </column>
             <column name="application_lock" type="boolean" defaultValueBoolean="false"/>
+            <column name="protected_downloads" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="custom_description_enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="home_page_w_featured_books_enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="home_page_w_featured_book_enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="home_page_w_new_books_enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="home_page_w_popular_books_enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
