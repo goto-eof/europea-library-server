@@ -60,7 +60,7 @@ public class ExternalMetaInfoStepConfig {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
         queryProvider.setSelectClause("SELECT distinct fsi.id, base_path");
         queryProvider.setFromClause("FROM el_file_system_item fsi, el_file_meta_info fmi, el_book_info bi");
-        queryProvider.setWhereClause("WHERE fsi.record_status = 1 and fsi.is_directory is false and fsi.file_meta_info_id = fmi.id and bi.file_meta_info_id=fmi.id and bi.web_retrievement_status is null and bi.manual_lock = 0 and (bi.isbn13 is not null or bi.authors is not null or bi.publisher is not null)");
+        queryProvider.setWhereClause("WHERE fsi.record_status = 1 and fsi.is_directory is false and fsi.file_meta_info_id = fmi.id and bi.file_meta_info_id=fmi.id and bi.web_retrievement_status is null and (bi.manual_lock is null or bi.manual_lock = 0) and (bi.isbn13 is not null or bi.authors is not null or bi.publisher is not null)");
         Map<String, Order> orderByKeys = new HashMap<>();
         orderByKeys.put("base_path", Order.ASCENDING);
         queryProvider.setSortKeys(orderByKeys);

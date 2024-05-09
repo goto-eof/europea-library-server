@@ -68,6 +68,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(category.id.eq(categoryId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+
         if (cursorId != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
@@ -96,6 +98,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(tag.id.eq(tagId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+
         if (cursorRequestDTO.getNextCursor() != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
@@ -124,6 +128,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.extension.eq(extension));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+
         if (cursorTypeRequestDTO.getNextCursor() != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
@@ -186,6 +192,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.language.eq(parent));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+
         if (cursorRequestDTO.getNextCursor() != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
@@ -214,6 +222,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publisher.eq(parent));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+
         if (cursorRequestDTO.getNextCursor() != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
@@ -474,6 +484,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
+        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+
         if (cursorId != null) {
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }

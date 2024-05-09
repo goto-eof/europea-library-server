@@ -5,8 +5,8 @@
                             ⣿⣿⣿⣿⡿⠏⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠹⢿⣿⣿⣿⣿
                             ⣿⣿⣿⣿⣟⣠⣄⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣠⣄⣻⣿⣿⣿⣿
                             ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
-                            ⣿⣿⣿⡍⠀⢩⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡍⠀⢩⣿⣿⣿
-                            ⣿⣿⣿⣷⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣾⣿⣿⣿
+                            ⣿⣿⣿⡍⠀⢩⣿⣿⣿⣿⣿⣿⣿⣿⡍⠀⢩⣿⣿⣿⣿⣿⣿⣿⡍⠀⢩⣿⣿⣿
+                            ⣿⣿⣿⣷⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣾⣿⣿⣿⣿⣿⣿⣿⣷⣶⣾⣿⣿⣿
                             ⣿⣿⣿⣿⡿⠟⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠻⢿⣿⣿⣿⣿
                             ⣿⣿⣿⣿⡷⣀⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢀⣀⢾⣿⣿⣿⣿
                             ⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠻⣿⣿⣿⣿⣿⣿⣿⣿⠟⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿
@@ -21,16 +21,61 @@
                                                                           SERVER
 ```
 
-# Europea Library (server)
+# Introduction
+
+Because I have many e-books, one day, I get up and said "Why not create a web application that allows to
+index, catalogue, search and provide e-book information?". In this way was born Europea Library.
+
+# What is Europea Library (server)
 
 A library web application that allows to index, edit, explore, retrieve information about books from file metadata/web (
-by using
-multi-threading), search and download e-books (need to be authenticated in order to be able to download). The front-end
-project can be
+by using multi-threading), search and download e-books. The front-end project can be
 found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can be
 cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
 
-## Run the project
+## How the application works?
+
+The core of the application is the indexer job. It retrieves all the information about files and saves them on the DB.
+The indexing process consists of file metadata extraction and web metadata retrievement (in particular from Google Books
+API). On the first run the job it will take some time to index and extract information from files or retrieve
+them from web. This happens because the file metadata extraction and the web metadata retrievement is expensive in terms
+of resources even if I implemented a **multithreading job**. The next job run will take less time, because the metadata
+extraction was done for all the files (except the cases when the directory contains new e-books). After the job
+completed all steps, the API becomes available for queries, so that the client application can interact with the API (
+otherwise an HTTP 404 status is returned). Moreover, the indexer job starts every night at 00:00 PM (configurable). If
+the job is already running then it will continue to process files and no other job will run.
+After the job finished it's work, the e-book database is made available for exploration. In particular, the front-end
+is able to list the files in different ways and orders, it allows also to filter the results or search for a e-book.
+Moreover, it is also possible to view e-book information, update it, change the cover image and finally, download the
+e-book. The file download is customizable, in particular, the administrator can choose if only authenticated users
+should be able to download files or also not authenticated users have this right.
+Currently, there are 3 categories of users: ADMINISTRATOR, USER and not authenticated user. ADMINISTRATOR is able to
+customize the Home Page, to run the job and reload the application cache. While the user is able to download e-books (as
+I said, this feature is customizable). All the users, authenticated and not authenticated, are able to explore the
+library, search for an e-book and view book information.
+
+## Features
+
+- index and catalog large digital books collection quickly;
+- explore e-books by directory/top rated/featured/number of downloads/just added/category/tags/file
+  extension/language/publisher/published date;
+- view book information;
+- download e-books;
+- search by title, author, publisher, ISBN and published date;
+- edit e-book information, including change book cover image (only administrator is able to do this);
+- generate e-book URL QR Code;
+- login/change password/register to the system and change password (2 categories of user: ADMINISTRATOR and USER);
+- password reset
+- bulk category/tag/language/publisher name change  (only administrator is able to do this);
+- control panel (administration for admin, profile and security for all users)
+    - customize home page
+        - enable/disable widgets
+    - enable/disable protected downloads feature (only authenticated users or not authenticated are able to download
+      e-books)
+    - start/stop job
+    - reload application cache
+
+## Run the project (test environment)
 
 Before running the software as Spring Boot application it is necessary to follow some steps:
 
@@ -49,22 +94,10 @@ Before running the software as Spring Boot application it is necessary to follow
       default-admin-password: password
       ```
     - edit the `qr-code-path` property in order to allow to generate QR Codes for each e-book;
-    - generate certificates for encrypting and decrypting our JWT tokens in `src/main/resources/certs`:
-        - Generate a Private Key (RSA):
+    - generate certificates for encrypting and decrypting our JWT tokens in `src/main/resources/certs` by executing this
+      set of commands:
         ```
-        openssl genpkey -algorithm RSA -out private-key-old.pem
-        ```
-        - Extract the Public Key from the Private Key by running:
-        ```
-        openssl rsa -pubout -in private-key-old.pem -out public-key.pem
-        ```
-        - Then convert it to the appropriate PCKS format
-        ```
-        openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key-old.pem -out private-key.pem -nocrypt
-        ```
-        - Remove the old `.pem` file
-        ```
-        rm private-key-old.pem
+        openssl genpkey -algorithm RSA -out private-key-old.pem && openssl rsa -pubout -in private-key-old.pem -out public-key.pem && openssl pkcs8 -topk8 -inform PEM -outform PEM -in private-key-old.pem -out private-key.pem -nocrypt &&   rm private-key-old.pem
         ```
         - Now you should have a `private-key.pem` and a `public-key.pem` file in `src/main/resources/certs`
     - start the DBMS from the projects root directory with `sudo docker-compose up -d` command or create from your
@@ -89,36 +122,9 @@ Before running the software as Spring Boot application it is necessary to follow
       ./start.sh
       ```
 
-## How the application works?
-
-The core of the application is the indexer job. It retrieves all the information about files and saves them on the DB.
-The indexing process consists of file metadata extraction and web metadata retrievement (in particular from Google Books
-API). On the first run the job it will take some time to index and extract information from files or retrieve
-them from web. This happens because the file metadata extraction and the web metadata retrievement is expensive in terms
-of resources even if I implemented a **multithreading job**. The next job run will take less time, because the metadata
-extraction was done for all the files (except the cases when the directory contains new e-books). After the job
-completed all steps, the API becomes available for queries, so that the client application can interact with the API (
-otherwise an HTTP 404 status is returned). Moreover, the indexer job starts every night at 11:00 PM (configurable). If
-the job is already running then it will continue to process files and no other job will run.
-
 # API documentation
 
 The API documentation can be accessed here: http://localhost:8081/swagger-ui/index.html
-
-## Features
-
-- index and catalog large digital books collection quickly;
-- explore e-books by directory/top rated/featured/category/tag/file type/language/publisher;
-- view book information;
-- download e-books (only authenticated users are able to do this);
-- search by title, author, publisher, ISBN and published date;
-- edit e-book information, including change book cover image (only administrator is able to do this);
-- generate e-book URL QR Code;
-- login/register to the system and change password (2 categories of user: ADMINISTRATOR and USER);
-- password reset
-- bulk category/tag/language/publisher name change  (only administrator is able to do this);
-- control panel (administration for admin, profile and security for all users).
-- customizable Home Page
 
 ## Job steps
 
@@ -141,7 +147,8 @@ Google Books API
 
 ## More
 
-- Currently, I do not add new changesets to liquibase (the base schema is still in definition status), so that sometimes
+- Currently, I do not add *alter* changesets to liquibase (the base schema is still in definition status), so that
+  sometimes
   it is necessary to drop all tables and restart the application.
 - During my tests (in debug mode) I noticed that the job, in order to index and extract metadata from 8.850 files in a
   single-thread context,

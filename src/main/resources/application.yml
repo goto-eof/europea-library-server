@@ -57,7 +57,7 @@ com:
       rsa:
         private-key: classpath:certs/private-key.pem
         public-key: classpath:certs/public-key.pem
-      allowed-urls-when-job-is-running: /api/v1/job/indexer/stop,/api/v1/job/indexer/isRunning,/api/v1/auth/login,/api/v1/auth/me,/api/v1/auth/register,/api/v1/auth/changePassword,/api/v1/post/identifier/home-page.article,/api/v1/featured/cursored/highlight
+      allowed-urls-when-job-is-running: /api/v1/job/indexer/stop,/api/v1/job/indexer/isRunning,/api/v1/auth/login,/api/v1/auth/me,/api/v1/auth/register,/api/v1/auth/changePassword,/api/v1/post/identifier/home-page.article,/api/v1/featured/cursored/highlight,/api/v1/settings
       transaction-timeout-milliseconds: 60000
       qr-code-path: /your/path
       default-admin-username: admin
