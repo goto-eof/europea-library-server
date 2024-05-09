@@ -57,8 +57,18 @@ library, search for an e-book and view book information.
 ## Features
 
 - index and catalog large digital books collection quickly;
-- explore e-books by directory/top rated/featured/number of downloads/just added/category/tags/file
-  extension/language/publisher/published date;
+- explore e-books by
+    - directory
+    - top-rated
+    - featured
+    - number of downloads
+    - just added
+    - category
+    - tags
+    - file extension
+    - language
+    - publisher
+    - published date;
 - view book information;
 - download e-books;
 - search by title, author, publisher, ISBN and published date;
