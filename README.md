@@ -24,7 +24,7 @@
 # Introduction
 
 Because I have many e-books, one day, I get up and said "Why not create a web application that allows to
-index, catalogue, search and provide e-book information?". In this way was born Europea Library.
+index, catalogue, search and provide e-book information?". In this way was born Europea Library :)
 
 # What is Europea Library (server)
 
