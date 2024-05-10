@@ -121,30 +121,15 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     public List<FileSystemItem> retrieveChildrenByCursoredFileExtension(CursorTypeRequestDTO cursorTypeRequestDTO) {
         Objects.requireNonNull(cursorTypeRequestDTO.getExtension());
 
-        final String extension = cursorTypeRequestDTO.getExtension();
-        Long cursorId = cursorTypeRequestDTO.getNextCursor();
-
-        int numberOfResults = LimitUtil.calculateLimit(cursorTypeRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
-
-        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
-
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(fileSystemItem.extension.eq(extension));
-        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
-        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+        booleanBuilder.and(fileSystemItem.extension.eq(cursorTypeRequestDTO.getExtension()));
 
-        if (cursorTypeRequestDTO.getNextCursor() != null) {
-            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
-        }
 
-        return new JPAQuery<FileSystemItem>(entityManager)
-                .select(fileSystemItem)
-                .from(fileSystemItem)
-                .where(booleanBuilder)
-                .limit(numberOfResults + 1)
-                .orderBy(fileSystemItem.id.asc())
-                .fetch();
+        OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
+                fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
+        };
 
+        return this.basicRetrieve(cursorTypeRequestDTO.getNextCursor(), cursorTypeRequestDTO.getLimit(), booleanBuilder, customOrder);
     }
 
     @Override
@@ -184,30 +169,14 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     public List<FileSystemItem> retrieveChildrenByCursoredLanguage(GenericCursorRequestDTO<String> cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParent());
 
-        String parent = cursorRequestDTO.getParent();
-        Long cursorId = cursorRequestDTO.getNextCursor();
-
-        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
-
-        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
-
-
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.language.eq(parent));
-        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
-        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.language.eq(cursorRequestDTO.getParent()));
 
-        if (cursorRequestDTO.getNextCursor() != null) {
-            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
-        }
+        OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
+                fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
+        };
 
-        return new JPAQuery<FileSystemItem>(entityManager)
-                .select(fileSystemItem)
-                .from(fileSystemItem)
-                .where(booleanBuilder)
-                .limit(numberOfResults + 1)
-                .orderBy(fileSystemItem.id.asc())
-                .fetch();
+        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder);
     }
 
     @Override
