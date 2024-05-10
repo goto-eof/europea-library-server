@@ -385,7 +385,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .ifPresent((fileType) -> customWhere.and(fileSystemItem.extension.equalsIgnoreCase(cursoredRequestByFileTypeDTO.getFileType())));
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
-                fileSystemItem.downloadCount.desc(), fileSystemItem.id.desc()
+                fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
         };
 
         return this.basicRetrieve(cursoredRequestByFileTypeDTO.getNextCursor(), cursoredRequestByFileTypeDTO.getLimit(), customWhere, customOrder);
@@ -395,7 +395,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     public List<FileSystemItem> retrieveNewCursored(CursorCommonRequestDTO commonRequestDTO) {
         OrderSpecifier<?>[] order = new OrderSpecifier[]{
                 fileSystemItem.createdDate.desc(),
-                fileSystemItem.id.desc()
+                fileSystemItem.id.asc()
         };
 
         return this.basicRetrieve(commonRequestDTO.getNextCursor(), commonRequestDTO.getLimit(), new BooleanBuilder(), order);
@@ -407,7 +407,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
-        Optional.ofNullable(cursorId).ifPresent((cId) -> booleanBuilder.and(fileSystemItem.id.goe(cId)));
+        Optional.ofNullable(cursorId).ifPresent((cursorIdValue) -> booleanBuilder.and(fileSystemItem.id.goe(cursorIdValue)));
 
         booleanBuilder.and(customWhere);
 
