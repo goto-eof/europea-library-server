@@ -68,7 +68,6 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QCategory category = QCategory.category;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(category.id.eq(categoryId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
 
@@ -78,8 +77,10 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
-                .from(fileSystemItem, category)
-                .where(booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.categoryList.contains(category)))
+                .from(fileSystemItem)
+                .where(booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.categoryList.contains(
+                        JPAExpressions.select(category).from(category).where(category.id.eq(categoryId))
+                )))
                 .limit(numberOfResults + 1)
                 .orderBy(fileSystemItem.id.asc())
                 .fetch();
@@ -213,30 +214,14 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     public List<FileSystemItem> retrieveChildrenByCursoredPublisher(GenericCursorRequestDTO<String> cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParent());
 
-        String parent = cursorRequestDTO.getParent();
-        Long cursorId = cursorRequestDTO.getNextCursor();
-
-        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
-
-        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
-
-
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publisher.eq(parent));
-        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
-        booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
+        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publisher.eq(cursorRequestDTO.getParent()));
 
-        if (cursorRequestDTO.getNextCursor() != null) {
-            booleanBuilder.and(fileSystemItem.id.goe(cursorId));
-        }
+        OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
+                fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
+        };
 
-        return new JPAQuery<FileSystemItem>(entityManager)
-                .select(fileSystemItem)
-                .from(fileSystemItem)
-                .where(booleanBuilder)
-                .limit(numberOfResults + 1)
-                .orderBy(fileSystemItem.id.asc())
-                .fetch();
+        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder);
     }
 
     @Override
@@ -435,8 +420,6 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         };
 
         return this.basicRetrieve(cursoredRequestByFileTypeDTO.getNextCursor(), cursoredRequestByFileTypeDTO.getLimit(), customWhere, customOrder);
-
-
     }
 
     @Override

@@ -142,6 +142,21 @@ com:
             batch-size: 100
           step-category-obsolete-deleter:
             batch-size: 100
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true
+    env:
+      roles: ADMINISTRATOR
+      show-values: WHEN_AUTHORIZED
+
 logging:
   file:
     name: /your/path/europea-library.log
