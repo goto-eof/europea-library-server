@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.dto;
+package com.andreidodu.europealibrary.dto.stripe;
 
 import com.andreidodu.europealibrary.dto.common.CommonDTO;
 import com.andreidodu.europealibrary.model.security.User;

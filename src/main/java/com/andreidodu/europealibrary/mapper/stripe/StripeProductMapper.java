@@ -1,6 +1,7 @@
-package com.andreidodu.europealibrary.mapper;
+package com.andreidodu.europealibrary.mapper.stripe;
 
-import com.andreidodu.europealibrary.dto.StripeProductDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripeProductDTO;
+import com.andreidodu.europealibrary.mapper.FileMetaInfoBookMapper;
 import com.andreidodu.europealibrary.model.stripe.StripeProduct;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;

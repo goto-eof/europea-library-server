@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.dto;
+package com.andreidodu.europealibrary.dto.stripe;
 
 import lombok.Getter;
 import lombok.Setter;

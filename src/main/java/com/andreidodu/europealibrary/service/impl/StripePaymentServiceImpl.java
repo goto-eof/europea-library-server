@@ -1,10 +1,14 @@
 package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionRequestDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionResponseDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripeCustomerDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripeUserRegistrationRequestDTO;
 import com.andreidodu.europealibrary.enums.StripePurchaseSessionStatus;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.exception.ValidationException;
-import com.andreidodu.europealibrary.mapper.StripeCustomerMapper;
+import com.andreidodu.europealibrary.mapper.stripe.StripeCustomerMapper;
 import com.andreidodu.europealibrary.model.stripe.StripeCustomer;
 import com.andreidodu.europealibrary.model.stripe.StripeCustomerProductsOwned;
 import com.andreidodu.europealibrary.model.stripe.StripeProduct;
@@ -46,6 +50,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
 
     public static final String STRIPE_SIGNATURE_HEADER = "Stripe-Signature";
     public static final String STRIPE_EVENT_CHECKOUT_SESSION_COMPLETED = "checkout.session.completed";
+
     @Value("${com.andreidodu.europea-library.stripe.secret-key}")
     private String secretKey;
 

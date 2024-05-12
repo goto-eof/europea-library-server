@@ -2,8 +2,8 @@ package com.andreidodu.europealibrary.resource;
 
 
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.StripeCheckoutSessionRequestDTO;
-import com.andreidodu.europealibrary.dto.StripeCheckoutSessionResponseDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionRequestDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

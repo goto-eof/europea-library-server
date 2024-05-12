@@ -1,8 +1,8 @@
 package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.StripeCheckoutSessionRequestDTO;
-import com.andreidodu.europealibrary.dto.StripeCheckoutSessionResponseDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionRequestDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionResponseDTO;
 import com.andreidodu.europealibrary.resource.PaymentResource;
 import com.andreidodu.europealibrary.service.StripePaymentService;
 import lombok.RequiredArgsConstructor;
