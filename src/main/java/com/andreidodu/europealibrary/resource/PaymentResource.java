@@ -4,6 +4,7 @@ package com.andreidodu.europealibrary.resource;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionRequestDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionResponseDTO;
+import com.stripe.exception.StripeException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +22,7 @@ public interface PaymentResource {
 
     @PostMapping("/initCheckoutSession")
     @Operation(summary = "Init the checkout sessions", description = "")
-    ResponseEntity<StripeCheckoutSessionResponseDTO> initCheckoutSession(@Parameter(description = "Model containing the product id", example = "{productId: Long}") @Valid @RequestBody StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO, Authentication authentication);
+    ResponseEntity<StripeCheckoutSessionResponseDTO> initCheckoutSession(@Parameter(description = "Model containing the product id", example = "{productId: Long}") @Valid @RequestBody StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO, Authentication authentication) throws StripeException;
 
     @PostMapping("/checkPurchaseSessionStatus/{purchaseSessionId}")
     @Operation(summary = "", description = "")

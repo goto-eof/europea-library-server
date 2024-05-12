@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StripeCheckoutSessionResponseDTO {
-    private Long sessionId;
+    private String sessionId;
     private String stripePublicKey;
 }

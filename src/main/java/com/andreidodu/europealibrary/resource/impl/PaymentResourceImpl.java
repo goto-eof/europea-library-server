@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionRequestDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionResponseDTO;
 import com.andreidodu.europealibrary.resource.PaymentResource;
 import com.andreidodu.europealibrary.service.StripePaymentService;
+import com.stripe.exception.StripeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,8 @@ public class PaymentResourceImpl implements PaymentResource {
     private final StripePaymentService stripePaymentService;
 
     @Override
-    public ResponseEntity<StripeCheckoutSessionResponseDTO> initCheckoutSession(StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO, Authentication authentication) {
-        return ResponseEntity.ok(this.stripePaymentService.initCheckoutSession(stripeCheckoutSessionRequestDTO));
+    public ResponseEntity<StripeCheckoutSessionResponseDTO> initCheckoutSession(StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO, Authentication authentication) throws StripeException {
+        return ResponseEntity.ok(this.stripePaymentService.initCheckoutSession(stripeCheckoutSessionRequestDTO, authentication.getName()));
     }
 
     @Override

@@ -15,6 +15,7 @@ import com.andreidodu.europealibrary.model.stripe.StripeProduct;
 import com.andreidodu.europealibrary.model.stripe.StripePurchaseSession;
 import com.andreidodu.europealibrary.repository.StripeCustomerProductsOwnedRepository;
 import com.andreidodu.europealibrary.repository.StripeCustomerRepository;
+import com.andreidodu.europealibrary.repository.StripeProductRepository;
 import com.andreidodu.europealibrary.repository.StripePurchaseSessionRepository;
 import com.andreidodu.europealibrary.repository.security.UserRepository;
 import com.andreidodu.europealibrary.service.StripePaymentService;
@@ -63,6 +64,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     private final StripeCustomerProductsOwnedRepository stripeCustomerProductsOwnedRepository;
     private final StripePurchaseSessionRepository stripePurchaseSessionRepository;
     private final StripeCustomerRepository stripeCustomerRepository;
+    private final StripeProductRepository stripeProductRepository;
     private final UserRepository userRepository;
 
     private final StripeCustomerMapper stripeCustomerMapper;
@@ -70,6 +72,11 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     @PostConstruct
     private void postConstruct() {
         Stripe.apiKey = secretKey;
+    }
+
+    @Override
+    public OperationStatusDTO isStripeCustomer(String email) {
+        return new OperationStatusDTO(this.stripeCustomerRepository.existsByUser_email(email));
     }
 
     @Override
@@ -83,8 +90,33 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     }
 
     @Override
-    public StripeCheckoutSessionResponseDTO initCheckoutSession(StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO) {
+    public StripeCheckoutSessionResponseDTO initCheckoutSession(StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO, String username) throws StripeException {
         StripeCheckoutSessionResponseDTO stripeCheckoutSessionResponseDTO = new StripeCheckoutSessionResponseDTO();
+
+        StripeCustomer stripeCustomer = this.stripeCustomerRepository.findByUser_username(username).orElseThrow(() -> new ValidationException("User not found"));
+
+        StripePurchaseSession stripePurchaseSession = new StripePurchaseSession();
+        stripePurchaseSession.setStripeCustomer(stripeCustomer);
+        StripeProduct stripeProduct = this.stripeProductRepository.findByStripeProduct_fileMetaInfo_id(stripeCheckoutSessionRequestDTO.getFileMetaInfoId())
+                .orElseThrow(() -> new ValidationException("Product not found"));
+        stripePurchaseSession.setStripeProduct(stripeProduct);
+        stripePurchaseSession.setStripePurchaseSessionStatus(StripePurchaseSessionStatus.CHECKOUT_IN_PROGRESS);
+        stripePurchaseSession = this.stripePurchaseSessionRepository.save(stripePurchaseSession);
+
+        String clientReferenceId = String.valueOf(stripePurchaseSession.getId());
+        String price = String.valueOf(stripeProduct.getAmount());
+        long quantity = stripeCheckoutSessionRequestDTO.getQuantity();
+
+        Session session = this.createOneShotCheckoutSession(stripeCheckoutSessionRequestDTO.getCheckoutBaseUrl(),
+                stripeCustomer.getStripeCustomerId(),
+                clientReferenceId,
+                price,
+                quantity,
+                SessionCreateParams.PaymentMethodType.CARD
+        );
+
+        stripeCheckoutSessionResponseDTO.setSessionId(session.getId());
+        stripeCheckoutSessionResponseDTO.setStripePublicKey(publicKey);
         return stripeCheckoutSessionResponseDTO;
     }
 
@@ -200,7 +232,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         return Session.create(params);
     }
 
-    private Session createOneShotCheckoutSession(String checkoutBaseUrl, String stripeCustomerId, String clientReferenceId, String priceStripeId, Long quantity, SessionCreateParams.PaymentMethodType paymentMethodType) throws StripeException {
+    private Session createOneShotCheckoutSession(String checkoutBaseUrl, String stripeCustomerId, String clientReferenceId, String price, Long quantity, SessionCreateParams.PaymentMethodType paymentMethodType) throws StripeException {
         SessionCreateParams params =
                 SessionCreateParams.builder()
                         .setSuccessUrl(checkoutBaseUrl + "&ongoingPurchaseSessionId=" + clientReferenceId)
@@ -209,7 +241,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                         .addPaymentMethodType(paymentMethodType)
                         .addLineItem(
                                 SessionCreateParams.LineItem.builder()
-                                        .setPrice(priceStripeId)
+                                        .setPrice(price)
                                         .setQuantity(quantity)
                                         .build()
                         )

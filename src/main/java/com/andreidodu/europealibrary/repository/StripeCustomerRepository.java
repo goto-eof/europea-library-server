@@ -8,4 +8,8 @@ import java.util.Optional;
 
 public interface StripeCustomerRepository extends TransactionalRepository<StripeCustomer, Long> {
     Optional<StripeCustomer> findByUser_email(String email);
+
+    boolean existsByUser_email(String email);
+
+    Optional<StripeCustomer> findByUser_username(String username);
 }

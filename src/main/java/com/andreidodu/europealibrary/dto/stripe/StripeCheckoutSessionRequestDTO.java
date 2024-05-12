@@ -6,5 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StripeCheckoutSessionRequestDTO {
-    private Long productId;
+    private Long fileMetaInfoId;
+    private String checkoutBaseUrl;
+    private Long quantity;
 }
