@@ -3,9 +3,15 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.StripeCheckoutSessionRequestDTO;
 import com.andreidodu.europealibrary.dto.StripeCheckoutSessionResponseDTO;
+import com.andreidodu.europealibrary.enums.StripePurchaseSessionStatus;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.model.stripe.StripeCustomer;
+import com.andreidodu.europealibrary.model.stripe.StripeCustomerProductsOwned;
+import com.andreidodu.europealibrary.model.stripe.StripeProduct;
+import com.andreidodu.europealibrary.model.stripe.StripePurchaseSession;
+import com.andreidodu.europealibrary.repository.StripeCustomerProductsOwnedRepository;
 import com.andreidodu.europealibrary.repository.StripeCustomerRepository;
+import com.andreidodu.europealibrary.repository.StripePurchaseSessionRepository;
 import com.andreidodu.europealibrary.repository.security.UserRepository;
 import com.andreidodu.europealibrary.service.StripePaymentService;
 import com.nimbusds.jose.shaded.gson.JsonSyntaxException;
@@ -29,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,6 +44,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StripePaymentServiceImpl implements StripePaymentService {
 
+    public static final String STRIPE_SIGNATURE_HEADER = "Stripe-Signature";
+    public static final String STRIPE_EVENT_CHECKOUT_SESSION_COMPLETED = "checkout.session.completed";
     @Value("${com.andreidodu.europea-library.stripe.secret-key}")
     private String secretKey;
 
@@ -46,6 +55,8 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     @Value("${com.andreidodu.europea-library.stripe.public-key}")
     private String publicKey;
 
+    private final StripeCustomerProductsOwnedRepository stripeCustomerProductsOwnedRepository;
+    private final StripePurchaseSessionRepository stripePurchaseSessionRepository;
     private final StripeCustomerRepository stripeCustomerRepository;
     private final UserRepository userRepository;
 
@@ -66,7 +77,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         String payload = httpServletRequest.getReader()
                 .lines()
                 .collect(Collectors.joining(System.lineSeparator()));
-        String sigHeader = httpServletRequest.getHeader("Stripe-Signature");
+        String sigHeader = httpServletRequest.getHeader(STRIPE_SIGNATURE_HEADER);
         Event event = null;
 
         try {
@@ -88,25 +99,34 @@ public class StripePaymentServiceImpl implements StripePaymentService {
             return HttpStatus.BAD_REQUEST;
         }
         // Handle the event
-        switch (event.getType()) {
-            case "checkout.session.completed": {
-                // TODO change purchase session status to completed
-                // TODO save stripe customer id and reuse it for the next payment
-                Session session = (Session) stripeObject;
-                String customerStripeId = session.getCustomer();
-                long purchaseSessionId = Long.parseLong(session.getClientReferenceId());
-
-                break;
+        if (event.getType().equals(STRIPE_EVENT_CHECKOUT_SESSION_COMPLETED)) {
+            Session session = (Session) stripeObject;
+            String customerStripeId = session.getCustomer();
+            long purchaseSessionId = Long.parseLong(session.getClientReferenceId());
+            Optional<StripePurchaseSession> stripePurchaseSessionOptional = this.stripePurchaseSessionRepository.findById(purchaseSessionId);
+            if (stripePurchaseSessionOptional.isEmpty()) {
+                return HttpStatus.BAD_REQUEST;
             }
-            // ... handle other event types
-            default:
-                System.out.println("Unhandled event type: " + event.getType());
+            StripePurchaseSession stripePurchaseSession = stripePurchaseSessionOptional.get();
+            stripePurchaseSession.setStripePurchaseSessionStatus(StripePurchaseSessionStatus.CHECKOUT_COMPLETED);
+            final StripePurchaseSession savedStripePurchaseSession = this.stripePurchaseSessionRepository.save(stripePurchaseSession);
+
+            this.stripeCustomerRepository.findByUser_email(session.getCustomerEmail())
+                    .ifPresent(stripeCustomer -> {
+                        stripeCustomer.setStripeCustomerId(customerStripeId);
+                        stripeCustomer = this.stripeCustomerRepository.save(stripeCustomer);
+
+                        StripeProduct stripeProduct = savedStripePurchaseSession.getStripeProduct();
+                        StripeCustomerProductsOwned stripeCustomerProductsOwned = new StripeCustomerProductsOwned();
+                        stripeCustomerProductsOwned.setStripeCustomer(stripeCustomer);
+                        stripeCustomerProductsOwned.setStripeProduct(stripeProduct);
+                        this.stripeCustomerProductsOwnedRepository.save(stripeCustomerProductsOwned);
+                    });
+            return HttpStatus.OK;
+        } else {
+            System.out.println("Unhandled event type: " + event.getType());
         }
-
-
-        return HttpStatus.OK;
-
-
+        return HttpStatus.BAD_REQUEST;
     }
 
     @Override
@@ -187,14 +207,14 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         StripeCustomer stripeCustomer = new StripeCustomer();
         stripeCustomer.setFirstName(firstName);
         stripeCustomer.setLastName(lastName);
-//        stripeCustomer.setUser(this.userRepository.findByEmail(email).orElseThrow(() -> new ValidationException("User not found")));
-//        stripeCustomer.setStripeCustomerId(null);
+        stripeCustomer.setUser(this.userRepository.findByEmail(email).orElseThrow(() -> new ValidationException("User not found")));
+        stripeCustomer.setStripeCustomerId(null);
         return this.stripeCustomerRepository.save(stripeCustomer);
     }
 
     private StripeCustomer updateStripeCustomerId(String email, String stripeCustomerId) {
         StripeCustomer stripeCustomer = this.stripeCustomerRepository.findByUser_email(email).orElseThrow(() -> new ValidationException("Stripe Customer not found"));
-//        stripeCustomer.setStripeCustomerId(stripeCustomerId);
+        stripeCustomer.setStripeCustomerId(stripeCustomerId);
         return this.stripeCustomerRepository.save(stripeCustomer);
     }
 
