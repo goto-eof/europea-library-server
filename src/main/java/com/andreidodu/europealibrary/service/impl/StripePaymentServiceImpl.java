@@ -81,17 +81,21 @@ public class StripePaymentServiceImpl implements StripePaymentService {
 
         // Deserialize the nested object inside the event
         EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+        StripeObject stripeObject = null;
         if (dataObjectDeserializer.getObject().isPresent()) {
-            StripeObject stripeObject = dataObjectDeserializer.getObject().get();
-            // TODO change purchase session status to completed
-            // TODO save stripe customer id and reuse it for the next payment
+            stripeObject = dataObjectDeserializer.getObject().get();
         } else {
             return HttpStatus.BAD_REQUEST;
         }
         // Handle the event
         switch (event.getType()) {
-            case "payment_intent.succeeded": {
-                // Then define and call a function to handle the event payment_intent.succeeded
+            case "checkout.session.completed": {
+                // TODO change purchase session status to completed
+                // TODO save stripe customer id and reuse it for the next payment
+                Session session = (Session) stripeObject;
+                String customerStripeId = session.getCustomer();
+                long purchaseSessionId = Long.parseLong(session.getClientReferenceId());
+
                 break;
             }
             // ... handle other event types
@@ -183,14 +187,14 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         StripeCustomer stripeCustomer = new StripeCustomer();
         stripeCustomer.setFirstName(firstName);
         stripeCustomer.setLastName(lastName);
-        stripeCustomer.setUser(this.userRepository.findByEmail(email).orElseThrow(() -> new ValidationException("User not found")));
-        stripeCustomer.setStripeCustomerId(null);
+//        stripeCustomer.setUser(this.userRepository.findByEmail(email).orElseThrow(() -> new ValidationException("User not found")));
+//        stripeCustomer.setStripeCustomerId(null);
         return this.stripeCustomerRepository.save(stripeCustomer);
     }
 
     private StripeCustomer updateStripeCustomerId(String email, String stripeCustomerId) {
         StripeCustomer stripeCustomer = this.stripeCustomerRepository.findByUser_email(email).orElseThrow(() -> new ValidationException("Stripe Customer not found"));
-        stripeCustomer.setStripeCustomerId(stripeCustomerId);
+//        stripeCustomer.setStripeCustomerId(stripeCustomerId);
         return this.stripeCustomerRepository.save(stripeCustomer);
     }
 

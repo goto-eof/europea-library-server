@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -15,7 +17,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class StripeCustomer extends ModelCommon {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "el_stripe_customer_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "el_stripe_customer_seq", sequenceName = "el_stripe_customer_seq", allocationSize = 50)
     private Long id;
 
     @Column(name = "stripe_customer_id", unique = true)
@@ -28,7 +31,12 @@ public class StripeCustomer extends ModelCommon {
     private String lastName;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true, nullable = false)
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "stripeCustomer")
+    private List<StripeCustomerProductsOwned> stripeCustomerProductsOwnedList;
+
+    @OneToMany(mappedBy = "stripeCustomer")
+    private List<StripeCustomerPricingPlanOwned> stripeCustomerPricingPlanOwnedList;
 }
