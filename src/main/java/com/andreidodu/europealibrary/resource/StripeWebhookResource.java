@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 
-@RequestMapping("/api/v1/webhook")
+@RequestMapping("/api/v1/stripe/webhook")
 @Tag(name = "Payment", description = "Allows one-time purchase or subscriptions")
 public interface StripeWebhookResource {
 
