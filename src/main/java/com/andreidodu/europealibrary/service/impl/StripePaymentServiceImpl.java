@@ -75,8 +75,8 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     }
 
     @Override
-    public OperationStatusDTO isStripeCustomer(String email) {
-        return new OperationStatusDTO(this.stripeCustomerRepository.existsByUser_email(email));
+    public OperationStatusDTO isStripeCustomer(String username) {
+        return new OperationStatusDTO(this.stripeCustomerRepository.existsByUser_username(username));
     }
 
     @Override

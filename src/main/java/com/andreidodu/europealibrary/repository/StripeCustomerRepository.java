@@ -12,4 +12,6 @@ public interface StripeCustomerRepository extends TransactionalRepository<Stripe
     boolean existsByUser_email(String email);
 
     Optional<StripeCustomer> findByUser_username(String username);
+
+    boolean existsByUser_username(String username);
 }
