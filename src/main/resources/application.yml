@@ -53,6 +53,10 @@ springdoc:
 com:
   andreidodu:
     europea-library:
+      stripe:
+        secret-key: TBD
+        webhook-secret-key: TBD
+        public-key: TBD
       book-covers-directory: /your/path/here
       rsa:
         private-key: classpath:certs/private-key.pem

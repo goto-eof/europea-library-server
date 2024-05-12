@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.model.security;
 
 import com.andreidodu.europealibrary.model.common.ModelCommon;
+import com.andreidodu.europealibrary.model.stripe.StripeCustomer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -44,5 +45,8 @@ public class User extends ModelCommon {
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST})
     private List<Authority> authorityList;
+
+    @OneToOne(mappedBy = "user")
+    private StripeCustomer stripeCustomer;
 
 }
