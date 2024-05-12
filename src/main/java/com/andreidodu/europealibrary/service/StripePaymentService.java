@@ -1,8 +1,6 @@
 package com.andreidodu.europealibrary.service;
 
-import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.StripeCheckoutSessionRequestDTO;
-import com.andreidodu.europealibrary.dto.StripeCheckoutSessionResponseDTO;
+import com.andreidodu.europealibrary.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -10,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import java.io.IOException;
 
 public interface StripePaymentService {
+
+    StripeCustomerDTO createStripeCustomer(StripeUserRegistrationRequestDTO stripeUserRegistrationRequestDTO);
+
     StripeCheckoutSessionResponseDTO initCheckoutSession(StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO);
 
     HttpStatus checkoutSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException;

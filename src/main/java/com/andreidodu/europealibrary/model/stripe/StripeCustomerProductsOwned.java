@@ -1,7 +1,6 @@
 package com.andreidodu.europealibrary.model.stripe;
 
 import com.andreidodu.europealibrary.model.common.ModelCommon;
-import com.andreidodu.europealibrary.model.security.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

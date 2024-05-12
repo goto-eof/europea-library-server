@@ -1,10 +1,10 @@
 package com.andreidodu.europealibrary.service.impl;
 
-import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.StripeCheckoutSessionRequestDTO;
-import com.andreidodu.europealibrary.dto.StripeCheckoutSessionResponseDTO;
+import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.enums.StripePurchaseSessionStatus;
+import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.exception.ValidationException;
+import com.andreidodu.europealibrary.mapper.StripeCustomerMapper;
 import com.andreidodu.europealibrary.model.stripe.StripeCustomer;
 import com.andreidodu.europealibrary.model.stripe.StripeCustomerProductsOwned;
 import com.andreidodu.europealibrary.model.stripe.StripeProduct;
@@ -60,9 +60,21 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     private final StripeCustomerRepository stripeCustomerRepository;
     private final UserRepository userRepository;
 
+    private final StripeCustomerMapper stripeCustomerMapper;
+
     @PostConstruct
     private void postConstruct() {
         Stripe.apiKey = secretKey;
+    }
+
+    @Override
+    public StripeCustomerDTO createStripeCustomer(StripeUserRegistrationRequestDTO stripeUserRegistrationRequestDTO) {
+        StripeCustomer stripeCustomer = new StripeCustomer();
+        stripeCustomer.setUser(this.userRepository.findById(stripeUserRegistrationRequestDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("user not found")));
+        stripeCustomer.setFirstName(stripeUserRegistrationRequestDTO.getFirstName());
+        stripeCustomer.setLastName(stripeUserRegistrationRequestDTO.getLastName());
+        return this.stripeCustomerMapper.toDTO(this.stripeCustomerRepository.save(stripeCustomer));
     }
 
     @Override
