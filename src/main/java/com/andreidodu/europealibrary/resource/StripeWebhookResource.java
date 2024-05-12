@@ -19,9 +19,4 @@ public interface StripeWebhookResource {
     @Operation(summary = "Checkout session completed", description = "")
     ResponseEntity<String> checkoutSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException;
 
-    @PostMapping("/checkoutSubscriptionSessionCompleted")
-    @Operation(summary = "Checkout subscription session completed", description = "")
-    ResponseEntity<String> checkoutSubscriptionSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException;
-
-
 }

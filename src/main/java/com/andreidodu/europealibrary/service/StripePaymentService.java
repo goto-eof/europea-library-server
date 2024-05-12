@@ -22,7 +22,6 @@ public interface StripePaymentService {
 
     HttpStatus checkoutSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException;
 
-    OperationStatusDTO checkPurchaseSessionStatus(Long purchaseSessionId);
+    OperationStatusDTO isCheckoutPurchaseSessionCompleted(Long purchaseSessionId);
 
-    HttpStatus checkoutSubscriptionSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse);
 }

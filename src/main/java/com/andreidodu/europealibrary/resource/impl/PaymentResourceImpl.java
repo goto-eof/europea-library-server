@@ -25,7 +25,7 @@ public class PaymentResourceImpl implements PaymentResource {
 
     @Override
     public ResponseEntity<OperationStatusDTO> checkPurchaseSessionStatus(Long purchaseSessionId, Authentication authentication) {
-        return ResponseEntity.ok(this.stripePaymentService.checkPurchaseSessionStatus(purchaseSessionId));
+        return ResponseEntity.ok(this.stripePaymentService.isCheckoutPurchaseSessionCompleted(purchaseSessionId));
 
     }
 }

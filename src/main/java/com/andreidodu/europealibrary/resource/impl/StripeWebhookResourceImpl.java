@@ -24,10 +24,4 @@ public class StripeWebhookResourceImpl implements StripeWebhookResource {
                 .body("");
     }
 
-    @Override
-    public ResponseEntity<String> checkoutSubscriptionSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        return ResponseEntity
-                .status(this.stripePaymentService.checkoutSubscriptionSessionCompleted(httpServletRequest, httpServletResponse))
-                .body("");
-    }
 }
