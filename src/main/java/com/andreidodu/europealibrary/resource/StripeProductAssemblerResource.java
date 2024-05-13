@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.resource;
 
 
 import com.andreidodu.europealibrary.dto.stripe.StripePriceDTO;
-import com.andreidodu.europealibrary.dto.stripe.StripeProductDTO;
 import com.stripe.exception.StripeException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,7 +1,6 @@
 package com.andreidodu.europealibrary.service;
 
 import com.andreidodu.europealibrary.dto.stripe.StripePriceDTO;
-import com.andreidodu.europealibrary.dto.stripe.StripeProductDTO;
 import com.stripe.exception.StripeException;
 
 public interface StripeProductAssemblerService {
