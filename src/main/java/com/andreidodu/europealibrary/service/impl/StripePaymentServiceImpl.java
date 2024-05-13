@@ -23,11 +23,11 @@ import com.nimbusds.jose.shaded.gson.JsonSyntaxException;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Event;
-import com.stripe.model.EventDataObjectDeserializer;
-import com.stripe.model.StripeObject;
+import com.stripe.model.*;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
+import com.stripe.param.PriceCreateParams;
+import com.stripe.param.SubscriptionCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -211,6 +211,36 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                         .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
                         .build();
         return Session.create(params);
+    }
+
+    public Subscription createSubscription(String priceStripeId, String customerStripeId) throws StripeException {
+        SubscriptionCreateParams params =
+                SubscriptionCreateParams.builder()
+                        .setCustomer(customerStripeId)
+                        .addItem(
+                                SubscriptionCreateParams.Item.builder()
+                                        .setPrice(priceStripeId)
+                                        .build()
+                        )
+                        .build();
+        return Subscription.create(params);
+    }
+
+    public Price createPrice() throws StripeException {
+        PriceCreateParams params =
+                PriceCreateParams.builder()
+                        .setCurrency("eur")
+                        .setUnitAmount(1000L)
+                        .setRecurring(
+                                PriceCreateParams.Recurring.builder()
+                                        .setInterval(PriceCreateParams.Recurring.Interval.MONTH)
+                                        .build()
+                        )
+                        .setProductData(
+                                PriceCreateParams.ProductData.builder().setName("Gold Plan").build()
+                        )
+                        .build();
+        return Price.create(params);
     }
 
     private Session createOneShotCheckoutSession(String checkoutBaseUrl, String stripeCustomerId, String clientReferenceId, String price, Long quantity, SessionCreateParams.PaymentMethodType paymentMethodType) throws StripeException {
