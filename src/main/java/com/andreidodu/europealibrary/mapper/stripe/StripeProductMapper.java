@@ -19,7 +19,6 @@ public abstract class StripeProductMapper {
     public abstract StripeProduct toModel(StripeProductDTO dto);
 
     @Mapping(source = "fileMetaInfo.id", target = "fileMetaInfoId")
-    @Mapping(ignore = true, target = "stripePrice")
     public abstract StripeProductDTO toDTO(StripeProduct model);
 
     @Mapping(target = "fileMetaInfo", ignore = true)
@@ -27,4 +26,7 @@ public abstract class StripeProductMapper {
     @Mapping(target = "stripeProductId", ignore = true)
     @Mapping(target = "stripePrice", ignore = true)
     public abstract void map(@MappingTarget StripeProduct stripeProduct, StripeProductDTO stripeProductDTO);
+
+    @Mapping(source = "fileMetaInfo.id", target = "fileMetaInfoId")
+    public abstract void map(@MappingTarget StripeProductDTO stripeProductDTO, StripeProduct stripeProduct);
 }

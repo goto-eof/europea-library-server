@@ -42,24 +42,6 @@
             <column name="version" type="INT"/>
         </createTable>
 
-        <createTable tableName="${tablePrefix}stripe_price">
-            <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_stripe_price"/>
-            </column>
-            <column name="stripe_price_id" type="VARCHAR(100)">
-                <constraints unique="true" nullable="false"/>
-            </column>
-            <column name="currency" type="VARCHAR(3)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="amount" type="DECIMAL">
-                <constraints nullable="false"/>
-            </column>
-            <column name="insert_date" type="DATETIME" defaultValueDate="${defaultTimeStamp}"/>
-            <column name="update_date" type="DATETIME" defaultValueDate="${defaultTimeStamp}"/>
-            <column name="version" type="INT"/>
-        </createTable>
-
         <createTable tableName="${tablePrefix}stripe_product">
             <column name="id" type="BIGINT"
                     defaultValueSequenceNext="${tablePrefix}stripe_product_seq">
@@ -78,14 +60,34 @@
                 <constraints foreignKeyName="fk_file_meta_info_id" references="${tablePrefix}file_meta_info(id)"
                              nullable="false"/>
             </column>
-            <column name="stripe_price_id" type="BIGINT">
-                <constraints foreignKeyName="fk_stripe_price" references="${tablePrefix}stripe_price(id)"
+            <column name="insert_date" type="DATETIME" defaultValueDate="${defaultTimeStamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueDate="${defaultTimeStamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+
+        <createTable tableName="${tablePrefix}stripe_price">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_stripe_price"/>
+            </column>
+            <column name="stripe_price_id" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="currency" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="DECIMAL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stripe_product_id" type="BIGINT">
+                <constraints foreignKeyName="fk_stripe_product" references="${tablePrefix}stripe_product(id)"
                              nullable="true"/>
             </column>
             <column name="insert_date" type="DATETIME" defaultValueDate="${defaultTimeStamp}"/>
             <column name="update_date" type="DATETIME" defaultValueDate="${defaultTimeStamp}"/>
             <column name="version" type="INT"/>
         </createTable>
+
 
         <createTable tableName="${tablePrefix}stripe_pricing_plan">
             <column name="id" type="BIGINT"

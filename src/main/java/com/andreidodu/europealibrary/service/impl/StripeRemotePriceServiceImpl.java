@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.service.StripeRemotePriceService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Price;
 import com.stripe.param.PriceCreateParams;
+import com.stripe.param.PriceUpdateParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,14 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class StripeRemotePriceServiceImpl implements StripeRemotePriceService {
 
     @Override
-    public String createNewStripePrice(String stripeProductId, Long amount, PriceCreateParams.Recurring.Interval interval) throws StripeException {
+    public Price createNewStripePrice(String stripeProductId, Long amount, PriceCreateParams.Recurring.Interval interval) throws StripeException {
         Price price = null;
         if (interval != null) {
             price = this.createSubscriptionPrice(stripeProductId, StripeCurrency.EUR, amount, interval);
         } else {
             price = this.createOneShotPrice(stripeProductId, StripeCurrency.EUR, amount);
         }
-        return price.getId();
+        return price;
     }
 
     private Price createOneShotPrice(String stripeProductId, StripeCurrency currency, Long amount) throws StripeException {
@@ -43,6 +44,14 @@ public class StripeRemotePriceServiceImpl implements StripeRemotePriceService {
                 .setCurrency(currency.name())
                 .setUnitAmount(amount)
                 .setProduct(stripeProductId);
+    }
+
+    @Override
+    public Price deactivate(String stripePriceId) throws StripeException {
+        Price resource = Price.retrieve(stripePriceId);
+        PriceUpdateParams params =
+                PriceUpdateParams.builder().setActive(false).build();
+        return resource.update(params);
     }
 
 }

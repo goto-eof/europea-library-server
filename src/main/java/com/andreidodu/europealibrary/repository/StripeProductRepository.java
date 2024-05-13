@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface StripeProductRepository extends TransactionalRepository<StripeProduct, Long> {
     Optional<StripeProduct> findByFileMetaInfo_id(Long fileMetaInfoId);
+
+    boolean existsByFileMetaInfo_id(Long fileMetaInfoId);
 }

@@ -29,7 +29,8 @@ public class StripePrice extends ModelCommon {
     @Column(name = "amount")
     private BigDecimal amount;
 
-    @OneToOne(mappedBy = "stripePrice", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @OneToOne
+    @JoinColumn(name = "stripe_product_id", referencedColumnName = "id", unique = false, nullable = true)
     private StripeProduct stripeProduct;
 
 }

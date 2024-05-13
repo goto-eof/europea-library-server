@@ -10,8 +10,7 @@ import java.math.BigDecimal;
 @Setter
 public class StripePriceDTO extends CommonDTO {
     private Long id;
-    private String stripePriceId;
-    private Long stripeProductId;
     private String currency;
     private BigDecimal amount;
+    private StripeProductDTO stripeProduct;
 }

@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.resource.impl;
 
+import com.andreidodu.europealibrary.dto.stripe.StripePriceDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeProductDTO;
 import com.andreidodu.europealibrary.resource.StripeProductAssemblerResource;
 import com.andreidodu.europealibrary.service.StripeProductAssemblerService;
@@ -18,17 +19,17 @@ public class StripeProductAssemblerResourceImpl implements StripeProductAssemble
     private final StripeProductAssemblerService stripeProductAssemblerService;
 
     @Override
-    public ResponseEntity<StripeProductDTO> get(Long fileMetaInfoId) throws IOException, StripeException {
+    public ResponseEntity<StripePriceDTO> get(Long fileMetaInfoId) throws IOException, StripeException {
         return ResponseEntity.ok(this.stripeProductAssemblerService.getProductAssembly(fileMetaInfoId));
     }
 
     @Override
-    public ResponseEntity<StripeProductDTO> create(StripeProductDTO stripeProductDTO) throws IOException, StripeException {
-        return ResponseEntity.ok(this.stripeProductAssemblerService.createNewStripeProductAssembly(stripeProductDTO));
+    public ResponseEntity<StripePriceDTO> create(StripePriceDTO stripePriceDTO) throws IOException, StripeException {
+        return ResponseEntity.ok(this.stripeProductAssemblerService.createNewStripePriceAssembly(stripePriceDTO));
     }
 
     @Override
-    public ResponseEntity<StripeProductDTO> update(StripeProductDTO stripeProductDTO) throws IOException, StripeException {
-        return ResponseEntity.ok(this.stripeProductAssemblerService.updateStripeProductAssembly(stripeProductDTO));
+    public ResponseEntity<StripePriceDTO> update(StripePriceDTO stripePriceDTO) throws IOException, StripeException {
+        return ResponseEntity.ok(this.stripeProductAssemblerService.updateStripeProductAssembly(stripePriceDTO));
     }
 }

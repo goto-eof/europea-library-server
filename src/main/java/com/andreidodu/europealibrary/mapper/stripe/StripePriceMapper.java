@@ -9,16 +9,17 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 @Slf4j
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {StripeProductMapper.class})
 public abstract class StripePriceMapper {
 
     @Mapping(ignore = true, target = "stripeProduct")
+    @Mapping(ignore = true, target = "stripePriceId")
     public abstract StripePrice toModel(StripePriceDTO dto);
 
-    @Mapping(ignore = true, target = "stripeProductId")
     public abstract StripePriceDTO toDTO(StripePrice model);
 
     @Mapping(target = "stripeProduct", ignore = true)
+    @Mapping(target = "stripePriceId", ignore = true)
     public abstract void map(@MappingTarget StripePrice target, StripePriceDTO source);
 
 

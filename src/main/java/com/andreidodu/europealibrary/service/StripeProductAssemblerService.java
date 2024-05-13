@@ -1,12 +1,13 @@
 package com.andreidodu.europealibrary.service;
 
+import com.andreidodu.europealibrary.dto.stripe.StripePriceDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeProductDTO;
 import com.stripe.exception.StripeException;
 
 public interface StripeProductAssemblerService {
-    StripeProductDTO getProductAssembly(Long fileMetaInfoId);
+    StripePriceDTO getProductAssembly(Long fileMetaInfoId);
 
-    StripeProductDTO createNewStripeProductAssembly(StripeProductDTO stripeProductDTO) throws StripeException;
+    StripePriceDTO createNewStripePriceAssembly(StripePriceDTO stripePriceDTO) throws StripeException;
 
-    StripeProductDTO updateStripeProductAssembly(StripeProductDTO stripeProductDTO) throws StripeException;
+    StripePriceDTO updateStripeProductAssembly(StripePriceDTO stripePriceDTO) throws StripeException;
 }
