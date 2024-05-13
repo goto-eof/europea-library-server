@@ -1,7 +1,6 @@
 package com.andreidodu.europealibrary.service.impl;
 
-import com.andreidodu.europealibrary.dto.common.Limitable;
-import com.andreidodu.europealibrary.model.common.Identificable;
+import com.andreidodu.europealibrary.model.common.Identifiable;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +8,7 @@ import java.util.stream.Collectors;
 
 public abstract class CursoredServiceCommon {
 
-    protected <T extends Identificable> Optional<Long> calculateNextId(List<T> itemsList, Integer limit, int defaultLimit) {
+    protected <T extends Identifiable> Optional<Long> calculateNextId(List<T> itemsList, Integer limit, int defaultLimit) {
         if (limit == null) {
             limit = defaultLimit;
         }
@@ -22,7 +21,7 @@ public abstract class CursoredServiceCommon {
         return Optional.of(itemsList.get(limit).getId());
     }
 
-    protected <T extends Identificable> List<T> limit(List<T> itemsList, Integer limit, int defaultLimit) {
+    protected <T extends Identifiable> List<T> limit(List<T> itemsList, Integer limit, int defaultLimit) {
         if (limit == null) {
             limit = defaultLimit;
         }

@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.model;
 
-import com.andreidodu.europealibrary.model.common.Identificable;
+import com.andreidodu.europealibrary.model.common.Identifiable;
 import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @Table(name = "el_file_system_item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "base_path", "job_step"})})
 @EntityListeners(AuditingEntityListener.class)
-public class FileSystemItem extends ModelCommon implements Identificable {
+public class FileSystemItem extends ModelCommon implements Identifiable {
 
     @Id
     @GeneratedValue(generator = "el_file_system_item_seq", strategy = GenerationType.SEQUENCE)

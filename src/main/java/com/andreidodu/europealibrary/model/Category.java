@@ -1,6 +1,6 @@
 package com.andreidodu.europealibrary.model;
 
-import com.andreidodu.europealibrary.model.common.Identificable;
+import com.andreidodu.europealibrary.model.common.Identifiable;
 import com.andreidodu.europealibrary.model.common.ModelCommon;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @Table(name = "el_category")
 @EntityListeners(AuditingEntityListener.class)
-public class Category extends ModelCommon implements Identificable {
+public class Category extends ModelCommon implements Identifiable {
     @Id
     @GeneratedValue(generator = "el_category_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "el_category_seq", sequenceName = "el_category_seq", allocationSize = 50)

@@ -3,7 +3,9 @@ package com.andreidodu.europealibrary.repository.impl;
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.model.*;
+import com.andreidodu.europealibrary.repository.CategoryRepository;
 import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.andreidodu.europealibrary.util.LimitUtil;
@@ -16,15 +18,18 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class CustomFileSystemItemRepositoryImpl extends CommonRepository implements CustomFileSystemItemRepository {
     @PersistenceContext
     private EntityManager entityManager;
+    private final CategoryRepository categoryRepository;
 
     private final static QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -65,7 +70,6 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
-        QCategory category = QCategory.category;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
@@ -75,16 +79,18 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
             booleanBuilder.and(fileSystemItem.id.goe(cursorId));
         }
 
+        Category category = this.categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ValidationException("Category not found"));
+
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
                 .from(fileSystemItem)
-                .where(booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.categoryList.contains(
-                        JPAExpressions.select(category).from(category).where(category.id.eq(categoryId))
-                )))
+                .where(booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.categoryList.contains(category)))
                 .limit(numberOfResults + 1)
                 .orderBy(fileSystemItem.id.asc())
                 .fetch();
     }
+
 
     @Override
     public List<FileSystemItem> retrieveChildrenByCursoredTagId(CursorRequestDTO cursorRequestDTO) {

@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.model;
 
-import com.andreidodu.europealibrary.model.common.Identificable;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.Setter;
