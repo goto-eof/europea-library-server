@@ -132,6 +132,14 @@ Before running the software as Spring Boot application it is necessary to follow
       ./start.sh
       ```
 
+# Stripe payments
+
+Test payments in your local environment.
+
+```
+stripe listen --forward-to localhost:8081/api/v1/stripe/webhook
+```
+
 # API documentation
 
 The API documentation can be accessed here: http://localhost:8081/swagger-ui/index.html
@@ -172,4 +180,5 @@ Google Books API
   equipped with SSD, and it took 39 minutes to finish
   the job. Some steps were skipped (like FSI/FMI deleter) because I started the job on an empty database.
 - developed and tested on Linux.
-- if you have any suggestions or found a bug please contact me [here](https://andre-i.eu/#contactme) <img src="https://andre-i.eu:8080/api/v1/ipResource/custom.png?host=https://github.com/goto-eof/europea-library-server" onerror="this.parentNode.removeChild(this)" />
+- if you have any suggestions or found a bug please contact
+  me [here](https://andre-i.eu/#contactme) <img src="https://andre-i.eu:8080/api/v1/ipResource/custom.png?host=https://github.com/goto-eof/europea-library-server" onerror="this.parentNode.removeChild(this)" />

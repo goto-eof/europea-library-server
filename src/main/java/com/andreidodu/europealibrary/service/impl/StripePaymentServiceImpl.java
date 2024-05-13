@@ -9,16 +9,11 @@ import com.andreidodu.europealibrary.enums.StripePurchaseSessionStatus;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.stripe.StripeCustomerMapper;
-import com.andreidodu.europealibrary.model.stripe.StripeCustomer;
-import com.andreidodu.europealibrary.model.stripe.StripeCustomerProductsOwned;
-import com.andreidodu.europealibrary.model.stripe.StripeProduct;
-import com.andreidodu.europealibrary.model.stripe.StripePurchaseSession;
-import com.andreidodu.europealibrary.repository.StripeCustomerProductsOwnedRepository;
-import com.andreidodu.europealibrary.repository.StripeCustomerRepository;
-import com.andreidodu.europealibrary.repository.StripeProductRepository;
-import com.andreidodu.europealibrary.repository.StripePurchaseSessionRepository;
+import com.andreidodu.europealibrary.model.stripe.*;
+import com.andreidodu.europealibrary.repository.*;
 import com.andreidodu.europealibrary.repository.security.UserRepository;
 import com.andreidodu.europealibrary.service.StripePaymentService;
+import com.andreidodu.europealibrary.util.ValidationUtil;
 import com.nimbusds.jose.shaded.gson.JsonSyntaxException;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
@@ -26,7 +21,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.*;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
-import com.stripe.param.PriceCreateParams;
+import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.SubscriptionCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
@@ -67,6 +62,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     private final StripePurchaseSessionRepository stripePurchaseSessionRepository;
     private final StripeCustomerRepository stripeCustomerRepository;
     private final StripeProductRepository stripeProductRepository;
+    private final StripePriceRepository stripePriceRepository;
     private final UserRepository userRepository;
 
     private final StripeCustomerMapper stripeCustomerMapper;
@@ -95,7 +91,11 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     public StripeCheckoutSessionResponseDTO initCheckoutSession(StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO, String username) throws StripeException {
         StripeCheckoutSessionResponseDTO stripeCheckoutSessionResponseDTO = new StripeCheckoutSessionResponseDTO();
 
-        StripeCustomer stripeCustomer = this.stripeCustomerRepository.findByUser_username(username).orElseThrow(() -> new ValidationException("User not found"));
+        StripeCustomer stripeCustomer = this.stripeCustomerRepository.findByUser_username(username)
+                .orElseThrow(() -> new ValidationException("User not found"));
+        StripePrice stripePrice = this.stripePriceRepository.findByStripeProduct_FileMetaInfo_id(stripeCheckoutSessionRequestDTO.getFileMetaInfoId())
+                .orElseThrow(() -> new ValidationException("Price not found"));
+
 
         StripePurchaseSession stripePurchaseSession = new StripePurchaseSession();
         stripePurchaseSession.setStripeCustomer(stripeCustomer);
@@ -106,13 +106,13 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         stripePurchaseSession = this.stripePurchaseSessionRepository.save(stripePurchaseSession);
 
         String clientReferenceId = String.valueOf(stripePurchaseSession.getId());
-        String price = String.valueOf(stripeProduct.getAmount());
         long quantity = stripeCheckoutSessionRequestDTO.getQuantity();
 
-        Session session = this.createOneShotCheckoutSession(stripeCheckoutSessionRequestDTO.getCheckoutBaseUrl(),
+        Session session = this.createOneShotCheckoutSession(
+                stripePrice.getStripePriceId(),
+                stripeCheckoutSessionRequestDTO.getCheckoutBaseUrl(),
                 stripeCustomer.getStripeCustomerId(),
                 clientReferenceId,
-                price,
                 quantity,
                 SessionCreateParams.PaymentMethodType.CARD
         );
@@ -188,29 +188,32 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         return new OperationStatusDTO(status.equals(StripePurchaseSessionStatus.CHECKOUT_COMPLETED), status.toString());
     }
 
-    private Session createSubscriptionCheckoutSession(String checkoutBaseUrl, String subscribePricingPlanId, String stripeCustomerId, String clientReferenceId, String priceStripeId, Long quantity, SessionCreateParams.PaymentMethodType paymentMethodType) throws StripeException {
-        SessionCreateParams params =
-                SessionCreateParams.builder()
-                        .setSuccessUrl(checkoutBaseUrl + "?" + SUCCESS_QUERY_PARAMETER + "=true&" + ONGOING_PURCHASE_SESSION_ID_QUERY_PARAMETER + "=" + clientReferenceId)
-                        .setCancelUrl(checkoutBaseUrl + "?" + SUCCESS_QUERY_PARAMETER + "=false&" + ONGOING_PURCHASE_SESSION_ID_QUERY_PARAMETER + "=" + clientReferenceId)
-                        .setClientReferenceId(clientReferenceId)
-                        .addPaymentMethodType(paymentMethodType)
-                        .setSubscriptionData(
-                                SessionCreateParams.SubscriptionData.builder()
-                                        .setDescription("")
-                                        .build()
-                        )
-                        .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                        .addLineItem(new SessionCreateParams.LineItem.Builder()
-                                // For metered billing, do not pass quantity
-                                .setQuantity(quantity)
-                                .setPrice(priceStripeId)
+    private Session createSubscriptionCheckoutSession(String subscriptionDescription, String checkoutBaseUrl, String stripeCustomerId, String clientReferenceId, String priceStripeId, Long quantity, SessionCreateParams.PaymentMethodType paymentMethodType) throws StripeException {
+        SessionCreateParams params = this.createCommonSessionBuilder(priceStripeId, quantity, checkoutBaseUrl, clientReferenceId, paymentMethodType, stripeCustomerId)
+                .setSubscriptionData(
+                        SessionCreateParams.SubscriptionData.builder()
+                                .setDescription(subscriptionDescription)
                                 .build()
-                        )
-                        .setCustomer(stripeCustomerId)
-                        .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                        .build();
+                )
+                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+                .build();
+
         return Session.create(params);
+    }
+
+
+    private SessionCreateParams.Builder createCommonSessionBuilder(String stripePriceId, Long quantity, String checkoutBaseUrl, String clientReferenceId, SessionCreateParams.PaymentMethodType paymentMethodType, String stripeCustomerId) {
+        return SessionCreateParams.builder()
+                .setSuccessUrl(checkoutBaseUrl + "?" + SUCCESS_QUERY_PARAMETER + "=true&" + ONGOING_PURCHASE_SESSION_ID_QUERY_PARAMETER + "=" + clientReferenceId)
+                .setCancelUrl(checkoutBaseUrl + "?" + SUCCESS_QUERY_PARAMETER + "=false&" + ONGOING_PURCHASE_SESSION_ID_QUERY_PARAMETER + "=" + clientReferenceId)
+                .setClientReferenceId(clientReferenceId)
+                .addPaymentMethodType(paymentMethodType)
+                .addLineItem(new SessionCreateParams.LineItem.Builder()
+                        .setQuantity(quantity)
+                        .setPrice(stripePriceId)
+                        .build()
+                )
+                .setCustomer(stripeCustomerId);
     }
 
     public Subscription createSubscription(String priceStripeId, String customerStripeId) throws StripeException {
@@ -226,40 +229,24 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         return Subscription.create(params);
     }
 
-    public Price createPrice() throws StripeException {
-        PriceCreateParams params =
-                PriceCreateParams.builder()
-                        .setCurrency("eur")
-                        .setUnitAmount(1000L)
-                        .setRecurring(
-                                PriceCreateParams.Recurring.builder()
-                                        .setInterval(PriceCreateParams.Recurring.Interval.MONTH)
-                                        .build()
-                        )
-                        .setProductData(
-                                PriceCreateParams.ProductData.builder().setName("Gold Plan").build()
-                        )
-                        .build();
-        return Price.create(params);
+    private Session createOneShotCheckoutSession(String stripePriceId, String checkoutBaseUrl, String stripeCustomerId, String clientReferenceId, Long quantity, SessionCreateParams.PaymentMethodType paymentMethodType) throws StripeException {
+        SessionCreateParams params = this.createCommonSessionBuilder(stripePriceId, quantity, checkoutBaseUrl, clientReferenceId, paymentMethodType, stripeCustomerId)
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .build();
+        return Session.create(params);
     }
 
-    private Session createOneShotCheckoutSession(String checkoutBaseUrl, String stripeCustomerId, String clientReferenceId, String price, Long quantity, SessionCreateParams.PaymentMethodType paymentMethodType) throws StripeException {
-        SessionCreateParams params =
-                SessionCreateParams.builder()
-                        .setSuccessUrl(checkoutBaseUrl + "?" + SUCCESS_QUERY_PARAMETER + "=true&" + ONGOING_PURCHASE_SESSION_ID_QUERY_PARAMETER + "=" + clientReferenceId)
-                        .setCancelUrl(checkoutBaseUrl + "?" + SUCCESS_QUERY_PARAMETER + "=false&" + ONGOING_PURCHASE_SESSION_ID_QUERY_PARAMETER + "=" + clientReferenceId)
-                        .setClientReferenceId(clientReferenceId)
-                        .addPaymentMethodType(paymentMethodType)
-                        .addLineItem(
-                                SessionCreateParams.LineItem.builder()
-                                        .setPrice(price)
-                                        .setQuantity(quantity)
-                                        .build()
-                        )
-                        .setCustomer(stripeCustomerId)
-                        .setMode(SessionCreateParams.Mode.PAYMENT)
+    public Customer createCustomer(String firstName, String lastName, String email) throws StripeException {
+        ValidationUtil.assertNotNull(firstName, "firstName could not be null");
+        ValidationUtil.assertNotNull(lastName, "lastName could not be null");
+        ValidationUtil.assertNotNull(email, "email could not be null");
+
+        CustomerCreateParams params =
+                CustomerCreateParams.builder()
+                        .setName(firstName + " " + lastName)
+                        .setEmail(email)
                         .build();
-        return Session.create(params);
+        return Customer.create(params);
     }
 
 }

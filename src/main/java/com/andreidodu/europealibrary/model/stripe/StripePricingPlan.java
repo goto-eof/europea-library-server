@@ -2,6 +2,8 @@ package com.andreidodu.europealibrary.model.stripe;
 
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.common.ModelCommon;
+import com.stripe.param.PlanCreateParams;
+import com.stripe.param.PriceCreateParams;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +35,10 @@ public class StripePricingPlan extends ModelCommon {
 
     @Column(name = "currency")
     private String currency;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "interval")
+    private PriceCreateParams.Recurring.Interval interval;
 
     @Column(name = "stripe_pricing_plan_id")
     private String stripePricingPlanId;

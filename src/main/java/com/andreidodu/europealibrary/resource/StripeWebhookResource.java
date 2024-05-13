@@ -15,7 +15,7 @@ import java.io.IOException;
 @Tag(name = "Payment", description = "Allows one-time purchase or subscriptions")
 public interface StripeWebhookResource {
 
-    @PostMapping("/checkoutSessionCompleted")
+    @PostMapping
     @Operation(summary = "Checkout session completed", description = "")
     ResponseEntity<String> checkoutSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException;
 
