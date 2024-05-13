@@ -18,6 +18,7 @@ import com.stripe.model.Price;
 import com.stripe.model.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,15 +57,18 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
         ValidationUtil.assertNotNull(stripePriceDTO.getStripeProduct(), "StripeProduct could not be null");
         StripeProductDTO stripeProductDTO = stripePriceDTO.getStripeProduct();
         ValidationUtil.assertNotNull(stripeProductDTO.getFileMetaInfoId(), "FileMetaInfoId could not be null");
-        ValidationUtil.assertNotNull(stripeProductDTO.getName(), "StripeProduct name could not be null");
-        ValidationUtil.assertNotNull(stripeProductDTO.getDescription(), "StripeProduct description could not be null");
 
         if (stripeProductRepository.existsByFileMetaInfo_id(stripeProductDTO.getFileMetaInfoId())) {
             throw new ValidationException("Product already exists");
         }
 
-        FileMetaInfo fileMetaInfo = this.fileMetaInfoRepository.findById(stripeProductDTO.getFileMetaInfoId())
-                .orElseThrow(() -> new ValidationException("FileMetaInfo does not exists"));
+        FileMetaInfo fileMetaInfo = checkExistenceFileMetaInfo(stripeProductDTO);
+        fillStripeProductNameIfNull(stripeProductDTO, fileMetaInfo);
+        fillStripeProductDescriptionIfNull(stripeProductDTO, fileMetaInfo);
+
+        ValidationUtil.assertNotNull(stripeProductDTO.getName(), "StripeProduct name could not be null");
+        ValidationUtil.assertNotNull(stripeProductDTO.getDescription(), "StripeProduct description could not be null");
+
 
         StripeProduct stripeProduct = this.stripeProductMapper.toModel(stripeProductDTO);
         stripeProduct.setFileMetaInfo(fileMetaInfo);
@@ -116,12 +120,14 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
         ValidationUtil.assertNotNull(stripePriceDTO.getStripeProduct(), "StripeProduct could not be null");
         StripeProductDTO stripeProductDTO = stripePriceDTO.getStripeProduct();
         ValidationUtil.assertNotNull(stripeProductDTO.getFileMetaInfoId(), "FileMetaInfoId could not be null");
+
+        FileMetaInfo fileMetaInfo = checkExistenceFileMetaInfo(stripeProductDTO);
+        fillStripeProductNameIfNull(stripeProductDTO, fileMetaInfo);
+        fillStripeProductDescriptionIfNull(stripeProductDTO, fileMetaInfo);
+
         ValidationUtil.assertNotNull(stripeProductDTO.getName(), "StripeProduct name could not be null");
         ValidationUtil.assertNotNull(stripeProductDTO.getDescription(), "StripeProduct description could not be null");
 
-
-        FileMetaInfo fileMetaInfo = this.fileMetaInfoRepository.findById(stripeProductDTO.getFileMetaInfoId())
-                .orElseThrow(() -> new ValidationException("FileMetaInfo does not exists"));
 
         StripeProduct stripeProduct = this.stripeProductRepository.findByFileMetaInfo_id(stripeProductDTO.getFileMetaInfoId())
                 .orElseThrow(() -> new ValidationException("StripeProduct does not exists"));
@@ -133,6 +139,23 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
         this.stripeRemoteProductService.updateStripeProduct(stripeProduct.getStripeProductId(), stripeProductDTO.getName(), stripeProductDTO.getDescription());
 
         return this.stripeProductRepository.save(stripeProduct);
+    }
+
+    private FileMetaInfo checkExistenceFileMetaInfo(StripeProductDTO stripeProductDTO) {
+        return this.fileMetaInfoRepository.findById(stripeProductDTO.getFileMetaInfoId())
+                .orElseThrow(() -> new ValidationException("FileMetaInfo does not exists"));
+    }
+
+    private static void fillStripeProductDescriptionIfNull(StripeProductDTO stripeProductDTO, FileMetaInfo fileMetaInfo) {
+        if (stripeProductDTO.getDescription() == null) {
+            stripeProductDTO.setDescription(StringUtils.abbreviate(fileMetaInfo.getDescription(), 350));
+        }
+    }
+
+    private static void fillStripeProductNameIfNull(StripeProductDTO stripeProductDTO, FileMetaInfo fileMetaInfo) {
+        if (stripeProductDTO.getName() == null) {
+            stripeProductDTO.setName(StringUtils.abbreviate(fileMetaInfo.getTitle(), 100));
+        }
     }
 
 }
