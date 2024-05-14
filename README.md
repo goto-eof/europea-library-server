@@ -84,7 +84,7 @@ library, search for an e-book and view book information.
       e-books)
     - start/stop job
     - reload application cache
-- sell/buy e-books
+- sell/buy e-books and view transactions
 
 ## Run the project (test environment)
 
