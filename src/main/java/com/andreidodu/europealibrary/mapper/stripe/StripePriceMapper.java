@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Slf4j
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {PriceConvertMapper.class})
 public abstract class StripePriceMapper {
 
     @Mapping(ignore = true, target = "id")
@@ -29,21 +29,5 @@ public abstract class StripePriceMapper {
     @Mapping(target = "amount", source = "amount", qualifiedByName = "priceNormalize")
     public abstract void map(@MappingTarget StripePrice target, StripePriceDTO source);
 
-
-    @Named(value = "priceNormalize")
-    public BigDecimal priceNormalize(BigDecimal in) {
-        if (in == null) {
-            return null;
-        }
-        return in.multiply(BigDecimal.valueOf(100));
-    }
-
-    @Named(value = "priceDeNormalize")
-    public BigDecimal priceDeNormalize(BigDecimal in) {
-        if (in == null) {
-            return null;
-        }
-        return in.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-    }
 
 }

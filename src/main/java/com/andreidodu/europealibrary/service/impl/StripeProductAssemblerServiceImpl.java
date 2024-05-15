@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.dto.stripe.StripePriceDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeProductDTO;
 import com.andreidodu.europealibrary.exception.ValidationException;
+import com.andreidodu.europealibrary.mapper.stripe.PriceConvertMapper;
 import com.andreidodu.europealibrary.mapper.stripe.StripeProductMapper;
 import com.andreidodu.europealibrary.mapper.stripe.StripePriceMapper;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.Optional;
 
 @Slf4j
@@ -40,6 +43,7 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
     private final StripePriceRepository stripePriceRepository;
 
     private final StripeProductMapper stripeProductMapper;
+    private final PriceConvertMapper priceConvertMapper;
     private final StripePriceMapper stripePriceMapper;
 
     @Override
@@ -74,7 +78,6 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
         ValidationUtil.assertNotNull(stripeProductDTO.getName(), "StripeProduct name could not be null");
         ValidationUtil.assertNotNull(stripeProductDTO.getDescription(), "StripeProduct description could not be null");
 
-
         StripeProduct stripeProduct = this.stripeProductMapper.toModel(stripeProductDTO);
         stripeProduct.setFileMetaInfo(fileMetaInfo);
 
@@ -90,12 +93,41 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
         ValidationUtil.assertNotNull(stripeProduct.getStripeProductId(), "StripeProductId could not be null");
         ValidationUtil.assertNotNull(stripeProduct, "StripeProduct could not be null");
 
+        StripePrice oldProductPrice = stripeProduct.getCurrentStripePrice();
+
+        BigDecimal oldPrice = oldProductPrice.getAmount();
+        BigDecimal newPrice = stripePriceDTO.getAmount();
+
+        String oldCurrency = oldProductPrice.getCurrency();
+        String newCurrency = stripePriceDTO.getCurrency();
+
+        // TODO the multiplication by 100 => find a more elegant solution
+        if (!areDifferent(oldPrice, newPrice.multiply(BigDecimal.valueOf(100))) && !areDifferent(oldCurrency, newCurrency)) {
+            return stripeProduct.getCurrentStripePrice();
+        }
+
         StripePrice stripePrice = this.stripePriceMapper.toModel(stripePriceDTO);
         stripePrice.setStripeProduct(stripeProduct);
-        Price price = this.stripeRemotePriceService.createNewStripePrice(stripeProduct.getStripeProductId(), stripePriceDTO.getAmount().longValue(), null);
+        Price price = this.stripeRemotePriceService.createNewStripePrice(stripeProduct.getStripeProductId(), stripePrice.getAmount().longValue(), null);
         stripePrice.setStripePriceId(price.getId());
         stripePrice = this.stripePriceRepository.save(stripePrice);
         return stripePrice;
+    }
+
+    // TODO move it in a different place
+    private <T extends Comparable<T>> boolean areDifferent(T a, T b) {
+        if (a == null && b != null) {
+            return true;
+        }
+        if (a != null && b == null) {
+            return true;
+        }
+
+        if (a.compareTo(b) != 0) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -103,6 +135,7 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
         ValidationUtil.assertNotNull(stripePriceDTO, "dto could not be null");
 
         // TODO check if there are any changes, if not, do not call Stripe
+
 
         StripeProduct stripeProduct = this.updateStripeProduct(stripePriceDTO);
 
@@ -143,6 +176,10 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
 
         StripeProduct stripeProduct = this.stripeProductRepository.findByFileMetaInfo_id(stripeProductDTO.getFileMetaInfoId())
                 .orElseThrow(() -> new ValidationException("StripeProduct does not exists"));
+
+        if (!areDifferent(stripeProductDTO.getName(), stripeProduct.getName()) && !areDifferent(stripeProductDTO.getDescription(), stripeProduct.getDescription())) {
+            return stripeProduct;
+        }
 
         this.stripeProductMapper.map(stripeProduct, stripeProductDTO);
 
