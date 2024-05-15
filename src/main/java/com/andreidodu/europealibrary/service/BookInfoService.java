@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.service;
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.RenameDTO;
+import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface BookInfoService {
@@ -10,7 +11,7 @@ public interface BookInfoService {
 
     FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto);
 
-    FileMetaInfoBookDTO updateBookInfo(Long fileMetaInfoId, FileMetaInfoBookDTO dto);
+//    FileMetaInfoBookDTO updateBookInfo(Long fileMetaInfoId, FileMetaInfoBookDTO dto);
 
     OperationStatusDTO delete(Long id);
 
@@ -27,4 +28,6 @@ public interface BookInfoService {
     OperationStatusDTO unlock(Long fileMetaInfoId);
 
     OperationStatusDTO uploadBookCover(Long metaInfoId, MultipartFile file);
+
+    FileMetaInfoDTO updateFileMetaInfoFull(Long fileMetaInfoId, FileMetaInfoDTO dto);
 }

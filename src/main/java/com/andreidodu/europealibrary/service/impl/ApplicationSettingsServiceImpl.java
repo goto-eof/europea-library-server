@@ -7,7 +7,7 @@ import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.ApplicationSettingsMapper;
-import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
+import com.andreidodu.europealibrary.mapper.FileSystemItemFullMapper;
 import com.andreidodu.europealibrary.model.ApplicationSettings;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.ApplicationSettingsRepository;
@@ -26,7 +26,7 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
     final private ApplicationSettingsRepository applicationSettingsRepository;
     final private ApplicationSettingsMapper applicationSettingsMapper;
     private final FileSystemItemRepository fileSystemItemRepository;
-    final private FileSystemItemMapper fileSystemItemMapper;
+    final private FileSystemItemFullMapper fileSystemItemFullMapper;
 
     @Override
     public ApplicationSettingsDTO lockApplication() {
@@ -92,7 +92,7 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
         ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
         FileSystemItem fileSystemItem = Optional.ofNullable(applicationSettings.getFeaturedFileSystemItem())
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
-        return this.fileSystemItemMapper.toHighlightDTO(fileSystemItem);
+        return this.fileSystemItemFullMapper.toHighlightDTO(fileSystemItem);
     }
 
     @Override

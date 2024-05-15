@@ -4,7 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.batch.indexer.enums.RecordStatusEnum;
 import com.andreidodu.europealibrary.dto.FileDTO;
 import com.andreidodu.europealibrary.mapper.FileMapper;
-import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
+import com.andreidodu.europealibrary.mapper.FileSystemItemFullMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.util.FileUtil;
@@ -28,7 +28,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
 
     final private FileMapper fileMapper;
     final private FileUtil fileUtil;
-    final private FileSystemItemMapper fileSystemItemMapper;
+    final private FileSystemItemFullMapper fileSystemItemFullMapper;
     final private FileSystemItemRepository fileSystemItemRepository;
     @Value("${com.andreidodu.europea-library.job.indexer.step-indexer.force-load-meta-info-from-web}")
     private boolean forceLoadMetaInfoFromWeb;
@@ -65,7 +65,7 @@ public class FileIndexerProcessor implements ItemProcessor<File, FileSystemItem>
     }
 
     private FileSystemItem buildFileSystemItemFromScratch(FileDTO fileSystemItemDTO) {
-        FileSystemItem fileSystemItem = this.fileSystemItemMapper.toModel(fileSystemItemDTO);
+        FileSystemItem fileSystemItem = this.fileSystemItemFullMapper.toModel(fileSystemItemDTO);
         fileSystemItem.setJobStep(JobStepEnum.INSERTED.getStepNumber());
         fileSystemItem.setRecordStatus(RecordStatusEnum.JUST_UPDATED.getStatus());
         fileSystemItem.setExtension(StringUtil.toLowerCase(this.fileUtil.getExtension(fileSystemItemDTO.getName())));

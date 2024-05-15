@@ -11,8 +11,8 @@ import org.mapstruct.*;
 import java.util.List;
 
 @Slf4j
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
-public abstract class FileSystemItemMapper {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {FileMetaInfoMapper.class})
+public abstract class FileSystemItemFullMapper {
 
 
     @Mapping(ignore = true, target = "id")
@@ -43,14 +43,14 @@ public abstract class FileSystemItemMapper {
     public abstract FileSystemItemDTO toDTOParent(FileSystemItem model);
 
     @Named("toDTOWithChildAndParent")
-    public FileSystemItemDTO toDTO(FileSystemItem model) {
+    public FileSystemItemDTO toDTOLess(FileSystemItem model) {
         FileSystemItemDTO dto = this.toDTOWithoutChildrenAndParent(model);
         dto.setChildrenList(toDTOWithoutChildrenAndParent(model.getChildrenList()));
         dto.setParent(this.toDTOParent(model.getParent()));
         return dto;
     }
 
-    public List<FileSystemItemDTO> toDTO(List<FileSystemItem> list) {
+    public List<FileSystemItemDTO> toDTOLess(List<FileSystemItem> list) {
         return list.stream().map(this::toDTOWithoutChildrenAndParent).toList();
     }
 

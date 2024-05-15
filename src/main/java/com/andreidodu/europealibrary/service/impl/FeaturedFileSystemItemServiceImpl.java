@@ -3,7 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
-import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
+import com.andreidodu.europealibrary.mapper.FileSystemItemFullMapper;
 import com.andreidodu.europealibrary.model.FeaturedFileSystemItem;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FeaturedFileSystemRepository;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon implements FeaturedFileSystemItemService {
     private final FeaturedFileSystemRepository featuredFileSystemRepository;
-    private final FileSystemItemMapper fileSystemItemMapper;
+    private final FileSystemItemFullMapper fileSystemItemFullMapper;
     private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
@@ -65,12 +65,12 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
 
     @Override
     public GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO) {
-        return this.genericRetrieveCursored(cursorCommonRequestDTO, this.fileSystemItemMapper::toDTOWithParentDTORecursively);
+        return this.genericRetrieveCursored(cursorCommonRequestDTO, this.fileSystemItemFullMapper::toDTOWithParentDTORecursively);
     }
 
     @Override
     public GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredHighlight(CursorCommonRequestDTO cursorCommonRequestDTO) {
-        return this.genericRetrieveCursored(cursorCommonRequestDTO, this.fileSystemItemMapper::toHighlightDTO);
+        return this.genericRetrieveCursored(cursorCommonRequestDTO, this.fileSystemItemFullMapper::toHighlightDTO);
     }
 
 

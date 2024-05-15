@@ -28,7 +28,7 @@ public class FileMetaInfo extends ModelCommon {
     @Column(length = 4000)
     private String description;
 
-    @OneToOne(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToOne(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private BookInfo bookInfo;
 
     @Column(name = "on_sale")

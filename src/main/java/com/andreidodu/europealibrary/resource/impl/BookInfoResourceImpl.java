@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
 import com.andreidodu.europealibrary.resource.BookInfoResource;
 import com.andreidodu.europealibrary.service.BookInfoService;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +35,15 @@ public class BookInfoResourceImpl implements BookInfoResource {
         return ResponseEntity.ok(createdDTO);
     }
 
+//    @Override
+//    public ResponseEntity<FileMetaInfoBookDTO> update(Long fileMetaInfoId, FileMetaInfoBookDTO dto) throws Exception {
+//        FileMetaInfoBookDTO updatedDTO = this.bookInfoService.updateBookInfo(fileMetaInfoId, dto);
+//        return ResponseEntity.ok(updatedDTO);
+//    }
+
     @Override
-    public ResponseEntity<FileMetaInfoBookDTO> update(@PathVariable("id") Long fileMetaInfoId, @RequestBody FileMetaInfoBookDTO dto) throws Exception {
-        FileMetaInfoBookDTO updatedDTO = this.bookInfoService.updateBookInfo(fileMetaInfoId, dto);
+    public ResponseEntity<FileMetaInfoDTO> updateByFileMetaInfo(Long fileMetaInfoId, FileMetaInfoDTO dto) {
+        FileMetaInfoDTO updatedDTO = this.bookInfoService.updateFileMetaInfoFull(fileMetaInfoId, dto);
         return ResponseEntity.ok(updatedDTO);
     }
 

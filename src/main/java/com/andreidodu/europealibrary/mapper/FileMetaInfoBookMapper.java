@@ -19,7 +19,7 @@ public abstract class FileMetaInfoBookMapper {
     @Autowired
     private FileMetaInfoMapper fileMetaInfoMapper;
     @Autowired
-    private FileSystemItemMapper fileSystemItemMapper;
+    private FileSystemItemFullMapper fileSystemItemFullMapper;
     @Autowired
     private CategoryMapper categoryMapper;
 
@@ -42,6 +42,8 @@ public abstract class FileMetaInfoBookMapper {
     @Mapping(ignore = true, target = "description")
     @Mapping(ignore = true, target = "tagList")
     @Mapping(ignore = true, target = "fileSystemItemIdList")
+    @Mapping(ignore = true, target = "bookInfo")
+    @Mapping(ignore = true, target = "stripeProduct")
     @Mapping(source = "fileMetaInfo.onSale", target = "onSale")
     @Mapping(source = "fileMetaInfo.hidden", target = "hidden")
     @Mapping(source = "fileMetaInfo.stripeProduct.stripePrice.amount", target = "price")

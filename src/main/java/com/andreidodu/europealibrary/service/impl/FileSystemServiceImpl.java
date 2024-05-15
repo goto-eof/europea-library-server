@@ -4,7 +4,7 @@ import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.exception.WorkInProgressException;
-import com.andreidodu.europealibrary.mapper.FileSystemItemMapper;
+import com.andreidodu.europealibrary.mapper.FileSystemItemFullMapper;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.service.FileSystemService;
@@ -23,7 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileSystemServiceImpl implements FileSystemService {
     private final FileSystemItemRepository fileSystemItemRepository;
-    private final FileSystemItemMapper fileSystemItemMapper;
+    private final FileSystemItemFullMapper fileSystemItemFullMapper;
 
     @Override
     public FileSystemItemDTO readDirectory(Long id) {
@@ -43,7 +43,7 @@ public class FileSystemServiceImpl implements FileSystemService {
                 .sort(Comparator.comparing(FileSystemItem::getIsDirectory)
                         .reversed()
                         .thenComparing(FileSystemItem::getName));
-        return this.fileSystemItemMapper.toDTO(fileSystemItem);
+        return this.fileSystemItemFullMapper.toDTOLess(fileSystemItem);
     }
 
     private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {

@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.resource;
 import com.andreidodu.europealibrary.annotation.security.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +22,13 @@ public interface BookInfoResource {
     @PostMapping("/create")
     ResponseEntity<FileMetaInfoBookDTO> create(@RequestBody FileMetaInfoBookDTO dto) throws Exception;
 
+//    @AllowOnlyAdministrator
+//    @PutMapping("/id/{id}")
+//    ResponseEntity<FileMetaInfoBookDTO> update(@PathVariable("id") Long fileMetaInfoId, @RequestBody FileMetaInfoBookDTO dto) throws Exception;
+
     @AllowOnlyAdministrator
-    @PutMapping("/id/{id}")
-    ResponseEntity<FileMetaInfoBookDTO> update(@PathVariable("id") Long fileMetaInfoId, @RequestBody FileMetaInfoBookDTO dto) throws Exception;
+    @PutMapping("/fileMetaInfoId/{fileMetaInfoId}")
+    ResponseEntity<FileMetaInfoDTO> updateByFileMetaInfo(@PathVariable("fileMetaInfoId") Long fileMetaInfoId, @RequestBody FileMetaInfoDTO dto) throws Exception;
 
     @AllowOnlyAdministrator
     @DeleteMapping("/id/{id}")
