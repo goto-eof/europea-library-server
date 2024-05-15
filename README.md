@@ -29,7 +29,8 @@ index, catalogue, search and provide e-book information?". In this way was born 
 # What is Europea Library (server)
 
 A library web application that allows to index, edit, explore, retrieve information about books from file metadata/web (
-by using multi-threading), search, sell/buy through Stripe platform (WIP) and download e-books. The front-end project can be
+by using multi-threading), search, sell/buy through Stripe platform (WIP) and download e-books. The front-end project
+can be
 found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can be
 cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
 
@@ -85,6 +86,8 @@ library, search for an e-book and view book information.
     - start/stop job
     - reload application cache
 - sell/buy e-books and view transactions (Work In Progress)
+    - stripe product + price creation almost done
+    - need to redefine the stripe entities
 
 ## Run the project (test environment)
 
