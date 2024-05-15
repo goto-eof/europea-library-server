@@ -23,7 +23,6 @@ public abstract class FileMetaInfoBookMapper {
     @Autowired
     private CategoryMapper categoryMapper;
 
-
     public FileMetaInfoBookDTO toDTO(FileMetaInfo fileMetaInfo) {
         return Optional.ofNullable(fileMetaInfo)
                 .map(model -> {
@@ -43,6 +42,9 @@ public abstract class FileMetaInfoBookMapper {
     @Mapping(ignore = true, target = "description")
     @Mapping(ignore = true, target = "tagList")
     @Mapping(ignore = true, target = "fileSystemItemIdList")
+    @Mapping(source = "fileMetaInfo.onSale", target = "onSale")
+    @Mapping(source = "fileMetaInfo.hidden", target = "hidden")
+    @Mapping(source = "fileMetaInfo.stripeProduct.stripePrice.amount", target = "price")
     public abstract void map(@MappingTarget FileMetaInfoBookDTO dto, BookInfo source);
 
     public void map(@MappingTarget FileMetaInfo model, FileMetaInfoBookDTO dto) {

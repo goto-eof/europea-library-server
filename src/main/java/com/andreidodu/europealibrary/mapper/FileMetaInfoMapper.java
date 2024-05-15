@@ -23,6 +23,7 @@ public abstract class FileMetaInfoMapper {
     @Mapping(ignore = true, target = "fileSystemItemList")
     @Mapping(ignore = true, target = "bookInfo")
     @Mapping(ignore = true, target = "tagList")
+    @Mapping(ignore = true, target = "stripeProduct")
     public abstract void map(@MappingTarget FileMetaInfo target, FileMetaInfoBookDTO source);
 
 }

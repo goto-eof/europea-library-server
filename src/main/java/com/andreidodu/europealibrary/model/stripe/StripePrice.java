@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,8 +30,11 @@ public class StripePrice extends ModelCommon {
     @Column(name = "amount")
     private BigDecimal amount;
 
-    @OneToOne
-    @JoinColumn(name = "stripe_product_id", referencedColumnName = "id", unique = false, nullable = true)
+    @ManyToOne
+    @JoinColumn(name = "stripe_product_id", nullable = false)
     private StripeProduct stripeProduct;
+
+    @OneToMany(mappedBy = "stripePrice")
+    private List<StripePurchaseSession> stripePurchaseSessionHistoryList;
 
 }

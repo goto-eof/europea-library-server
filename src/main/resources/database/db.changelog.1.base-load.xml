@@ -28,6 +28,12 @@
             </column>
             <column name="description" type="VARCHAR(4000)"/>
 
+            <column name="on_sale" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="hidden" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
             <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
             <column name="version" type="INT"/>

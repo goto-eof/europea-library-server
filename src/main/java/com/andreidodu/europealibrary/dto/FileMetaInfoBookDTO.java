@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -26,4 +27,7 @@ public class FileMetaInfoBookDTO extends FileMetaInfoDTO {
     private List<CategoryDTO> categoryList;
     private List<TagDTO> tagList;
     private Integer manualLock;
+    private Boolean onSale;
+    private BigDecimal price;
+    private Boolean hidden;
 }

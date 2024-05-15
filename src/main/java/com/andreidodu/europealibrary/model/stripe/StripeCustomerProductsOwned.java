@@ -27,4 +27,8 @@ public class StripeCustomerProductsOwned extends ModelCommon {
     @JoinColumn(name = "stripe_product_id", nullable = false)
     private StripeProduct stripeProduct;
 
+    @ManyToOne
+    @JoinColumn(name = "stripe_price_id", nullable = false)
+    private StripePrice stripePrice;
+
 }

@@ -1,6 +1,7 @@
 package com.andreidodu.europealibrary.model;
 
 import com.andreidodu.europealibrary.model.common.ModelCommon;
+import com.andreidodu.europealibrary.model.stripe.StripeProduct;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,11 @@ public class FileMetaInfo extends ModelCommon {
     @OneToOne(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private BookInfo bookInfo;
 
+    @Column(name = "on_sale")
+    private Boolean onSale = false;
+
+    @Column(name = "hidden")
+    private Boolean hidden = false;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -43,6 +49,8 @@ public class FileMetaInfo extends ModelCommon {
     @OneToMany(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY)
     private List<FileSystemItem> fileSystemItemList;
 
+    @OneToOne(mappedBy = "fileMetaInfo")
+    private StripeProduct stripeProduct;
 
     @Override
     public String toString() {

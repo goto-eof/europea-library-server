@@ -12,6 +12,7 @@ import org.mapstruct.ReportingPolicy;
 public abstract class StripePurchaseSessionMapper {
 
     @Mapping(ignore = true, target = "stripeCustomer")
+    @Mapping(ignore = true, target = "stripePrice")
     public abstract StripePurchaseSession toModel(StripePurchaseSessionDTO dto);
 
     public abstract StripePurchaseSessionDTO toDTO(StripePurchaseSession model);

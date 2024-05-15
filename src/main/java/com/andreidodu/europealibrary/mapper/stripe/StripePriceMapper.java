@@ -14,12 +14,14 @@ public abstract class StripePriceMapper {
 
     @Mapping(ignore = true, target = "stripeProduct")
     @Mapping(ignore = true, target = "stripePriceId")
+    @Mapping(ignore = true, target = "stripePurchaseSessionHistoryList")
     public abstract StripePrice toModel(StripePriceDTO dto);
 
     public abstract StripePriceDTO toDTO(StripePrice model);
 
     @Mapping(target = "stripeProduct", ignore = true)
     @Mapping(target = "stripePriceId", ignore = true)
+    @Mapping(target = "stripePurchaseSessionHistoryList", ignore = true)
     public abstract void map(@MappingTarget StripePrice target, StripePriceDTO source);
 
 

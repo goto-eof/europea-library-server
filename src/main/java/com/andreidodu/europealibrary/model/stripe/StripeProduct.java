@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -33,8 +35,11 @@ public class StripeProduct extends ModelCommon {
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id", unique = true, nullable = false)
     private FileMetaInfo fileMetaInfo;
 
-    @OneToOne(mappedBy = "stripeProduct", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
+    @OneToOne
+    @JoinColumn(name = "current_stripe_price_id", referencedColumnName = "id", unique = true, nullable = false)
     private StripePrice stripePrice;
 
+    @OneToMany(mappedBy = "stripeProduct")
+    private List<StripePrice> stripePriceHistoryList;
 
 }

@@ -12,6 +12,7 @@ import org.mapstruct.ReportingPolicy;
 public abstract class StripeCustomerProductOwnedMapper {
 
     @Mapping(ignore = true, target = "stripeCustomer")
+    @Mapping(ignore = true, target = "stripePrice")
     public abstract StripeCustomerProductsOwned toModel(StripeCustomerProductsOwnedDTO dto);
 
     public abstract StripeCustomerProductsOwnedDTO toDTO(StripeCustomerProductsOwned model);
