@@ -3,10 +3,10 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.constants.BookInfoConst;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
+import com.andreidodu.europealibrary.dto.stripe.StripePriceDTO;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.BookInfoMapper;
-import com.andreidodu.europealibrary.mapper.FileMetaInfoBookMapper;
 import com.andreidodu.europealibrary.mapper.FileMetaInfoMapper;
 import com.andreidodu.europealibrary.model.BookInfo;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
@@ -14,10 +14,8 @@ import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.BookInfoRepository;
 import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
-import com.andreidodu.europealibrary.service.BookInfoService;
-import com.andreidodu.europealibrary.service.CacheLoaderService;
-import com.andreidodu.europealibrary.service.CategoryService;
-import com.andreidodu.europealibrary.service.TagService;
+import com.andreidodu.europealibrary.service.*;
+import com.stripe.exception.StripeException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +33,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -45,8 +41,8 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class BookInfoServiceImpl implements BookInfoService {
+    private final StripeProductAssemblerService stripeProductAssemblerService;
     private final FileSystemItemRepository fileSystemItemRepository;
-    private final FileMetaInfoBookMapper fileMetaInfoBookMapper;
     private final FileMetaInfoMapper fileMetaInfoMapper;
     private final BookInfoRepository bookInfoRepository;
     private final CacheLoaderService cacheLoaderService;
@@ -66,11 +62,11 @@ public class BookInfoServiceImpl implements BookInfoService {
     @Value("${com.andreidodu.europea-library.server.book-cover-path}")
     private String bookCoverPath;
 
-    private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
-        if (id == null || !id.equals(dto.getId())) {
-            throw new ApplicationException("IDs does not match");
-        }
-    }
+//    private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
+//        if (id == null || !id.equals(dto.getId())) {
+//            throw new ApplicationException("IDs does not match");
+//        }
+//    }
 
     private static void validateUpdateInput(Long id, FileMetaInfoDTO dto) {
         if (id == null || !id.equals(dto.getId())) {
@@ -78,26 +74,26 @@ public class BookInfoServiceImpl implements BookInfoService {
         }
     }
 
-    @Override
-    public FileMetaInfoBookDTO retrieveById(Long id) {
-        FileMetaInfo model = this.checkFileMetaInfoExistence(id);
-        return this.fileMetaInfoBookMapper.toDTO(model);
-    }
+//    @Override
+//    public FileMetaInfoBookDTO retrieveById(Long id) {
+//        FileMetaInfo model = this.checkFileMetaInfoExistence(id);
+//        return this.fileMetaInfoBookMapper.toDTO(model);
+//    }
 
-    @Override
-    public FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto) {
-        FileMetaInfo model = this.fileMetaInfoBookMapper.toModel(dto);
-        model.setTagList(dto.getTagList()
-                .stream()
-                .map(tagDTO -> this.tagService.loadOrCreateTagEntity(tagDTO.getName()))
-                .collect(Collectors.toList()));
-        List<FileSystemItem> fileSystemItemList = this.fileSystemItemRepository.findAllById(dto.getFileSystemItemIdList());
-        fileSystemItemList.forEach(fileSystemItem -> fileSystemItem.setFileMetaInfo(model));
-        model.setFileSystemItemList(fileSystemItemList);
-        model.getBookInfo().setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
-        FileMetaInfo newModel = this.repository.save(model);
-        return this.fileMetaInfoBookMapper.toDTO(newModel);
-    }
+//    @Override
+//    public FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto) {
+//        FileMetaInfo model = this.fileMetaInfoBookMapper.toModel(dto);
+//        model.setTagList(dto.getTagList()
+//                .stream()
+//                .map(tagDTO -> this.tagService.loadOrCreateTagEntity(tagDTO.getName()))
+//                .collect(Collectors.toList()));
+//        List<FileSystemItem> fileSystemItemList = this.fileSystemItemRepository.findAllById(dto.getFileSystemItemIdList());
+//        fileSystemItemList.forEach(fileSystemItem -> fileSystemItem.setFileMetaInfo(model));
+//        model.setFileSystemItemList(fileSystemItemList);
+//        model.getBookInfo().setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
+//        FileMetaInfo newModel = this.repository.save(model);
+//        return this.fileMetaInfoBookMapper.toDTO(newModel);
+//    }
 
 //    @Override
 //    public FileMetaInfoBookDTO updateBookInfo(Long fileMetaInfoId, FileMetaInfoBookDTO dto) {
@@ -135,11 +131,11 @@ public class BookInfoServiceImpl implements BookInfoService {
                 .orElse(new OperationStatusDTO(false, "not found"));
     }
 
-    @Override
-    public FileMetaInfoBookDTO retrieveByFileSystemItemId(Long fileSystemItemId) {
-        FileSystemItem fileSystemItem = checkFileSystemItemExistence(fileSystemItemId);
-        return this.fileMetaInfoBookMapper.toDTO(fileSystemItem.getFileMetaInfo());
-    }
+//    @Override
+//    public FileMetaInfoBookDTO retrieveByFileSystemItemId(Long fileSystemItemId) {
+//        FileSystemItem fileSystemItem = checkFileSystemItemExistence(fileSystemItemId);
+//        return this.fileMetaInfoBookMapper.toDTO(fileSystemItem.getFileMetaInfo());
+//    }
 
     @Override
     public OperationStatusDTO bulkLanguageRename(RenameDTO renameDTO) {
@@ -213,8 +209,9 @@ public class BookInfoServiceImpl implements BookInfoService {
     }
 
     @Override
-    public FileMetaInfoDTO updateFileMetaInfoFull(Long fileMetaInfoId, FileMetaInfoDTO dto) {
+    public FileMetaInfoDTO updateFileMetaInfoFull(Long fileMetaInfoId, FileMetaInfoDTO dto) throws StripeException {
         validateUpdateInput(fileMetaInfoId, dto);
+
         FileMetaInfo model = checkFileMetaInfoExistence(fileMetaInfoId);
         this.fileMetaInfoMapper.map(model, dto);
         model.setTagList(dto.getTagList()
@@ -225,22 +222,34 @@ public class BookInfoServiceImpl implements BookInfoService {
                 .distinct()
                 .map(this.tagService::loadOrCreateTagEntity)
                 .collect(Collectors.toList()));
-        Optional.ofNullable(dto.getBookInfo())
-                .ifPresent(bookInfoDTO -> {
-                    BookInfo bookInfo = model.getBookInfo();
-                    this.bookInfoMapper.map(bookInfo, bookInfoDTO);
-                    bookInfo.setCategoryList(dto.getBookInfo().getCategoryList()
-                            .stream()
-                            .map(CategoryDTO::getName)
-                            .map(String::toLowerCase)
-                            .map(String::trim)
-                            .distinct()
-                            .map(this.categoryService::createCategoryEntity)
-                            .collect(Collectors.toList()));
-                    bookInfo.setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
-                });
         FileMetaInfo newModel = this.repository.save(model);
-        return this.fileMetaInfoBookMapper.toDTO(newModel);
+
+        BookInfoDTO bookInfoDTO = dto.getBookInfo();
+        if (bookInfoDTO != null) {
+            BookInfo bookInfo = model.getBookInfo();
+            this.bookInfoMapper.map(bookInfo, bookInfoDTO);
+            bookInfo.setCategoryList(dto.getBookInfo().getCategoryList()
+                    .stream()
+                    .map(CategoryDTO::getName)
+                    .map(String::toLowerCase)
+                    .map(String::trim)
+                    .distinct()
+                    .map(this.categoryService::createCategoryEntity)
+                    .collect(Collectors.toList()));
+            bookInfo.setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
+            this.bookInfoRepository.save(bookInfo);
+        }
+
+        StripePriceDTO stripePriceDTO = dto.getStripePrice();
+        if (stripePriceDTO != null) {
+            if (stripePriceDTO.getId() != null) {
+                this.stripeProductAssemblerService.updateStripeProductAssembly(stripePriceDTO);
+            } else {
+                this.stripeProductAssemblerService.createNewStripePriceAssembly(stripePriceDTO);
+            }
+        }
+
+        return this.fileMetaInfoMapper.toDTO(newModel);
     }
 
     private void updateFileMetaInfoImageUrl(Long metaInfoId, String filename) {

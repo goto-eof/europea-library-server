@@ -43,7 +43,7 @@ public class FileSystemServiceImpl implements FileSystemService {
                 .sort(Comparator.comparing(FileSystemItem::getIsDirectory)
                         .reversed()
                         .thenComparing(FileSystemItem::getName));
-        return this.fileSystemItemFullMapper.toDTOLess(fileSystemItem);
+        return this.fileSystemItemFullMapper.toDTOFull(fileSystemItem);
     }
 
     private FileSystemItemDTO manageCaseReadDirectoryNoIdProvided() {

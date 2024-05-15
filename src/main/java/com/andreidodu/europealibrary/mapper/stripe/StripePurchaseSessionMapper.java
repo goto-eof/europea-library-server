@@ -1,7 +1,6 @@
 package com.andreidodu.europealibrary.mapper.stripe;
 
 import com.andreidodu.europealibrary.dto.stripe.StripePurchaseSessionDTO;
-import com.andreidodu.europealibrary.mapper.StripeProductMapper;
 import com.andreidodu.europealibrary.model.stripe.StripePurchaseSession;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.Mapper;

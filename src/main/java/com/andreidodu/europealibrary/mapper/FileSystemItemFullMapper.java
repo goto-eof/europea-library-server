@@ -33,6 +33,7 @@ public abstract class FileSystemItemFullMapper {
     @Mapping(ignore = true, target = "parent")
     @Mapping(source = "fileMetaInfo.bookInfo.averageRating", target = "averageRating")
     @Mapping(source = "fileMetaInfo.bookInfo.ratingsCount", target = "ratingsCount")
+    @Mapping(qualifiedByName = "toDTOWithRevertedPriceProduct", source = "fileMetaInfo", target = "fileMetaInfo")
     public abstract FileSystemItemDTO toDTOWithoutChildrenAndParent(FileSystemItem model);
 
     @Named(value = "parentToDTO")
@@ -43,17 +44,12 @@ public abstract class FileSystemItemFullMapper {
     public abstract FileSystemItemDTO toDTOParent(FileSystemItem model);
 
     @Named("toDTOWithChildAndParent")
-    public FileSystemItemDTO toDTOLess(FileSystemItem model) {
+    public FileSystemItemDTO toDTOFull(FileSystemItem model) {
         FileSystemItemDTO dto = this.toDTOWithoutChildrenAndParent(model);
         dto.setChildrenList(toDTOWithoutChildrenAndParent(model.getChildrenList()));
         dto.setParent(this.toDTOParent(model.getParent()));
         return dto;
     }
-
-    public List<FileSystemItemDTO> toDTOLess(List<FileSystemItem> list) {
-        return list.stream().map(this::toDTOWithoutChildrenAndParent).toList();
-    }
-
 
     @Named("toDTOWithoutChildrenAndParent")
     public List<FileSystemItemDTO> toDTOWithoutChildrenAndParent(List<FileSystemItem> fileSystemItemList) {

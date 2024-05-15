@@ -37,7 +37,7 @@ public class StripeProduct extends ModelCommon {
 
     @OneToOne
     @JoinColumn(name = "current_stripe_price_id", referencedColumnName = "id", unique = true, nullable = false)
-    private StripePrice stripePrice;
+    private StripePrice currentStripePrice;
 
     @OneToMany(mappedBy = "stripeProduct")
     private List<StripePrice> stripePriceHistoryList;

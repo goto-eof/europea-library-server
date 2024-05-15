@@ -4,18 +4,19 @@ import com.andreidodu.europealibrary.dto.FileMetaInfoBookDTO;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.RenameDTO;
 import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
+import com.stripe.exception.StripeException;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface BookInfoService {
-    FileMetaInfoBookDTO retrieveById(Long id);
+//    FileMetaInfoBookDTO retrieveById(Long id);
 
-    FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto);
+//    FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto);
 
 //    FileMetaInfoBookDTO updateBookInfo(Long fileMetaInfoId, FileMetaInfoBookDTO dto);
 
     OperationStatusDTO delete(Long id);
 
-    FileMetaInfoBookDTO retrieveByFileSystemItemId(Long fileSystemItemId);
+//    FileMetaInfoBookDTO retrieveByFileSystemItemId(Long fileSystemItemId);
 
     OperationStatusDTO bulkLanguageRename(RenameDTO renameDTO);
 
@@ -29,5 +30,5 @@ public interface BookInfoService {
 
     OperationStatusDTO uploadBookCover(Long metaInfoId, MultipartFile file);
 
-    FileMetaInfoDTO updateFileMetaInfoFull(Long fileMetaInfoId, FileMetaInfoDTO dto);
+    FileMetaInfoDTO updateFileMetaInfoFull(Long fileMetaInfoId, FileMetaInfoDTO dto) throws StripeException;
 }

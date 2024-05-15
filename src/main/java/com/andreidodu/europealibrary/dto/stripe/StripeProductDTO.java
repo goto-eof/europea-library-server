@@ -11,5 +11,4 @@ public class StripeProductDTO extends CommonDTO {
     private String name;
     private String description;
     private Long fileMetaInfoId;
-    private StripePriceDTO stripePrice;
 }

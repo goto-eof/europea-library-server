@@ -30,6 +30,9 @@ public class StripePrice extends ModelCommon {
     @Column(name = "amount")
     private BigDecimal amount;
 
+    @Column(name = "archived")
+    private Boolean archived;
+
     @ManyToOne
     @JoinColumn(name = "stripe_product_id", nullable = false)
     private StripeProduct stripeProduct;

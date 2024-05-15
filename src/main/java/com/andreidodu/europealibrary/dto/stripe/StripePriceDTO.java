@@ -13,4 +13,5 @@ public class StripePriceDTO extends CommonDTO {
     private String currency;
     private BigDecimal amount;
     private StripeProductDTO stripeProduct;
+    private Boolean archived;
 }

@@ -174,7 +174,7 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     @Override
     public FileSystemItemDTO get(Long fileSystemItemId) {
         return this.fileSystemItemRepository.findById(fileSystemItemId)
-                .map(this.fileSystemItemFullMapper::toDTOLess)
+                .map(this.fileSystemItemFullMapper::toDTOFull)
                 .orElseThrow(() -> new ApplicationException("Item not found"));
     }
 

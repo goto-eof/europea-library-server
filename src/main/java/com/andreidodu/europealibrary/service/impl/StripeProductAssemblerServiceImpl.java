@@ -3,7 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.dto.stripe.StripePriceDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeProductDTO;
 import com.andreidodu.europealibrary.exception.ValidationException;
-import com.andreidodu.europealibrary.mapper.StripeProductMapper;
+import com.andreidodu.europealibrary.mapper.stripe.StripeProductMapper;
 import com.andreidodu.europealibrary.mapper.stripe.StripePriceMapper;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.stripe.StripePrice;
@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -52,6 +53,8 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
 
         StripeProduct stripeProduct = createStripeProduct(stripePriceDTO);
         StripePrice stripePrice = createStripePrice(stripePriceDTO, stripeProduct);
+        stripeProduct.setCurrentStripePrice(stripePrice);
+        this.stripeProductRepository.save(stripeProduct);
         return this.stripePriceMapper.toDTO(stripePrice);
     }
 
@@ -91,30 +94,37 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
         stripePrice.setStripeProduct(stripeProduct);
         Price price = this.stripeRemotePriceService.createNewStripePrice(stripeProduct.getStripeProductId(), stripePriceDTO.getAmount().longValue(), null);
         stripePrice.setStripePriceId(price.getId());
-        return this.stripePriceRepository.save(stripePrice);
+        stripePrice = this.stripePriceRepository.save(stripePrice);
+        return stripePrice;
     }
 
     @Override
     public StripePriceDTO updateStripeProductAssembly(StripePriceDTO stripePriceDTO) throws StripeException {
         ValidationUtil.assertNotNull(stripePriceDTO, "dto could not be null");
 
+        // TODO check if there are any changes, if not, do not call Stripe
+
         StripeProduct stripeProduct = this.updateStripeProduct(stripePriceDTO);
 
-        deleteStripePrice(stripePriceDTO);
+        archivePrice(stripePriceDTO);
 
         StripePrice stripePrice = createStripePrice(stripePriceDTO, stripeProduct);
+
+        stripeProduct.setCurrentStripePrice(stripePrice);
+        this.stripeProductRepository.save(stripeProduct);
+
         return this.stripePriceMapper.toDTO(stripePrice);
     }
 
-    private void deleteStripePrice(StripePriceDTO stripePriceDTO) throws StripeException {
+    @Transactional(propagation = Propagation.REQUIRED)
+    private void archivePrice(StripePriceDTO stripePriceDTO) throws StripeException {
         ValidationUtil.assertNotNull(stripePriceDTO.getStripeProduct(), "StripeProduct could not be null");
         ValidationUtil.assertNotNull(stripePriceDTO.getStripeProduct().getFileMetaInfoId(), "FileMetaInfoId could not be null");
 
-        Optional<StripePrice> stripePriceOptional = this.stripePriceRepository.findByStripeProduct_FileMetaInfo_id(stripePriceDTO.getStripeProduct().getFileMetaInfoId());
-        if (stripePriceOptional.isPresent()) {
-            StripePrice stripePrice = stripePriceOptional.get();
+        StripePrice stripePrice = this.stripeProductRepository.findById(stripePriceDTO.getStripeProduct().getId()).get().getCurrentStripePrice();// this.stripePriceRepository.findByStripeProduct_FileMetaInfo_id(stripePriceDTO.getStripeProduct().getFileMetaInfoId());
+        if (stripePrice != null) {
             this.stripeRemotePriceService.deactivate(stripePrice.getStripePriceId());
-            this.stripePriceRepository.delete(stripePrice);
+            this.stripePriceRepository.archive(true, stripePrice.getId());
         }
     }
 

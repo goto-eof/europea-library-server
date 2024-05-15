@@ -58,6 +58,9 @@
             <column name="stripe_product_id" type="BIGINT">
                 <constraints nullable="true"/>
             </column>
+            <column name="archived" type="boolean">
+                <constraints nullable="true"/>
+            </column>
             <column name="insert_date" type="DATETIME" defaultValueDate="${defaultTimeStamp}"/>
             <column name="update_date" type="DATETIME" defaultValueDate="${defaultTimeStamp}"/>
             <column name="version" type="INT"/>

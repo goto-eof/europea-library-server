@@ -12,15 +12,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/bookInfo")
 @Tag(name = "Book info resource", description = "Allows to view and manage book information")
 public interface BookInfoResource {
-    @GetMapping("/fileSystemItemId/{fileSystemItemId}")
-    ResponseEntity<FileMetaInfoBookDTO> retrieveByFileSystemItemId(@PathVariable Long fileSystemItemId) throws Exception;
+//    @GetMapping("/fileSystemItemId/{fileSystemItemId}")
+//    ResponseEntity<FileMetaInfoBookDTO> retrieveByFileSystemItemId(@PathVariable Long fileSystemItemId) throws Exception;
 
-    @GetMapping("/id/{id}")
-    ResponseEntity<FileMetaInfoBookDTO> retrieve(@PathVariable Long id) throws Exception;
+//    @GetMapping("/id/{id}")
+//    ResponseEntity<FileMetaInfoBookDTO> retrieve(@PathVariable Long id) throws Exception;
 
-    @AllowOnlyAdministrator
-    @PostMapping("/create")
-    ResponseEntity<FileMetaInfoBookDTO> create(@RequestBody FileMetaInfoBookDTO dto) throws Exception;
+//    @AllowOnlyAdministrator
+//    @PostMapping("/create")
+//    ResponseEntity<FileMetaInfoBookDTO> create(@RequestBody FileMetaInfoBookDTO dto) throws Exception;
 
 //    @AllowOnlyAdministrator
 //    @PutMapping("/id/{id}")
