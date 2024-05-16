@@ -95,15 +95,17 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
 
         StripePrice oldProductPrice = stripeProduct.getCurrentStripePrice();
 
-        BigDecimal oldPrice = oldProductPrice.getAmount();
-        BigDecimal newPrice = stripePriceDTO.getAmount();
+        if (oldProductPrice != null) {
+            BigDecimal oldPrice = oldProductPrice.getAmount();
+            BigDecimal newPrice = stripePriceDTO.getAmount();
 
-        String oldCurrency = oldProductPrice.getCurrency();
-        String newCurrency = stripePriceDTO.getCurrency();
+            String oldCurrency = oldProductPrice.getCurrency();
+            String newCurrency = stripePriceDTO.getCurrency();
 
-        // TODO the multiplication by 100 => find a more elegant solution
-        if (!areDifferent(oldPrice, newPrice.multiply(BigDecimal.valueOf(100))) && !areDifferent(oldCurrency, newCurrency)) {
-            return stripeProduct.getCurrentStripePrice();
+            // TODO the multiplication by 100 => find a more elegant solution
+            if (!areDifferent(oldPrice, newPrice.multiply(BigDecimal.valueOf(100))) && !areDifferent(oldCurrency, newCurrency)) {
+                return stripeProduct.getCurrentStripePrice();
+            }
         }
 
         StripePrice stripePrice = this.stripePriceMapper.toModel(stripePriceDTO);

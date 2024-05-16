@@ -30,13 +30,23 @@ public class StripeCustomer extends ModelCommon {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "email")
+    private String email;
+
     @OneToOne
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
+
+    @OneToOne
+    @JoinColumn(name = "current_stripe_customer_address_id", unique = true, nullable = false)
+    private StripeCustomerAddress currentStripeCustomerAddress;
 
     @OneToMany(mappedBy = "stripeCustomer")
     private List<StripeCustomerProductsOwned> stripeCustomerProductsOwnedList;
 
     @OneToMany(mappedBy = "stripeCustomer")
     private List<StripeCustomerPricingPlanOwned> stripeCustomerPricingPlanOwnedList;
+
+    @OneToMany(mappedBy = "stripeCustomer")
+    private List<StripeCustomerAddress> stripeCustomerAddressList;
 }
