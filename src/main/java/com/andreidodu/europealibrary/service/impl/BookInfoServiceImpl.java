@@ -19,6 +19,7 @@ import com.stripe.exception.StripeException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -240,12 +241,14 @@ public class BookInfoServiceImpl implements BookInfoService {
             this.bookInfoRepository.save(bookInfo);
         }
 
-        StripePriceDTO stripePriceDTO = dto.getStripePrice();
-        if (stripePriceDTO != null) {
-            if (stripePriceDTO.getId() != null) {
-                this.stripeProductAssemblerService.updateStripeProductAssembly(stripePriceDTO);
-            } else {
-                this.stripeProductAssemblerService.createNewStripePriceAssembly(stripePriceDTO);
+        if (BooleanUtils.isTrue(dto.getOnSale())) {
+            StripePriceDTO stripePriceDTO = dto.getStripePrice();
+            if (stripePriceDTO != null) {
+                if (stripePriceDTO.getId() != null) {
+                    this.stripeProductAssemblerService.updateStripeProductAssembly(stripePriceDTO);
+                } else {
+                    this.stripeProductAssemblerService.createNewStripePriceAssembly(stripePriceDTO);
+                }
             }
         }
 
