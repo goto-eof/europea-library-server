@@ -14,4 +14,8 @@ public interface StripePriceRepository extends TransactionalRepository<StripePri
     @Modifying
     @Query("update StripePrice sp set sp.archived = :isArchived where sp.id = :id")
     void archive(boolean isArchived, Long id);
+
+    Optional<StripePrice> findByStripeProduct_FileMetaInfo_idAndArchivedNot(Long fileMetaInfoId, boolean b);
+
+    Optional<StripePrice> findByStripeProduct_FileMetaInfo_idAndArchivedIsNull(Long fileMetaInfoId);
 }
