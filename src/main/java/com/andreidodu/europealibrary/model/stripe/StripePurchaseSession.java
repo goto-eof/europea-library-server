@@ -24,7 +24,8 @@ public class StripePurchaseSession extends ModelCommon {
     @Column(name = "status")
     private StripePurchaseSessionStatus stripePurchaseSessionStatus;
 
-    @Column(name = "stripe_customer_id")
+    @ManyToOne
+    @JoinColumn(name = "stripe_customer_id")
     private StripeCustomer stripeCustomer;
 
     @ManyToOne

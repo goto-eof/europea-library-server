@@ -92,16 +92,16 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         StripeCheckoutSessionResponseDTO stripeCheckoutSessionResponseDTO = new StripeCheckoutSessionResponseDTO();
 
         StripeCustomer stripeCustomer = this.stripeCustomerRepository.findByUser_username(username)
-                .orElseThrow(() -> new ValidationException("User not found"));
+                .orElseThrow(() -> new ValidationException("StripeCustomer not found"));
         StripePrice stripePrice = this.stripePriceRepository.findByStripeProduct_FileMetaInfo_id(stripeCheckoutSessionRequestDTO.getFileMetaInfoId())
                 .orElseThrow(() -> new ValidationException("Price not found"));
-
 
         StripePurchaseSession stripePurchaseSession = new StripePurchaseSession();
         stripePurchaseSession.setStripeCustomer(stripeCustomer);
         StripeProduct stripeProduct = this.stripeProductRepository.findByFileMetaInfo_id(stripeCheckoutSessionRequestDTO.getFileMetaInfoId())
                 .orElseThrow(() -> new ValidationException("Product not found"));
         stripePurchaseSession.setStripeProduct(stripeProduct);
+        stripePurchaseSession.setStripePrice(stripePrice);
         stripePurchaseSession.setStripePurchaseSessionStatus(StripePurchaseSessionStatus.CHECKOUT_IN_PROGRESS);
         stripePurchaseSession = this.stripePurchaseSessionRepository.save(stripePurchaseSession);
 
