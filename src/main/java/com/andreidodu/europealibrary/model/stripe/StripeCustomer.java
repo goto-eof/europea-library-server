@@ -45,8 +45,5 @@ public class StripeCustomer extends ModelCommon {
     private List<StripeCustomerProductsOwned> stripeCustomerProductsOwnedList;
 
     @OneToMany(mappedBy = "stripeCustomer")
-    private List<StripeCustomerPricingPlanOwned> stripeCustomerPricingPlanOwnedList;
-
-    @OneToMany(mappedBy = "stripeCustomer")
     private List<StripeCustomerAddress> stripeCustomerAddressList;
 }

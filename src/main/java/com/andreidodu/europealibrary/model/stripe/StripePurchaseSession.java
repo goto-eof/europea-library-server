@@ -33,10 +33,6 @@ public class StripePurchaseSession extends ModelCommon {
     private StripeProduct stripeProduct;
 
     @ManyToOne
-    @JoinColumn(name = "stripe_pricing_plan_id", nullable = true, unique = false)
-    private StripePricingPlan stripePricingPlan;
-
-    @ManyToOne
     @JoinColumn(name = "stripe_price_id", referencedColumnName = "id", nullable = false)
     private StripePrice stripePrice;
 

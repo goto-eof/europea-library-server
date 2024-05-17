@@ -13,7 +13,6 @@ public class StripePurchaseSessionDTO extends CommonDTO {
     private StripePurchaseSessionStatus stripePurchaseSessionStatus;
     private StripeCustomerDTO stripeCustomer;
     private StripeProductDTO stripeProduct;
-    private StripePricingPlanDTO stripePricingPlan;
 
 
 }

@@ -9,7 +9,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 @Slf4j
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {StripeCustomerPricingPlanOwnedMapper.class, StripeCustomerProductOwnedMapper.class, StripeCustomerAddressMapper.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, uses = {StripeCustomerProductOwnedMapper.class, StripeCustomerAddressMapper.class})
 public abstract class StripeCustomerMapper {
 
     @Mapping(ignore = true, target = "user")
