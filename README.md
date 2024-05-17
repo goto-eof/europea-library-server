@@ -86,8 +86,6 @@ library, search for an e-book and view book information.
     - start/stop job
     - reload application cache
 - sell/buy e-books and view transactions (Work In Progress)
-    - stripe product + price creation almost done
-    - need to redefine the stripe entities (the current DB schema is a draft)
 
 ## Run the project (test environment)
 
@@ -138,7 +136,7 @@ Before running the software as Spring Boot application it is necessary to follow
 
 # Stripe payments
 
-Test payments in your local environment.
+Test payments in your local environment (Stripe CLI).
 
 ```
 stripe listen --forward-to localhost:8081/api/v1/stripe/webhook
@@ -160,7 +158,7 @@ Java • Spring Boot • Spring Batch • Spring Security • Spring Email Start
 Hibernate • Feign • Liquibase • PostgreSQL • Swagger (OpenAPI) • Docker • epublib • pdfbox • Google ZXing • Google Books
 API • Stripe
 
-## DB schema (DRAFT)
+## DB schema
 
 ![db_schema](images/db_schema.png)
 
