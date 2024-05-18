@@ -1,10 +1,14 @@
 package com.andreidodu.europealibrary.repository;
 
 
+import com.andreidodu.europealibrary.enums.StripeCustomerProductsOwnedStatus;
 import com.andreidodu.europealibrary.model.stripe.StripeCustomerProductsOwned;
 import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
 
 import java.util.Optional;
 
 public interface StripeCustomerProductsOwnedRepository extends TransactionalRepository<StripeCustomerProductsOwned, Long>, CustomStripeCustomerProductsOwnedRepository {
+    Optional<StripeCustomerProductsOwned> findFirstByStripeCustomer_User_usernameAndStripeProduct_FileMetaInfo_idAndStatus(String username, Long id, StripeCustomerProductsOwnedStatus stripeCustomerProductsOwnedStatus);
+
+    boolean existsByStripeCustomer_User_usernameAndStripeProduct_FileMetaInfo_idAndStatus(String username, Long id, StripeCustomerProductsOwnedStatus stripeCustomerProductsOwnedStatus);
 }

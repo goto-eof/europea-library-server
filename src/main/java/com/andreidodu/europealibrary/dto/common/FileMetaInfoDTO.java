@@ -18,4 +18,5 @@ public class FileMetaInfoDTO extends CommonDTO {
     private StripePriceDTO stripePrice;
     private Boolean onSale;
     private Boolean hidden;
+    private Boolean downloadable;
 }

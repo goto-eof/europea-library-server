@@ -28,9 +28,10 @@ public abstract class FileMetaInfoMapper {
 
     @Mapping(target = "stripePrice", source = "stripeProduct.currentStripePrice")
     @Mapping(target = "stripePrice.stripeProduct", source = "stripeProduct")
+    @Mapping(ignore = true, target = "downloadable")
     public abstract FileMetaInfoDTO toDTO(FileMetaInfo model);
 
-    @Named(value="toDTOWithRevertedPriceProduct")
+    @Named(value = "toDTOWithRevertedPriceProduct")
     public FileMetaInfoDTO toDTOWithRevertedPriceProduct(FileMetaInfo model) {
         FileMetaInfoDTO result = this.toDTO(model);
         StripeProduct stripeProduct = model.getStripeProduct();

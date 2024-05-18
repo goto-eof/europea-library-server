@@ -5,18 +5,24 @@ import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.constants.PersistenceConst;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
+import com.andreidodu.europealibrary.enums.StripeCustomerProductsOwnedStatus;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
+import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.*;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
-import com.andreidodu.europealibrary.repository.CategoryRepository;
-import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
-import com.andreidodu.europealibrary.repository.TagRepository;
+import com.andreidodu.europealibrary.model.stripe.StripeCustomerProductsOwned;
+import com.andreidodu.europealibrary.model.stripe.StripeProduct;
+import com.andreidodu.europealibrary.repository.*;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +40,11 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class CursoredFileSystemServiceImpl extends CursoredServiceCommon implements CursoredFileSystemService {
+    private final StripeCustomerProductsOwnedRepository stripeCustomerProductsOwnedRepository;
     private final FileSystemItemRepository fileSystemItemRepository;
-    private final ItemAndFrequencyMapper itemAndFrequencyMapper;
     private final FileSystemItemFullMapper fileSystemItemFullMapper;
     private final FileSystemItemLessMapper fileSystemItemLessMapper;
+    private final ItemAndFrequencyMapper itemAndFrequencyMapper;
     private final FileExtensionMapper fileExtensionMapper;
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
@@ -152,10 +159,11 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     }
 
     @Override
-    public DownloadDTO retrieveResourceForDownload(Long fileSystemId) {
+    public DownloadDTO retrieveResourceForDownload(String username, Long fileSystemId) {
         return this.fileSystemItemRepository.findById(fileSystemId)
                 .map(fileSystemItem -> {
                     try {
+                        checkIfUserAllowedToDownloadResource(username, fileSystemItem);
                         fileSystemItem.setDownloadCount(fileSystemItem.getDownloadCount() + 1);
                         this.fileSystemItemRepository.save(fileSystemItem);
                         File file = new File(fileSystemItem.getBasePath() + "/" + fileSystemItem.getName());
@@ -171,18 +179,34 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 }).orElseThrow();
     }
 
-    @Override
-    public FileSystemItemDTO get(Long fileSystemItemId) {
-        return this.fileSystemItemRepository.findById(fileSystemItemId)
-                .map(this.fileSystemItemFullMapper::toDTOFull)
-                .orElseThrow(() -> new ApplicationException("Item not found"));
+    private void checkIfUserAllowedToDownloadResource(String username, FileSystemItem fileSystemItem) {
+        FileMetaInfo fileMetaInfo = fileSystemItem.getFileMetaInfo();
+        if (BooleanUtils.isTrue(fileMetaInfo.getOnSale())) {
+            stripeCustomerProductsOwnedRepository.findFirstByStripeCustomer_User_usernameAndStripeProduct_FileMetaInfo_idAndStatus(username, fileMetaInfo.getId(), StripeCustomerProductsOwnedStatus.PURCHASED)
+                    .orElseThrow(() -> new AccessDeniedException("Product not purchased"));
+        }
     }
 
     @Override
-    public FileSystemItemDTO getByFileMetaInfoId(Long fileMetaInfoId) {
-        return this.fileSystemItemRepository.findByFileMetaInfo_id(fileMetaInfoId)
+    public FileSystemItemDTO get(String username, Long fileSystemItemId) {
+        FileSystemItemDTO fileSystemItemDTO = this.fileSystemItemRepository.findById(fileSystemItemId)
                 .map(this.fileSystemItemFullMapper::toDTOFull)
                 .orElseThrow(() -> new ApplicationException("Item not found"));
+        fileSystemItemDTO.getFileMetaInfo().setDownloadable(calculateIsDownloadableByFileMetaInfoId(fileSystemItemDTO.getFileMetaInfo(), username));
+        return fileSystemItemDTO;
+    }
+
+    @Override
+    public FileSystemItemDTO getByFileMetaInfoId(String username, Long fileMetaInfoId) {
+        FileSystemItemDTO fileSystemItemDTO = this.fileSystemItemRepository.findByFileMetaInfo_id(fileMetaInfoId)
+                .map(this.fileSystemItemFullMapper::toDTOFull)
+                .orElseThrow(() -> new ApplicationException("Item not found"));
+        fileSystemItemDTO.getFileMetaInfo().setDownloadable(calculateIsDownloadableByFileMetaInfoId(fileSystemItemDTO.getFileMetaInfo(), username));
+        return fileSystemItemDTO;
+    }
+
+    private boolean calculateIsDownloadableByFileMetaInfoId(FileMetaInfoDTO fileMetaInfo, String username) {
+        return BooleanUtils.isTrue(fileMetaInfo.getOnSale()) ? stripeCustomerProductsOwnedRepository.existsByStripeCustomer_User_usernameAndStripeProduct_FileMetaInfo_idAndStatus(username, fileMetaInfo.getId(), StripeCustomerProductsOwnedStatus.PURCHASED) : true;
     }
 
     @Override

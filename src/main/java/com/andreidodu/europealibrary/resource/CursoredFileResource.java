@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,10 +13,10 @@ import java.util.List;
 @RequestMapping("/api/v2/file")
 public interface CursoredFileResource {
     @GetMapping("/{fileSystemItemId}")
-    ResponseEntity<FileSystemItemDTO> get(@PathVariable Long fileSystemItemId);
+    ResponseEntity<FileSystemItemDTO> get(Authentication authentication, @PathVariable Long fileSystemItemId);
 
     @GetMapping("/fileMetaInfoId/{fileMetaInfoId}")
-    ResponseEntity<FileSystemItemDTO> getByFileMetaInfoId(@PathVariable Long fileMetaInfoId);
+    ResponseEntity<FileSystemItemDTO> getByFileMetaInfoId(Authentication authentication, @PathVariable Long fileMetaInfoId);
 
     @PostMapping("/cursored")
     ResponseEntity<CursoredFileSystemItemDTO> retrieveCursored(@RequestBody CursorRequestDTO cursorRequestDTO);
@@ -46,7 +47,7 @@ public interface CursoredFileResource {
 
     @AllowCalculatedAuthorities
     @GetMapping(path = "/download/{fileSystemItemId}")
-    ResponseEntity<InputStreamResource> download(@PathVariable Long fileSystemItemId);
+    ResponseEntity<InputStreamResource> download(Authentication authentication, @PathVariable Long fileSystemItemId);
 
     @PostMapping("/cursored/search")
     ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(@RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);

@@ -9,6 +9,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
@@ -22,13 +23,13 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     final private CursoredFileSystemService cursoredFileSystemService;
 
     @Override
-    public ResponseEntity<FileSystemItemDTO> get(@PathVariable Long fileSystemItemId) {
-        return ResponseEntity.ok(cursoredFileSystemService.get(fileSystemItemId));
+    public ResponseEntity<FileSystemItemDTO> get(Authentication authentication, Long fileSystemItemId) {
+        return ResponseEntity.ok(cursoredFileSystemService.get(authentication.getName(), fileSystemItemId));
     }
 
     @Override
-    public ResponseEntity<FileSystemItemDTO> getByFileMetaInfoId(Long fileMetaInfoId) {
-        return ResponseEntity.ok(cursoredFileSystemService.getByFileMetaInfoId(fileMetaInfoId));
+    public ResponseEntity<FileSystemItemDTO> getByFileMetaInfoId(Authentication authentication, Long fileMetaInfoId) {
+        return ResponseEntity.ok(cursoredFileSystemService.getByFileMetaInfoId(authentication.getName(), fileMetaInfoId));
     }
 
     @Override
@@ -77,8 +78,8 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     }
 
     @Override
-    public ResponseEntity<InputStreamResource> download(@PathVariable Long fileSystemItemId) {
-        DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(fileSystemItemId);
+    public ResponseEntity<InputStreamResource> download(Authentication authentication, @PathVariable Long fileSystemItemId) {
+        DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(authentication.getName(), fileSystemItemId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
