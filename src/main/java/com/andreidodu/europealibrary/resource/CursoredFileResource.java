@@ -1,16 +1,11 @@
 package com.andreidodu.europealibrary.resource;
 
 import com.andreidodu.europealibrary.annotation.security.AllowCalculatedAuthorities;
-import com.andreidodu.europealibrary.annotation.security.AllowOnlyAuthenticatedUsers;
 import com.andreidodu.europealibrary.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,6 +13,9 @@ import java.util.List;
 public interface CursoredFileResource {
     @GetMapping("/{fileSystemItemId}")
     ResponseEntity<FileSystemItemDTO> get(@PathVariable Long fileSystemItemId);
+
+    @GetMapping("/fileMetaInfoId/{fileMetaInfoId}")
+    ResponseEntity<FileSystemItemDTO> getByFileMetaInfoId(@PathVariable Long fileMetaInfoId);
 
     @PostMapping("/cursored")
     ResponseEntity<CursoredFileSystemItemDTO> retrieveCursored(@RequestBody CursorRequestDTO cursorRequestDTO);

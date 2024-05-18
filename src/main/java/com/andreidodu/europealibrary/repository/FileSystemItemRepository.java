@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.repository;
 
+import com.andreidodu.europealibrary.mapper.ApplicationSettingsMapper;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.common.TransactionalRepository;
@@ -28,4 +29,5 @@ public interface FileSystemItemRepository extends TransactionalRepository<FileSy
     @Query(value = "select fsi.id from FileSystemItem fsi where fsi.basePath = :basePath and fsi.name = :name and fsi.jobStep = :jobStep")
     Optional<Long> findIdByBasePathAndNameAndJobStep(String basePath, String name, int jobStep);
 
+    Optional<FileSystemItem> findByFileMetaInfo_id(Long fileMetaInfoId);
 }

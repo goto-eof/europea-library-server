@@ -21,7 +21,7 @@ spring:
     jdbc:
       initialize-schema: always
     job:
-      enabled: false
+      enabled: true
   mvc:
     dispatch-options-request: true
   datasource:

@@ -4,8 +4,8 @@ import com.andreidodu.europealibrary.dto.stripe.StripePriceDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeProductDTO;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.stripe.PriceConvertMapper;
-import com.andreidodu.europealibrary.mapper.stripe.StripeProductMapper;
 import com.andreidodu.europealibrary.mapper.stripe.StripePriceMapper;
+import com.andreidodu.europealibrary.mapper.stripe.StripeProductMapper;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.stripe.StripePrice;
 import com.andreidodu.europealibrary.model.stripe.StripeProduct;
@@ -27,8 +27,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -107,6 +105,9 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
                 return stripeProduct.getCurrentStripePrice();
             }
         }
+        if (stripePriceDTO.getId() != null) {
+            archivePrice(stripePriceDTO);
+        }
 
         StripePrice stripePrice = this.stripePriceMapper.toModel(stripePriceDTO);
         stripePrice.setStripeProduct(stripeProduct);
@@ -141,7 +142,6 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
 
         StripeProduct stripeProduct = this.updateStripeProduct(stripePriceDTO);
 
-        archivePrice(stripePriceDTO);
 
         StripePrice stripePrice = createStripePrice(stripePriceDTO, stripeProduct);
 
@@ -156,7 +156,7 @@ public class StripeProductAssemblerServiceImpl implements StripeProductAssembler
         ValidationUtil.assertNotNull(stripePriceDTO.getStripeProduct(), "StripeProduct could not be null");
         ValidationUtil.assertNotNull(stripePriceDTO.getStripeProduct().getFileMetaInfoId(), "FileMetaInfoId could not be null");
 
-        StripePrice stripePrice = this.stripeProductRepository.findById(stripePriceDTO.getStripeProduct().getId()).get().getCurrentStripePrice();// this.stripePriceRepository.findByStripeProduct_FileMetaInfo_id(stripePriceDTO.getStripeProduct().getFileMetaInfoId());
+        StripePrice stripePrice = this.stripeProductRepository.findById(stripePriceDTO.getStripeProduct().getId()).get().getCurrentStripePrice();
         if (stripePrice != null) {
             this.stripeRemotePriceService.deactivate(stripePrice.getStripePriceId());
             this.stripePriceRepository.archive(true, stripePrice.getId());

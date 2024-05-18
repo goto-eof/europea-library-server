@@ -179,6 +179,13 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     }
 
     @Override
+    public FileSystemItemDTO getByFileMetaInfoId(Long fileMetaInfoId) {
+        return this.fileSystemItemRepository.findByFileMetaInfo_id(fileMetaInfoId)
+                .map(this.fileSystemItemFullMapper::toDTOFull)
+                .orElseThrow(() -> new ApplicationException("Item not found"));
+    }
+
+    @Override
     public SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> search(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
         SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> result = new SearchResultDTO<>();
         List<FileSystemItem> children = this.fileSystemItemRepository.search(searchFileSystemItemRequestDTO);

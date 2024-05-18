@@ -27,6 +27,11 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     }
 
     @Override
+    public ResponseEntity<FileSystemItemDTO> getByFileMetaInfoId(Long fileMetaInfoId) {
+        return ResponseEntity.ok(cursoredFileSystemService.getByFileMetaInfoId(fileMetaInfoId));
+    }
+
+    @Override
     public ResponseEntity<CursoredFileSystemItemDTO> retrieveCursored(@RequestBody CursorRequestDTO cursorRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.readDirectory(cursorRequestDTO));
     }

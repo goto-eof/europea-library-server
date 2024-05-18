@@ -14,16 +14,19 @@ public abstract class StripeCustomerMapper {
 
     @Mapping(ignore = true, target = "user")
     @Mapping(ignore = true, target = "stripeCustomerId")
+    @Mapping(ignore = true, target = "stripeCustomerProductsOwnedList")
     public abstract StripeCustomer toModel(StripeCustomerDTO dto);
 
     @Mapping(ignore = true, target = "user")
     @Mapping(ignore = true, target = "currentStripeCustomerAddress")
     @Mapping(ignore = true, target = "stripeCustomerId")
+    @Mapping(ignore = true, target = "stripeCustomerProductsOwnedList")
     public abstract StripeCustomer toModelWithoutAddress(StripeCustomerDTO dto);
 
     public abstract StripeCustomerDTO toDTO(StripeCustomer model);
 
     @Mapping(ignore = true, target = "user")
     @Mapping(ignore = true, target = "stripeCustomerId")
+    @Mapping(ignore = true, target = "stripeCustomerProductsOwnedList")
     public abstract void map(@MappingTarget StripeCustomer stripeCustomer, StripeCustomerDTO stripeCustomerDTO);
 }

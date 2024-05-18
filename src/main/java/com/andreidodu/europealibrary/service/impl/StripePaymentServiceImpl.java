@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionRequestDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeCheckoutSessionResponseDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeCustomerDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeUserRegistrationRequestDTO;
+import com.andreidodu.europealibrary.enums.StripeCustomerProductsOwnedStatus;
 import com.andreidodu.europealibrary.enums.StripePurchaseSessionStatus;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.exception.ValidationException;
@@ -93,16 +94,16 @@ public class StripePaymentServiceImpl implements StripePaymentService {
 
         StripeCustomer stripeCustomer = this.stripeCustomerRepository.findByUser_username(username)
                 .orElseThrow(() -> new ValidationException("StripeCustomer not found"));
-        StripePrice stripePrice = this.stripePriceRepository.findByStripeProduct_FileMetaInfo_idAndArchivedIsNull(stripeCheckoutSessionRequestDTO.getFileMetaInfoId())
-                .orElseThrow(() -> new ValidationException("Price not found"));
 
         StripePurchaseSession stripePurchaseSession = new StripePurchaseSession();
         stripePurchaseSession.setStripeCustomer(stripeCustomer);
         StripeProduct stripeProduct = this.stripeProductRepository.findByFileMetaInfo_id(stripeCheckoutSessionRequestDTO.getFileMetaInfoId())
                 .orElseThrow(() -> new ValidationException("Product not found"));
+        StripePrice stripePrice = stripeProduct.getCurrentStripePrice();
         stripePurchaseSession.setStripeProduct(stripeProduct);
         stripePurchaseSession.setStripePrice(stripePrice);
         stripePurchaseSession.setStripePurchaseSessionStatus(StripePurchaseSessionStatus.CHECKOUT_IN_PROGRESS);
+
         stripePurchaseSession = this.stripePurchaseSessionRepository.save(stripePurchaseSession);
 
         String clientReferenceId = String.valueOf(stripePurchaseSession.getId());
@@ -116,7 +117,8 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                 quantity,
                 SessionCreateParams.PaymentMethodType.CARD
         );
-
+        stripePurchaseSession.setStripePaymentIntentId(session.getPaymentIntent());
+        this.stripePurchaseSessionRepository.save(stripePurchaseSession);
         stripeCheckoutSessionResponseDTO.setSessionId(session.getId());
         stripeCheckoutSessionResponseDTO.setStripePublicKey(publicKey);
         return stripeCheckoutSessionResponseDTO;
@@ -149,31 +151,46 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         } else {
             return HttpStatus.BAD_REQUEST;
         }
+        if (event.getType().equalsIgnoreCase("charge.refunded")) {
 
-        if (event.getType().equalsIgnoreCase("payment_intent.payment_failed")) {
+            Charge charge = (Charge) stripeObject;
+
+            String paymentIntentId = charge.getPaymentIntent();
+            StripePurchaseSession stripePurchaseSession = this.stripePurchaseSessionRepository.findByStripePaymentIntentId(paymentIntentId).get();
+
+            StripeCustomerProductsOwned stripeCustomerProductsOwned = stripePurchaseSession.getStripeCustomerProductsOwned();
+            stripeCustomerProductsOwned.setStatus(StripeCustomerProductsOwnedStatus.REFUNDED);
+            this.stripeCustomerProductsOwnedRepository.save(stripeCustomerProductsOwned);
+            return HttpStatus.OK;
+        } else if (event.getType().equalsIgnoreCase("payment_intent.payment_failed")) {
             StripePurchaseSession stripePurchaseSession = getStripePurchaseSession((Session) stripeObject);
             if (stripePurchaseSession == null) return HttpStatus.BAD_REQUEST;
             stripePurchaseSession.setStripePurchaseSessionStatus(StripePurchaseSessionStatus.CHECKOUT_FAILED);
             this.stripePurchaseSessionRepository.save(stripePurchaseSession);
             return HttpStatus.OK;
-        } else
-            // Handle the event
-            if (event.getType().equals(STRIPE_EVENT_CHECKOUT_SESSION_COMPLETED)) {
-                StripePurchaseSession stripePurchaseSession = getStripePurchaseSession((Session) stripeObject);
-                if (stripePurchaseSession == null) return HttpStatus.BAD_REQUEST;
-                stripePurchaseSession.setStripePurchaseSessionStatus(StripePurchaseSessionStatus.CHECKOUT_COMPLETED);
-                final StripePurchaseSession savedStripePurchaseSession = this.stripePurchaseSessionRepository.save(stripePurchaseSession);
-                StripeCustomer stripeCustomer = savedStripePurchaseSession.getStripeCustomer();
-                StripeProduct stripeProduct = savedStripePurchaseSession.getStripeProduct();
-                StripeCustomerProductsOwned stripeCustomerProductsOwned = new StripeCustomerProductsOwned();
-                stripeCustomerProductsOwned.setStripeCustomer(stripeCustomer);
-                stripeCustomerProductsOwned.setStripeProduct(stripeProduct);
-                stripeCustomerProductsOwned.setStripePrice(stripeProduct.getCurrentStripePrice());
-                this.stripeCustomerProductsOwnedRepository.save(stripeCustomerProductsOwned);
-                return HttpStatus.OK;
-            } else {
-                System.out.println("Unhandled event type: " + event.getType());
+        } else if (event.getType().equals(STRIPE_EVENT_CHECKOUT_SESSION_COMPLETED)) {
+            Session session = (Session) stripeObject;
+            StripePurchaseSession stripePurchaseSession = getStripePurchaseSession(session);
+            if (stripePurchaseSession == null) {
+                return HttpStatus.BAD_REQUEST;
             }
+            String paymentIntent = session.getPaymentIntent();
+            stripePurchaseSession.setStripePaymentIntentId(paymentIntent);
+            stripePurchaseSession.setStripePurchaseSessionStatus(StripePurchaseSessionStatus.CHECKOUT_COMPLETED);
+            final StripePurchaseSession savedStripePurchaseSession = this.stripePurchaseSessionRepository.save(stripePurchaseSession);
+            StripeCustomer stripeCustomer = savedStripePurchaseSession.getStripeCustomer();
+            StripeProduct stripeProduct = savedStripePurchaseSession.getStripeProduct();
+            StripeCustomerProductsOwned stripeCustomerProductsOwned = new StripeCustomerProductsOwned();
+            stripeCustomerProductsOwned.setStripeCustomer(stripeCustomer);
+            stripeCustomerProductsOwned.setStripeProduct(stripeProduct);
+            stripeCustomerProductsOwned.setStripePrice(stripeProduct.getCurrentStripePrice());
+            stripeCustomerProductsOwned.setStatus(StripeCustomerProductsOwnedStatus.PURCHASED);
+            stripeCustomerProductsOwned.setStripePurchaseSession(stripePurchaseSession);
+            this.stripeCustomerProductsOwnedRepository.save(stripeCustomerProductsOwned);
+            return HttpStatus.OK;
+        } else {
+            System.out.println("Unhandled event type: " + event.getType());
+        }
         return HttpStatus.BAD_REQUEST;
     }
 

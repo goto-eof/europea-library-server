@@ -48,4 +48,6 @@ public interface CursoredFileSystemService {
     GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveNewCursoredHighlight(CursorCommonRequestDTO cursorRequestDTO);
 
     GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredByDownloadCountHighlight(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
+
+    FileSystemItemDTO getByFileMetaInfoId(Long fileMetaInfoId);
 }

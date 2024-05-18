@@ -13,8 +13,11 @@ public abstract class StripePurchaseSessionMapper {
 
     @Mapping(ignore = true, target = "stripeCustomer")
     @Mapping(ignore = true, target = "stripePrice")
+    @Mapping(ignore = true, target = "stripeCustomerProductsOwned")
+    @Mapping(ignore = true, target = "stripePaymentIntentId")
     public abstract StripePurchaseSession toModel(StripePurchaseSessionDTO dto);
 
+    @Mapping(ignore = true, target = "stripeCustomer.stripeCustomerProductsOwnedList")
     public abstract StripePurchaseSessionDTO toDTO(StripePurchaseSession model);
 
 }
