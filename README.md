@@ -160,7 +160,7 @@ how it works.
 
 Java • Spring Boot • Spring Batch • Spring Security • Spring Email Starter • Apache FreeMarker • Spring JPA • Queryds •
 Hibernate • Feign • Liquibase • PostgreSQL • Swagger (OpenAPI) • Docker • epublib • pdfbox • Google ZXing • Google Books
-API • Stripe
+API • Stripe • Apache FreeMarker
 
 ## DB schema
 
