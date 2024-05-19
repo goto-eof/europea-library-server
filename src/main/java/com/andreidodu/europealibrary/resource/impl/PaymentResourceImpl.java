@@ -28,4 +28,9 @@ public class PaymentResourceImpl implements PaymentResource {
         return ResponseEntity.ok(this.stripePaymentService.isCheckoutPurchaseSessionCompleted(purchaseSessionId));
 
     }
+
+    @Override
+    public ResponseEntity<OperationStatusDTO> cancelPurchaseSession(Long ongoingPurchaseSessionId, Authentication authentication) {
+        return ResponseEntity.ok(this.stripePaymentService.cancelStripePurchaseSession(ongoingPurchaseSessionId));
+    }
 }

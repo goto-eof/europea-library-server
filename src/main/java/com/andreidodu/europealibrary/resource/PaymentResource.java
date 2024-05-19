@@ -25,5 +25,9 @@ public interface PaymentResource {
     @Operation(summary = "", description = "")
     ResponseEntity<OperationStatusDTO> checkPurchaseSessionStatus(@Parameter(description = "", example = "") @PathVariable Long purchaseSessionId, Authentication authentication);
 
+    @PutMapping("/cancel/ongoingPurchaseSessionId/{ongoingPurchaseSessionId}")
+    @Operation(summary = "", description = "")
+    ResponseEntity<OperationStatusDTO> cancelPurchaseSession(@Parameter(description = "", example = "") @PathVariable Long ongoingPurchaseSessionId, Authentication authentication);
+
 
 }

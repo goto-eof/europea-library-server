@@ -20,6 +20,8 @@ public interface StripePaymentService {
 
     StripeCheckoutSessionResponseDTO initCheckoutSession(StripeCheckoutSessionRequestDTO stripeCheckoutSessionRequestDTO, String username) throws StripeException;
 
+    OperationStatusDTO cancelStripePurchaseSession(Long purchaseSessionId);
+
     HttpStatus checkoutSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException;
 
     OperationStatusDTO isCheckoutPurchaseSessionCompleted(Long purchaseSessionId);

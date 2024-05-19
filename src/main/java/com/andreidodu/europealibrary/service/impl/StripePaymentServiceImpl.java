@@ -125,6 +125,16 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     }
 
     @Override
+    public OperationStatusDTO cancelStripePurchaseSession(Long purchaseSessionId) {
+        this.stripePurchaseSessionRepository.findById(purchaseSessionId)
+                .ifPresent(stripePurchaseSession -> {
+                    stripePurchaseSession.setStripePurchaseSessionStatus(StripePurchaseSessionStatus.CANCELED);
+                    this.stripePurchaseSessionRepository.save(stripePurchaseSession);
+                });
+        return new OperationStatusDTO(true, "canceled");
+    }
+
+    @Override
     public HttpStatus checkoutSessionCompleted(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
 
         String payload = httpServletRequest.getReader()
