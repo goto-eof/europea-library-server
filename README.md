@@ -36,7 +36,7 @@ cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-
 
 # Development status
 
-[Here](https://github.com/users/goto-eof/projects/4) you can find the development progress status.
+Take a look also to the [development progress status](https://github.com/users/goto-eof/projects/4).
 
 ## How the application works?
 
