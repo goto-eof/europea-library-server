@@ -34,6 +34,10 @@ can be
 found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can be
 cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
 
+# Development status
+
+[Here](https://github.com/users/goto-eof/projects/4) you can find the development progress status.
+
 ## How the application works?
 
 The core of the application is the indexer job. It retrieves all the information about files and saves them on the DB.
