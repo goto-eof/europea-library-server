@@ -2,10 +2,12 @@ package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.service.EmailSenderService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -21,18 +23,17 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
     @Async
     @Override
-    public Future<OperationStatusDTO> sendPasswordRecoveryEmail(String title, String mailFrom, String mailTo, String message) {
+    public Future<OperationStatusDTO> sendEmail(String title, String mailFrom, String mailTo, String message) throws MessagingException {
         log.debug("sending email to: {}", mailTo);
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom(mailFrom);
-        simpleMailMessage.setSubject(title);
-        simpleMailMessage.setTo(mailTo);
-        simpleMailMessage.setText(message);
-
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+        helper.setSubject(title);
+        helper.setTo(mailTo);
+        helper.setFrom(mailFrom);
+        helper.setText(message, true);
         try {
-            this.javaMailSender.send(simpleMailMessage);
+            this.javaMailSender.send(mimeMessage);
         } catch (Exception e) {
-            e.printStackTrace();
             log.debug("mail sent");
             return CompletableFuture.completedFuture(new OperationStatusDTO(false, "Mail NOT sent"));
         }

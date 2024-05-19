@@ -91,9 +91,8 @@ com:
             ttl:
               minutes: 3600
           mail:
-            from: europea@library.application
-            title: Europea Library Password Reset Link
-            body: "Hello, click on the following link in order to reset your Europea Library password:"
+            from: noteplay@europea-library.eu
+            title: Europea Library Password Reset Request
       task:
         indexer:
           cron:
@@ -160,6 +159,9 @@ management:
     env:
       roles: ADMINISTRATOR
       show-values: WHEN_AUTHORIZED
+
+spring.freemarker.cache: false
+spring.freemarker.template-loader-path: file:src/main/resources/templates/
 
 logging:
   file:

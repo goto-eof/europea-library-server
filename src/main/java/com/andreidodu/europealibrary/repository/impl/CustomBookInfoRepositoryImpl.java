@@ -1,9 +1,9 @@
 package com.andreidodu.europealibrary.repository.impl;
 
-import com.andreidodu.europealibrary.model.*;
-import com.andreidodu.europealibrary.repository.BookInfoRepository;
+import com.andreidodu.europealibrary.model.BookInfo;
+import com.andreidodu.europealibrary.model.Category;
+import com.andreidodu.europealibrary.model.QBookInfo;
 import com.andreidodu.europealibrary.repository.CustomBookInfoRepository;
-import com.andreidodu.europealibrary.repository.CustomFileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
@@ -11,7 +11,6 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.awt.print.Book;
 import java.util.List;
 
 @Repository

@@ -12,7 +12,7 @@ public interface AuthenticationAndRegistrationService {
 
     OperationStatusDTO changePassword(String name, ChangePasswordRequestDTO changePasswordRequestDTO);
 
-    OperationStatusDTO sendPasswordRecoveryEmail(String email);
+    OperationStatusDTO sendPasswordResetEmail(String email);
 
     OperationStatusDTO passwordReset(PasswordResetRequestDTO passwordResetRequestDTO);
 }

@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.service.impl.security;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
+import com.andreidodu.europealibrary.dto.PasswordResetEmailRequestDTO;
 import com.andreidodu.europealibrary.dto.security.*;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.AuthorityMapper;
@@ -10,6 +11,7 @@ import com.andreidodu.europealibrary.model.security.User;
 import com.andreidodu.europealibrary.repository.security.UserRepository;
 import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
 import com.andreidodu.europealibrary.service.EmailSenderService;
+import com.andreidodu.europealibrary.service.TemplateService;
 import com.andreidodu.europealibrary.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -48,20 +50,16 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
     private final AuthenticationManager authenticationManager;
     private final AuthorityMapper authorityMapper;
     private final EmailSenderService emailSenderService;
+    private final TemplateService templateService;
 
     @Value("${com.andreidodu.europea-library.password.reset.minutes-to-wait-for-another-attempt}")
     private int timeToWaitForAnotherAttempt;
 
     @Value("${com.andreidodu.europea-library.password.reset.mail.from}")
-    private String passwordresetMailFrom;
+    private String mailFrom;
 
-    // TODO create a template with FreeMarker and send it
     @Value("${com.andreidodu.europea-library.password.reset.mail.title}")
     private String passwordResetMailTitle;
-
-    // TODO create a template with FreeMarker and send it
-    @Value("${com.andreidodu.europea-library.password.reset.mail.body}")
-    private String passwordResetMailBody;
 
     @Value("${com.andreidodu.europea-library.client.url}")
     private String clientUrl;
@@ -168,10 +166,10 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
     }
 
     @Override
-    public OperationStatusDTO sendPasswordRecoveryEmail(String email) {
-        assertNotEmpty(email, "email could not be empty");
+    public OperationStatusDTO sendPasswordResetEmail(String mailTo) {
+        assertNotEmpty(mailTo, "email could not be empty");
 
-        Optional<User> userOptional = this.userRepository.findByEmail(email);
+        Optional<User> userOptional = this.userRepository.findByEmail(mailTo);
         User user = userOptional.orElseThrow(() -> new ValidationException("User does not exists"));
 
         LocalDateTime recoveryRequestLocalDateTime = user.getRecoveryRequestTimestamp();
@@ -183,9 +181,16 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
 
         updateUsersResetToken(user, recoveryKey);
 
-        this.emailSenderService.sendPasswordRecoveryEmail(passwordResetMailTitle, passwordresetMailFrom, email, passwordResetMailBody + " " + clientUrl + clientResetPasswordEndpoint + "/" + recoveryKey);
-
-        return new OperationStatusDTO(true, "email sent");
+        PasswordResetEmailRequestDTO passwordResetEmailRequestDTO = new PasswordResetEmailRequestDTO();
+        passwordResetEmailRequestDTO.setUsername(user.getUsername());
+        passwordResetEmailRequestDTO.setRedirectTo(clientUrl + clientResetPasswordEndpoint + "/" + recoveryKey);
+        try {
+            String emailContent = this.templateService.generatePasswordResetEmailContent(passwordResetEmailRequestDTO);
+            this.emailSenderService.sendEmail(passwordResetMailTitle, mailFrom, mailTo, emailContent);
+            return new OperationStatusDTO(true, "email sent");
+        } catch (Exception e) {
+            return new OperationStatusDTO(false, "email not sent");
+        }
     }
 
     private static String generateRandomUUID() {

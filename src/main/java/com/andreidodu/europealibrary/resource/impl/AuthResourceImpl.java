@@ -53,7 +53,7 @@ public class AuthResourceImpl implements AuthResource {
 
     @Override
     public ResponseEntity<OperationStatusDTO> sendPasswordRecoveryEmail(@Valid @RequestBody PasswordResetEmailRequestDTO passwordResetEmailRequestDTO) {
-        return ResponseEntity.ok(this.authenticationAndRegistrationService.sendPasswordRecoveryEmail(passwordResetEmailRequestDTO.getEmail()));
+        return ResponseEntity.ok(this.authenticationAndRegistrationService.sendPasswordResetEmail(passwordResetEmailRequestDTO.getEmail()));
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.QFileMetaInfo;
 import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.CustomFileMetaInfoRepository;
-import com.andreidodu.europealibrary.repository.TagRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
