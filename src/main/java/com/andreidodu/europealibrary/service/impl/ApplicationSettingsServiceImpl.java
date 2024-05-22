@@ -76,7 +76,7 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
         if (applicationSettingsOptional.isEmpty()) {
             ApplicationSettings applicationSettings = new ApplicationSettings();
             applicationSettings.setApplicationLock(ApplicationSettingsConst.APPLICATION_LOCK);
-            applicationSettings.setCustomDescriptionEnabled(true);
+            applicationSettings.setCustomDescriptionEnabled(false);
             applicationSettings.setFeaturedBooksWidgetEnabled(true);
             applicationSettings.setNewBooksWidgetEnabled(true);
             applicationSettings.setPopularBooksWidgetEnabled(true);
