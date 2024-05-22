@@ -26,7 +26,6 @@ public abstract class FileSystemItemLessMapper {
     @Mapping(ignore = true, target = "parentId")
     @Mapping(ignore = true, target = "downloadCount")
     @Mapping(ignore = true, target = "featuredFileSystemItem")
-    @Mapping(ignore = true, target = "applicationSettings")
     public abstract FileSystemItem toModel(FileDTO dto);
 
     @Mapping(ignore = true, target = "childrenList")

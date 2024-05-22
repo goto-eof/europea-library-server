@@ -14,17 +14,17 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR)
 public abstract class ApplicationSettingsMapper {
 
-    @Mapping(ignore = true, target = "featuredFileSystemItem")
+    @Mapping(ignore = true, target = "featuredFileMetaInfo")
     public abstract ApplicationSettings toModel(ApplicationSettingsDTO dto);
 
-    @Mapping(target = "featuredFileSystemItemId", source = "featuredFileSystemItem.id")
+    @Mapping(target = "featuredFileMetaInfoId", source = "featuredFileMetaInfo.id")
     public abstract ApplicationSettingsDTO toDTO(ApplicationSettings model);
 
     public abstract List<ApplicationSettingsDTO> toDTO(List<ApplicationSettings> modelList);
 
     @Mapping(ignore = true, target = "id")
     @Mapping(ignore = true, target = "applicationLock")
-    @Mapping(ignore = true, target = "featuredFileSystemItem")
+    @Mapping(ignore = true, target = "featuredFileMetaInfo")
     public abstract void map(@MappingTarget ApplicationSettings target, ApplicationSettingsDTO source);
 
 }

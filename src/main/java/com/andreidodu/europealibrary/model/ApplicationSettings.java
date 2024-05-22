@@ -38,7 +38,7 @@ public class ApplicationSettings {
     private Boolean popularBooksWidgetEnabled;
 
     @OneToOne
-    @JoinColumn(name = "featured_file_system_item_id", referencedColumnName = "id")
-    private FileSystemItem featuredFileSystemItem;
+    @JoinColumn(name = "featured_file_meta_info_id", referencedColumnName = "id")
+    private FileMetaInfo featuredFileMetaInfo;
 
 }

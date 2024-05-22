@@ -52,6 +52,9 @@ public class FileMetaInfo extends ModelCommon {
     @OneToOne(mappedBy = "fileMetaInfo")
     private StripeProduct stripeProduct;
 
+    @OneToOne(mappedBy = "featuredFileMetaInfo", fetch = FetchType.LAZY)
+    private ApplicationSettings applicationSettings;
+
     @Override
     public String toString() {
         return "FileMetaInfo{" +

@@ -31,16 +31,16 @@ public class InitializationTasklet implements Tasklet {
 
         this.applicationSettingsService.lockApplication();
 
-        backupFeaturedFileSystemItemId(chunkContext);
+        backupFeaturedFileMetaInfoId(chunkContext);
 
         return RepeatStatus.FINISHED;
     }
 
-    private void backupFeaturedFileSystemItemId(ChunkContext chunkContext) {
-        Long featuredFileSystemItemId = this.applicationSettingsService.get().getFeaturedFileSystemItemId();
-        if (featuredFileSystemItemId != null) {
+    private void backupFeaturedFileMetaInfoId(ChunkContext chunkContext) {
+        Long featuredFileMetaInfoId = this.applicationSettingsService.get().getFeaturedFileMetaInfoId();
+        if (featuredFileMetaInfoId != null) {
             applicationSettingsService.setFeatured(null);
-            taskletUtil.getExecutionContext(chunkContext).putLong(JobConst.JOB_VARIABLE_FEATURED_FSI_ID, featuredFileSystemItemId);
+            taskletUtil.getExecutionContext(chunkContext).putLong(JobConst.JOB_VARIABLE_FEATURED_FMI_ID, featuredFileMetaInfoId);
         }
     }
 

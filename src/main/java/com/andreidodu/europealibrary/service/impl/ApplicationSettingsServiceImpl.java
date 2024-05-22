@@ -1,5 +1,6 @@
 package com.andreidodu.europealibrary.service.impl;
 
+import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationSettingsConst;
 import com.andreidodu.europealibrary.dto.ApplicationSettingsDTO;
 import com.andreidodu.europealibrary.dto.FileSystemItemHighlightDTO;
@@ -11,6 +12,7 @@ import com.andreidodu.europealibrary.mapper.FileSystemItemFullMapper;
 import com.andreidodu.europealibrary.model.ApplicationSettings;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.ApplicationSettingsRepository;
+import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
     final private ApplicationSettingsMapper applicationSettingsMapper;
     private final FileSystemItemRepository fileSystemItemRepository;
     final private FileSystemItemFullMapper fileSystemItemFullMapper;
+    private final FileMetaInfoRepository fileMetaInfoRepository;
 
     @Override
     public ApplicationSettingsDTO lockApplication() {
@@ -90,7 +93,10 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
     @Override
     public FileSystemItemHighlightDTO getFeatured() {
         ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
-        FileSystemItem fileSystemItem = Optional.ofNullable(applicationSettings.getFeaturedFileSystemItem())
+        FileSystemItem fileSystemItem = Optional.ofNullable(applicationSettings.getFeaturedFileMetaInfo())
+                .map(fileMetaInfo -> fileMetaInfo.getFileSystemItemList().stream().findFirst()
+                        .filter(fsi -> JobStepEnum.READY.getStepNumber() == fsi.getJobStep())
+                        .orElseThrow(() -> new EntityNotFoundException("Entity not found")))
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
         return this.fileSystemItemFullMapper.toHighlightDTO(fileSystemItem);
     }
@@ -100,10 +106,20 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
         ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
         if (fileSystemItemId != null) {
             this.fileSystemItemRepository.findById(fileSystemItemId)
-                    .ifPresent(applicationSettings::setFeaturedFileSystemItem);
+                    .map(FileSystemItem::getFileMetaInfo)
+                    .ifPresent(applicationSettings::setFeaturedFileMetaInfo);
         } else {
-            applicationSettings.setFeaturedFileSystemItem(null);
+            applicationSettings.setFeaturedFileMetaInfo(null);
         }
+        this.applicationSettingsRepository.save(applicationSettings);
+        return new OperationStatusDTO(true, "done");
+    }
+
+    @Override
+    public OperationStatusDTO setFeaturedFMI(Long fileMetaInfoId) {
+        ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
+        this.fileMetaInfoRepository.findById(fileMetaInfoId)
+                .ifPresent(applicationSettings::setFeaturedFileMetaInfo);
         this.applicationSettingsRepository.save(applicationSettings);
         return new OperationStatusDTO(true, "done");
     }
@@ -111,9 +127,12 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
     @Override
     public OperationStatusDTO isFeatured(Long fileSystemItemId) {
         ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
-        FileSystemItem fileSystemItem = applicationSettings.getFeaturedFileSystemItem();
-        boolean result = fileSystemItem != null && fileSystemItem.getId().equals(fileSystemItemId);
-        return new OperationStatusDTO(result, result ? "yes" : "no");
+        boolean isFeatured = applicationSettings.getFeaturedFileMetaInfo()
+                .getFileSystemItemList()
+                .stream()
+                .map(FileSystemItem::getId)
+                .anyMatch(id -> id.equals(fileSystemItemId));
+        return new OperationStatusDTO(isFeatured, isFeatured ? "yes" : "no");
     }
 
 }

@@ -35,9 +35,9 @@ public class FinalizationTasklet implements Tasklet {
 
     private void restoreFeaturedFileSystemItemId(ChunkContext chunkContext) {
         ExecutionContext executionContext = this.taskletUtil.getExecutionContext(chunkContext);
-        if (executionContext.containsKey(JobConst.JOB_VARIABLE_FEATURED_FSI_ID)) {
-            Long featuredFileSystemItemId = executionContext.getLong(JobConst.JOB_VARIABLE_FEATURED_FSI_ID);
-            this.applicationSettingsService.setFeatured(featuredFileSystemItemId);
+        if (executionContext.containsKey(JobConst.JOB_VARIABLE_FEATURED_FMI_ID)) {
+            Long featuredFileMetaInfoId = executionContext.getLong(JobConst.JOB_VARIABLE_FEATURED_FMI_ID);
+            this.applicationSettingsService.setFeaturedFMI(featuredFileMetaInfoId);
         }
     }
 
