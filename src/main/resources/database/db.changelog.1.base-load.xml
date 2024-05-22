@@ -299,8 +299,9 @@
             <column name="home_page_w_popular_books_enabled" type="boolean" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="featured_file_system_item_id" type="bigint">
-                <constraints foreignKeyName="fk_file_system_item_id" references="${tablePrefix}file_system_item(id)"
+            <column name="featured_file_meta_info_id" type="bigint">
+                <constraints foreignKeyName="fk_featured_file_meta_info_id"
+                             references="${tablePrefix}file_meta_info(id)"
                              nullable="true"/>
             </column>
         </createTable>

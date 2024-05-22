@@ -23,5 +23,7 @@ public interface ApplicationSettingsService {
 
     OperationStatusDTO setFeatured(Long fileSystemItemId);
 
+    OperationStatusDTO setFeaturedFMI(Long fileMetaInfoId);
+
     OperationStatusDTO isFeatured(Long fileSystemItemId);
 }
