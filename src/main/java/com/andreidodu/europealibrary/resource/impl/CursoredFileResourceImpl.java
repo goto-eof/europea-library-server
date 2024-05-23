@@ -24,12 +24,12 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
 
     @Override
     public ResponseEntity<FileSystemItemDTO> get(Authentication authentication, Long fileSystemItemId) {
-        return ResponseEntity.ok(cursoredFileSystemService.get(authentication.getName(), fileSystemItemId));
+        return ResponseEntity.ok(cursoredFileSystemService.get(authentication != null ? authentication.getName() : null, fileSystemItemId));
     }
 
     @Override
     public ResponseEntity<FileSystemItemDTO> getByFileMetaInfoId(Authentication authentication, Long fileMetaInfoId) {
-        return ResponseEntity.ok(cursoredFileSystemService.getByFileMetaInfoId(authentication.getName(), fileMetaInfoId));
+        return ResponseEntity.ok(cursoredFileSystemService.getByFileMetaInfoId(authentication != null ? authentication.getName() : null, fileMetaInfoId));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorCommonRequestDTO;
 import com.andreidodu.europealibrary.dto.GenericCursoredResponseDTO;
 import com.andreidodu.europealibrary.dto.stripe.StripeCustomerProductsOwnedDTO;
+import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.mapper.stripe.StripeCustomerProductOwnedMapper;
 import com.andreidodu.europealibrary.model.stripe.StripeCustomerProductsOwned;
 import com.andreidodu.europealibrary.repository.StripeCustomerProductsOwnedRepository;
@@ -28,11 +29,11 @@ public class StripeCustomerProductsOwnedServiceImpl extends CursoredServiceCommo
     public GenericCursoredResponseDTO<String, StripeCustomerProductsOwnedDTO> retrieveCursored(String username, CursorCommonRequestDTO commonRequestDTO) {
         List<StripeCustomerProductsOwned> children = this.stripeCustomerProductsOwnedRepository.retrieveCursoredByUsername(username, commonRequestDTO);
         GenericCursoredResponseDTO<String, StripeCustomerProductsOwnedDTO> cursoredResult = new GenericCursoredResponseDTO<>();
-        List<StripeCustomerProductsOwned> childrenList = limit(children, commonRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        List<StripeCustomerProductsOwned> childrenList = limit(children, commonRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE, OrderEnum.DESC);
         cursoredResult.setChildrenList(childrenList.stream()
                 .map(this.stripeCustomerProductOwnedMapper::toDTO)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, commonRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+        super.calculateNextId(children, commonRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE, OrderEnum.DESC)
                 .ifPresent(cursoredResult::setNextCursor);
         cursoredResult.setParent("Stripe Customer Products Owned");
         return cursoredResult;

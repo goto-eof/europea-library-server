@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.FileSystemItemFullMapper;
 import com.andreidodu.europealibrary.model.FeaturedFileMetaInfo;
@@ -12,6 +13,7 @@ import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.service.FeaturedFileSystemItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,12 +76,11 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
     private <T> GenericCursoredResponseDTO<String, T> genericRetrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO, Function<FileSystemItem, T> toDTO) {
         GenericCursoredResponseDTO<String, T> responseDTO = new GenericCursoredResponseDTO<>();
         responseDTO.setParent("Featured");
-        List<FileSystemItem> children = this.featuredFileMetaInfoRepository.retrieveCursored(cursorCommonRequestDTO);
-        List<FileSystemItem> childrenList = limit(children, cursorCommonRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
-        responseDTO.setChildrenList(childrenList.stream()
+        PairDTO<List<FileSystemItem>, Long> pair = this.featuredFileMetaInfoRepository.retrieveCursored(cursorCommonRequestDTO);
+        responseDTO.setChildrenList(pair.getVal1().stream()
                 .map(toDTO)
                 .collect(Collectors.toList()));
-        super.calculateNextId(children, cursorCommonRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE)
+        Optional.ofNullable(pair.getVal2())
                 .ifPresent(responseDTO::setNextCursor);
         return responseDTO;
     }

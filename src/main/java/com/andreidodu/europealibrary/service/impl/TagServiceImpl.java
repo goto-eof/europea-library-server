@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.TagMapper;
 import com.andreidodu.europealibrary.model.Tag;
@@ -38,8 +39,8 @@ public class TagServiceImpl extends CursoredServiceCommon implements TagService 
 
         CursorDTO<TagDTO> cursoredResult = new CursorDTO<>();
         List<Tag> tagList = this.tagRepository.retrieveTagsCursored(commonCursoredRequestDTO);
-        List<TagDTO> tagListDTO = this.tagMapper.toDTO(limit(tagList, limit, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE));
-        calculateNextId(tagList, limit, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE)
+        List<TagDTO> tagListDTO = this.tagMapper.toDTO(limit(tagList, limit, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE, OrderEnum.ASC));
+        calculateNextId(tagList, limit, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE, OrderEnum.ASC)
                 .ifPresent(cursoredResult::setNextCursor);
         cursoredResult.setItems(tagListDTO);
         return cursoredResult;

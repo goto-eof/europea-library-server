@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.service.impl;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.CategoryMapper;
 import com.andreidodu.europealibrary.model.Category;
@@ -38,8 +39,8 @@ public class CategoryServiceImpl extends CursoredServiceCommon implements Catego
         int limit = LimitUtil.calculateLimit(commonCursoredRequestDTO, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE);
         CursorDTO<CategoryDTO> cursoredResult = new CursorDTO<>();
         List<Category> categoryList = this.categoryRepository.retrieveCategoriesCursored(commonCursoredRequestDTO);
-        List<CategoryDTO> categoryListDTO = this.categoryMapper.toDTO(limit(categoryList, limit, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE));
-        calculateNextId(categoryList, limit, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE)
+        List<CategoryDTO> categoryListDTO = this.categoryMapper.toDTO(limit(categoryList, limit, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE, OrderEnum.ASC));
+        calculateNextId(categoryList, limit, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE, OrderEnum.ASC)
                 .ifPresent(cursoredResult::setNextCursor);
         cursoredResult.setItems(categoryListDTO);
         return cursoredResult;

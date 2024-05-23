@@ -3,9 +3,10 @@ package com.andreidodu.europealibrary.repository.impl;
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorCommonRequestDTO;
+import com.andreidodu.europealibrary.dto.PairDTO;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.model.QFeaturedFileMetaInfo;
-import com.andreidodu.europealibrary.model.QFileSystemItem;
 import com.andreidodu.europealibrary.repository.CustomFeaturedFileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.andreidodu.europealibrary.util.LimitUtil;
@@ -14,6 +15,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,31 +23,47 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class CustomFeaturedFileSystemItemRepositoryImpl extends CommonRepository implements CustomFeaturedFileSystemItemRepository {
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
-    public List<FileSystemItem> retrieveCursored(CursorCommonRequestDTO commonRequestDTO) {
+    public PairDTO<List<FileSystemItem>, Long> retrieveCursored(CursorCommonRequestDTO commonRequestDTO) {
 
         Long cursorId = commonRequestDTO.getNextCursor();
         int numberOfResults = LimitUtil.calculateLimit(commonRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
-        QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
-        QFeaturedFileMetaInfo featuredFileSystemItem = QFeaturedFileMetaInfo.featuredFileMetaInfo;
+        QFeaturedFileMetaInfo featuredFileMetaInfo = QFeaturedFileMetaInfo.featuredFileMetaInfo;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
-        booleanBuilder.and(featuredFileSystemItem.fileMetaInfo.id.eq(fileSystemItem.fileMetaInfo.id));
+
         if (cursorId != null) {
-            booleanBuilder.and(featuredFileSystemItem.id.goe(cursorId));
+            booleanBuilder.and(featuredFileMetaInfo.id.loe(cursorId));
         }
 
-        return new JPAQuery<FileSystemItem>(entityManager)
-                .select(fileSystemItem)
-                .from(featuredFileSystemItem, fileSystemItem)
+        List<FileMetaInfo> featuredFileMetaInfoList = new JPAQuery<FileMetaInfo>(entityManager)
+                .select(featuredFileMetaInfo.fileMetaInfo)
+                .from(featuredFileMetaInfo)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
-                .orderBy(featuredFileSystemItem.createdDate.desc())
+                .orderBy(featuredFileMetaInfo.id.desc())
                 .fetch();
+
+        Long nextId = featuredFileMetaInfoList.stream()
+                .skip(numberOfResults)
+                .limit(1)
+                .findFirst()
+                .map(item -> item.getFeaturedFileMetaInfo().getId())
+                .orElse(null);
+
+        return new PairDTO<List<FileSystemItem>, Long>(featuredFileMetaInfoList
+                .stream()
+                .map(featured ->
+                        featured.getFileSystemItemList()
+                                .stream()
+                                .filter(fsi -> JobStepEnum.READY.getStepNumber() == fsi.getJobStep())
+                                .limit(1).findFirst().get()
+                ).limit(numberOfResults)
+                .toList(), nextId);
     }
 }

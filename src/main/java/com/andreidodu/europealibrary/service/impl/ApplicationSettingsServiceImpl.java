@@ -80,10 +80,10 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
             ApplicationSettings applicationSettings = new ApplicationSettings();
             applicationSettings.setApplicationLock(ApplicationSettingsConst.APPLICATION_LOCK);
             applicationSettings.setCustomDescriptionEnabled(false);
-            applicationSettings.setFeaturedBooksWidgetEnabled(true);
+            applicationSettings.setFeaturedBooksWidgetEnabled(false);
             applicationSettings.setNewBooksWidgetEnabled(true);
-            applicationSettings.setPopularBooksWidgetEnabled(true);
-            applicationSettings.setFeaturedBookWidgetEnabled(true);
+            applicationSettings.setPopularBooksWidgetEnabled(false);
+            applicationSettings.setFeaturedBookWidgetEnabled(false);
             applicationSettings.setProtectedDownloadsEnabled(true);
             return this.applicationSettingsRepository.save(applicationSettings);
         }

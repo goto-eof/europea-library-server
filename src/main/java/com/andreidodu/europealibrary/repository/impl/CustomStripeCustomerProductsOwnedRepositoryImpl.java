@@ -33,7 +33,7 @@ public class CustomStripeCustomerProductsOwnedRepositoryImpl implements CustomSt
 
         int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         Optional.ofNullable(cursorRequestDTO.getNextCursor())
-                .ifPresent((cursorIdValue) -> booleanBuilder.and(stripeCustomerProductsOwned.id.goe(cursorIdValue)));
+                .ifPresent((cursorIdValue) -> booleanBuilder.and(stripeCustomerProductsOwned.id.loe(cursorIdValue)));
 
         booleanBuilder.and(stripeCustomerProductsOwned.stripeCustomer.user.username.eq(username));
         booleanBuilder.and(stripeCustomerProductsOwned.status.eq(StripeCustomerProductsOwnedStatus.PURCHASED));
