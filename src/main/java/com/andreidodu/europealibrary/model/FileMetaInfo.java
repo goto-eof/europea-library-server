@@ -55,6 +55,9 @@ public class FileMetaInfo extends ModelCommon {
     @OneToOne(mappedBy = "featuredFileMetaInfo", fetch = FetchType.LAZY)
     private ApplicationSettings applicationSettings;
 
+    @OneToOne(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
+    private FeaturedFileMetaInfo featuredFileMetaInfo;
+
     @Override
     public String toString() {
         return "FileMetaInfo{" +

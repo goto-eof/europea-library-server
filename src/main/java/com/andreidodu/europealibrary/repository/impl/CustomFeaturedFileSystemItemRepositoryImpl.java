@@ -2,16 +2,11 @@ package com.andreidodu.europealibrary.repository.impl;
 
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
-import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
 import com.andreidodu.europealibrary.dto.CursorCommonRequestDTO;
-import com.andreidodu.europealibrary.dto.CursorRequestDTO;
 import com.andreidodu.europealibrary.model.FileSystemItem;
-import com.andreidodu.europealibrary.model.QFeaturedFileSystemItem;
+import com.andreidodu.europealibrary.model.QFeaturedFileMetaInfo;
 import com.andreidodu.europealibrary.model.QFileSystemItem;
-import com.andreidodu.europealibrary.model.QTag;
-import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.CustomFeaturedFileSystemItemRepository;
-import com.andreidodu.europealibrary.repository.CustomTagRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.andreidodu.europealibrary.util.LimitUtil;
 import com.querydsl.core.BooleanBuilder;
@@ -22,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -38,11 +31,11 @@ public class CustomFeaturedFileSystemItemRepositoryImpl extends CommonRepository
         int numberOfResults = LimitUtil.calculateLimit(commonRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
-        QFeaturedFileSystemItem featuredFileSystemItem = QFeaturedFileSystemItem.featuredFileSystemItem;
+        QFeaturedFileMetaInfo featuredFileSystemItem = QFeaturedFileMetaInfo.featuredFileMetaInfo;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
-        booleanBuilder.and(featuredFileSystemItem.fileSystemItem.id.eq(fileSystemItem.id));
+        booleanBuilder.and(featuredFileSystemItem.fileMetaInfo.id.eq(fileSystemItem.fileMetaInfo.id));
         if (cursorId != null) {
             booleanBuilder.and(featuredFileSystemItem.id.goe(cursorId));
         }

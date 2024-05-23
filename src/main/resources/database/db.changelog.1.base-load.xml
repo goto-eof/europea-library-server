@@ -309,17 +309,17 @@
 
     <changeSet id="2024-05-05-001" author="Andrei Dodu">
 
-        <createSequence sequenceName="${tablePrefix}featured_file_system_item_seq" cycle="false" startValue="1"
+        <createSequence sequenceName="${tablePrefix}featured_file_meta_info_seq" cycle="false" startValue="1"
                         incrementBy="50"
                         cacheSize="50"/>
 
-        <createTable tableName="${tablePrefix}featured_file_system_item">
+        <createTable tableName="${tablePrefix}featured_file_meta_info">
             <column name="id" type="BIGINT"
-                    defaultValueSequenceNext="${tablePrefix}featured_file_system_item_seq">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_featured_file_system_item"/>
+                    defaultValueSequenceNext="${tablePrefix}featured_file_meta_info_seq">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_featured_file_meta_info"/>
             </column>
-            <column name="file_system_item_id" type="BIGINT">
-                <constraints foreignKeyName="fk_file_system_item_id" references="${tablePrefix}file_system_item(id)"
+            <column name="file_meta_info_id" type="BIGINT">
+                <constraints foreignKeyName="fk_file_meta_info_id" references="${tablePrefix}file_meta_info(id)"
                              unique="true"
                              nullable="false"/>
             </column>

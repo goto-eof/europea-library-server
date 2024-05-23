@@ -47,14 +47,12 @@ public abstract class FileMetaInfoMapper {
         return result;
     }
 
-//    @Mapping(ignore = true, target = "stripePrice")
-//    public abstract void map(@MappingTarget FileMetaInfoDTO target, FileMetaInfo source);
-
     @Mapping(ignore = true, target = "fileSystemItemList")
     @Mapping(ignore = true, target = "bookInfo")
     @Mapping(ignore = true, target = "tagList")
     @Mapping(ignore = true, target = "stripeProduct")
     @Mapping(ignore = true, target = "applicationSettings")
+    @Mapping(ignore = true, target = "featuredFileMetaInfo")
     public abstract void map(@MappingTarget FileMetaInfo target, FileMetaInfoDTO source);
 
 }

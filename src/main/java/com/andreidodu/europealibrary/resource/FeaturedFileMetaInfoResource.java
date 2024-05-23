@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/featured")
-public interface FeaturedFileSystemItemResource {
+public interface FeaturedFileMetaInfoResource {
     @PostMapping(path = "/cursored")
     ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(@Valid @RequestBody CursorCommonRequestDTO cursorCommonRequestDTO);
 
