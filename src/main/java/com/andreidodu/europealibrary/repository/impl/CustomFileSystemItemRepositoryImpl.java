@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.repository.impl;
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.*;
+import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.CategoryRepository;
@@ -135,7 +136,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
         };
 
-        return this.basicRetrieve(cursorTypeRequestDTO.getNextCursor(), cursorTypeRequestDTO.getLimit(), booleanBuilder, customOrder);
+        return this.basicRetrieve(cursorTypeRequestDTO.getNextCursor(), cursorTypeRequestDTO.getLimit(), booleanBuilder, customOrder, OrderEnum.ASC);
     }
 
     @Override
@@ -182,7 +183,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
         };
 
-        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder);
+        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder, OrderEnum.ASC);
     }
 
     @Override
@@ -196,7 +197,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
         };
 
-        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder);
+        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder, OrderEnum.ASC);
     }
 
     @Override
@@ -364,10 +365,10 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publishedDate.eq(cursorRequestDTO.getParent()));
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
-                fileSystemItem.id.desc()
+                fileSystemItem.id.asc()
         };
 
-        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder);
+        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder, OrderEnum.ASC);
     }
 
     @Override
@@ -379,7 +380,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 fileSystemItem.fileMetaInfo.bookInfo.averageRating.desc(), fileSystemItem.fileMetaInfo.bookInfo.ratingsCount.desc()
         };
 
-        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder);
+        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder, OrderEnum.ASC);
     }
 
     @Override
@@ -394,26 +395,33 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
         };
 
-        return this.basicRetrieve(cursoredRequestByFileTypeDTO.getNextCursor(), cursoredRequestByFileTypeDTO.getLimit(), customWhere, customOrder);
+        return this.basicRetrieve(cursoredRequestByFileTypeDTO.getNextCursor(), cursoredRequestByFileTypeDTO.getLimit(), customWhere, customOrder, OrderEnum.ASC);
     }
 
     @Override
     public List<FileSystemItem> retrieveNewCursored(CursorCommonRequestDTO commonRequestDTO) {
         OrderSpecifier<?>[] order = new OrderSpecifier[]{
                 fileSystemItem.createdDate.desc(),
-                fileSystemItem.id.asc()
+                fileSystemItem.id.desc()
         };
 
-        return this.basicRetrieve(commonRequestDTO.getNextCursor(), commonRequestDTO.getLimit(), new BooleanBuilder(), order);
+        return this.basicRetrieve(commonRequestDTO.getNextCursor(), commonRequestDTO.getLimit(), new BooleanBuilder(), order, OrderEnum.DESC);
     }
 
-    public List<FileSystemItem> basicRetrieve(Long cursorId, Integer limit, BooleanBuilder customWhere, OrderSpecifier<?>[] customOrder) {
+    public List<FileSystemItem> basicRetrieve(Long cursorId, Integer limit, BooleanBuilder customWhere, OrderSpecifier<?>[] customOrder, OrderEnum order) {
         int numberOfResults = LimitUtil.calculateLimit(limit, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
-        Optional.ofNullable(cursorId).ifPresent((cursorIdValue) -> booleanBuilder.and(fileSystemItem.id.goe(cursorIdValue)));
+        Optional.ofNullable(cursorId).ifPresent((cursorIdValue) -> {
+                    if (OrderEnum.ASC.equals(order)) {
+                        booleanBuilder.and(fileSystemItem.id.goe(cursorIdValue));
+                    } else {
+                        booleanBuilder.and(fileSystemItem.id.loe(cursorIdValue));
+                    }
+                }
+        );
 
         booleanBuilder.and(customWhere);
 
