@@ -18,17 +18,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Getter
 @Setter
-@Table(name = "el_featured_file_system_item")
+@Table(name = "el_featured_file_meta_info")
 @EntityListeners(AuditingEntityListener.class)
-public class FeaturedFileSystemItem extends ModelCommon {
+public class FeaturedFileMetaInfo extends ModelCommon {
     @Id
     @Column(nullable = false, updatable = false)
-    @GeneratedValue(generator = "el_featured_file_system_item_seq", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "el_featured_file_system_item_seq", sequenceName = "el_featured_file_system_item_seq", allocationSize = 50)
+    @GeneratedValue(generator = "el_featured_file_meta_info_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "el_featured_file_meta_info_seq", sequenceName = "el_featured_file_meta_info_seq", allocationSize = 50)
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "file_system_item_id", referencedColumnName = "id")
-    private FileSystemItem fileSystemItem;
+    @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
+    private FileMetaInfo fileMetaInfo;
 
 }

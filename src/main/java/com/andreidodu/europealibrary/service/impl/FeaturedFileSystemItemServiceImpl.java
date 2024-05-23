@@ -4,9 +4,10 @@ import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
 import com.andreidodu.europealibrary.mapper.FileSystemItemFullMapper;
-import com.andreidodu.europealibrary.model.FeaturedFileSystemItem;
+import com.andreidodu.europealibrary.model.FeaturedFileMetaInfo;
+import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
-import com.andreidodu.europealibrary.repository.FeaturedFileSystemRepository;
+import com.andreidodu.europealibrary.repository.FeaturedFileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.service.FeaturedFileSystemItemService;
 import lombok.RequiredArgsConstructor;
@@ -24,21 +25,20 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon implements FeaturedFileSystemItemService {
-    private final FeaturedFileSystemRepository featuredFileSystemRepository;
+    private final FeaturedFileMetaInfoRepository featuredFileMetaInfoRepository;
     private final FileSystemItemFullMapper fileSystemItemFullMapper;
     private final FileSystemItemRepository fileSystemItemRepository;
 
     @Override
     public OperationStatusDTO addFeatured(Long fileSystemItemId) {
-        Optional<FeaturedFileSystemItem> featuredFileSystemItemOptional = this.featuredFileSystemRepository.findByFileSystemItem_id(fileSystemItemId);
-        if (featuredFileSystemItemOptional.isEmpty()) {
-            Optional<FileSystemItem> fileSystemItemOptional = this.fileSystemItemRepository.findById(fileSystemItemId);
-            if (fileSystemItemOptional.isEmpty()) {
-                throw new EntityNotFoundException("File not found");
-            }
-            FeaturedFileSystemItem featuredFileSystemItem = new FeaturedFileSystemItem();
-            featuredFileSystemItem.setFileSystemItem(fileSystemItemOptional.get());
-            this.featuredFileSystemRepository.save(featuredFileSystemItem);
+        FileSystemItem fileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId)
+                .orElseThrow(() -> new EntityNotFoundException("File not found"));
+        FileMetaInfo fileMetaInfo = fileSystemItem.getFileMetaInfo();
+        boolean alreadyAdded = fileMetaInfo.getFeaturedFileMetaInfo() != null;
+        if (!alreadyAdded) {
+            FeaturedFileMetaInfo featuredFileMetaInfo = new FeaturedFileMetaInfo();
+            featuredFileMetaInfo.setFileMetaInfo(fileMetaInfo);
+            this.featuredFileMetaInfoRepository.save(featuredFileMetaInfo);
             return new OperationStatusDTO(true, "Entity added");
         }
         return new OperationStatusDTO(true, "Entity already added");
@@ -46,21 +46,18 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
 
     @Override
     public OperationStatusDTO removeFeatured(Long fileSystemItemId) {
-        Optional<FeaturedFileSystemItem> featuredFileSystemItemOptional = this.featuredFileSystemRepository.findByFileSystemItem_id(fileSystemItemId);
-        if (featuredFileSystemItemOptional.isEmpty()) {
-            throw new EntityNotFoundException("File not found");
-        }
-        this.featuredFileSystemRepository.delete(featuredFileSystemItemOptional.get());
+        FeaturedFileMetaInfo featuredFileSystemItem = this.fileSystemItemRepository.findById(fileSystemItemId)
+                .map(fsi -> fsi.getFileMetaInfo().getFeaturedFileMetaInfo())
+                .orElseThrow(() -> new EntityNotFoundException("File not found"));
+        this.featuredFileMetaInfoRepository.delete(featuredFileSystemItem);
         return new OperationStatusDTO(true, "Entity removed");
     }
 
     @Override
     public OperationStatusDTO isFeatured(Long fileSystemItemId) {
-        Optional<FeaturedFileSystemItem> featuredFileSystemItemOptional = this.featuredFileSystemRepository.findByFileSystemItem_id(fileSystemItemId);
-        if (featuredFileSystemItemOptional.isPresent()) {
-            return new OperationStatusDTO(true, "yes");
-        }
-        return new OperationStatusDTO(false, "no");
+        boolean isFeatured = this.fileSystemItemRepository.findById(fileSystemItemId)
+                .stream().anyMatch(fsi -> fsi.getFileMetaInfo().getFeaturedFileMetaInfo() != null);
+        return new OperationStatusDTO(isFeatured, isFeatured ? "yes" : "no");
     }
 
     @Override
@@ -77,7 +74,7 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
     private <T> GenericCursoredResponseDTO<String, T> genericRetrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO, Function<FileSystemItem, T> toDTO) {
         GenericCursoredResponseDTO<String, T> responseDTO = new GenericCursoredResponseDTO<>();
         responseDTO.setParent("Featured");
-        List<FileSystemItem> children = this.featuredFileSystemRepository.retrieveCursored(cursorCommonRequestDTO);
+        List<FileSystemItem> children = this.featuredFileMetaInfoRepository.retrieveCursored(cursorCommonRequestDTO);
         List<FileSystemItem> childrenList = limit(children, cursorCommonRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         responseDTO.setChildrenList(childrenList.stream()
                 .map(toDTO)

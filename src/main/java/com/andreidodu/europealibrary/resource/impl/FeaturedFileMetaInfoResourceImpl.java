@@ -1,7 +1,7 @@
 package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.dto.*;
-import com.andreidodu.europealibrary.resource.FeaturedFileSystemItemResource;
+import com.andreidodu.europealibrary.resource.FeaturedFileMetaInfoResource;
 import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import com.andreidodu.europealibrary.service.FeaturedFileSystemItemService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class FeaturedFileSystemItemResourceImpl implements FeaturedFileSystemItemResource {
+public class FeaturedFileMetaInfoResourceImpl implements FeaturedFileMetaInfoResource {
     private final FeaturedFileSystemItemService featuredFileSystemItemService;
     private final ApplicationSettingsService applicationSettingsService;
 
