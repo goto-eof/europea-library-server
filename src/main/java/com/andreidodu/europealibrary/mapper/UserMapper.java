@@ -15,6 +15,7 @@ public abstract class UserMapper {
     @Mapping(ignore = true, target = "enabled")
     @Mapping(ignore = true, target = "resetToken")
     @Mapping(ignore = true, target = "stripeCustomer")
+    @Mapping(ignore = true, target = "tokenList")
     public abstract User toModel(UserDTO dto);
 
     public abstract UserDTO toDTO(User model);

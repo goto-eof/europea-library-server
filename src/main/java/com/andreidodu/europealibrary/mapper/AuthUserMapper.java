@@ -15,6 +15,7 @@ public abstract class AuthUserMapper {
     @Mapping(ignore = true, target = "email")
     @Mapping(ignore = true, target = "resetToken")
     @Mapping(ignore = true, target = "stripeCustomer")
+    @Mapping(ignore = true, target = "tokenList")
     public abstract User toModel(AuthUserDTO dto);
 
     @Mapping(ignore = true, target = "authorities")

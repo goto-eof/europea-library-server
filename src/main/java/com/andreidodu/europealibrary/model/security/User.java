@@ -49,4 +49,7 @@ public class User extends ModelCommon {
     @OneToOne(mappedBy = "user")
     private StripeCustomer stripeCustomer;
 
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokenList;
+
 }
