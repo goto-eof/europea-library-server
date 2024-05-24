@@ -357,6 +357,34 @@
             <column name="version" type="INT"/>
 
         </createTable>
+    </changeSet>
+
+    <changeSet id="2024-05-24-002" author="Andrei Dodu">
+
+        <createSequence sequenceName="${tablePrefix}token_seq" cycle="false" startValue="1" incrementBy="50"
+                        cacheSize="50"/>
+
+        <createTable tableName="${tablePrefix}token">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="${tablePrefix}token_seq">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_token"/>
+            </column>
+            <column name="token" type="VARCHAR(1000)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints foreignKeyName="fk_user_id" references="${tablePrefix}user(id)" unique="true"
+                             nullable="false"/>
+            </column>
+            <column name="valid_flag" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+
+        <addUniqueConstraint columnNames="token, user_id" constraintName="unq_token_user_id"
+                             tableName="${tablePrefix}token" validate="true"/>
 
     </changeSet>
 
