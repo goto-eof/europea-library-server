@@ -34,7 +34,7 @@ public interface CustomFileSystemItemRepository {
 
     List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    List<FileSystemItem> retrieveChildrenByCursoredRating(CursorRequestDTO cursorRequestDTO);
+    PairDTO<List<FileSystemItem>, Long> retrieveChildrenByCursoredRating(CursorCommonRequestDTO cursorRequestDTO);
 
     PairDTO<List<FileSystemItem>, Long> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
 

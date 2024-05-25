@@ -284,10 +284,15 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     }
 
     @Override
-    public GenericCursoredResponseDTO<String, FileSystemItemDTO> readDirectoryByRating(CursorRequestDTO cursorRequestDTO) {
-        return Optional.ofNullable(cursorRequestDTO.getParentId())
-                .map(id -> this.manageCaseListByRatingIdProvided(cursorRequestDTO))
-                .orElse(manageCaseListByRatingNoIdProvided());
+    public GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByRating(CursorCommonRequestDTO cursorRequestDTO) {
+        GenericCursoredResponseDTO<String, FileSystemItemDTO> responseDTO = new GenericCursoredResponseDTO<>();
+        responseDTO.setParent("By Top Rated");
+        PairDTO<List<FileSystemItem>, Long> pair = this.fileSystemItemRepository.retrieveChildrenByCursoredRating(cursorRequestDTO);
+        responseDTO.setChildrenList(pair.getVal1().stream()
+                .map(fileSystemItemLessMapper::toDTOWithParentDTORecursively)
+                .collect(Collectors.toList()));
+        responseDTO.setNextCursor(pair.getVal2());
+        return responseDTO;
     }
 
     @Override
@@ -309,25 +314,6 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     @Override
     public GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredByDownloadCountHighlight(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
         return this.genericRetrieveCursoredByDownloadCount(cursoredRequestByFileTypeDTO, fileSystemItemLessMapper::toHighlightDTO);
-    }
-
-    private GenericCursoredResponseDTO<String, FileSystemItemDTO> manageCaseListByRatingIdProvided(CursorRequestDTO cursorRequestDTO) {
-        List<FileSystemItem> children = this.fileSystemItemRepository.retrieveChildrenByCursoredRating(cursorRequestDTO);
-        GenericCursoredResponseDTO<String, FileSystemItemDTO> cursoredTagDTO = new GenericCursoredResponseDTO<>();
-        List<FileSystemItem> childrenList = limit(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE, OrderEnum.ASC);
-        cursoredTagDTO.setChildrenList(childrenList.stream()
-                .map(this.fileSystemItemLessMapper::toDTOWithParentDTORecursively)
-                .collect(Collectors.toList()));
-        super.calculateNextId(children, cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE, OrderEnum.ASC)
-                .ifPresent(cursoredTagDTO::setNextCursor);
-        cursoredTagDTO.setParent("by rating");
-        return cursoredTagDTO;
-    }
-
-    private GenericCursoredResponseDTO<String, FileSystemItemDTO> manageCaseListByRatingNoIdProvided() {
-        var cursoredRequest = new CursorRequestDTO();
-        cursoredRequest.setLimit(ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
-        return this.manageCaseListByRatingIdProvided(cursoredRequest);
     }
 
     @Override
