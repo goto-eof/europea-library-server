@@ -21,6 +21,9 @@ public class Token extends ModelCommon {
     @Column(name = "token", unique = true)
     private String token;
 
+    @Column(name = "agent_id")
+    private String agentId;
+
     @Column(name = "valid_flag")
     private Boolean validFlag = true;
 

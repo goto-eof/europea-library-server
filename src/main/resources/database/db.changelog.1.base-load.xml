@@ -371,8 +371,11 @@
             <column name="token" type="VARCHAR(1000)">
                 <constraints nullable="false" unique="true"/>
             </column>
+            <column name="agent_id" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
             <column name="user_id" type="BIGINT">
-                <constraints foreignKeyName="fk_user_id" references="${tablePrefix}user(id)" unique="true"
+                <constraints foreignKeyName="fk_user_id" references="${tablePrefix}user(id)"
                              nullable="false"/>
             </column>
             <column name="valid_flag" type="boolean" defaultValueBoolean="true">
@@ -383,7 +386,7 @@
             <column name="version" type="INT"/>
         </createTable>
 
-        <addUniqueConstraint columnNames="token, user_id" constraintName="unq_token_user_id"
+        <addUniqueConstraint columnNames="token,user_id,agent_id" constraintName="unq_token_user_id"
                              tableName="${tablePrefix}token" validate="true"/>
 
     </changeSet>

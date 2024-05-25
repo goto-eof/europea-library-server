@@ -1,13 +1,16 @@
 package com.andreidodu.europealibrary.service.impl.security;
 
 import com.andreidodu.europealibrary.constants.AuthConst;
+import com.andreidodu.europealibrary.constants.CookieConst;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.PasswordResetEmailRequestDTO;
 import com.andreidodu.europealibrary.dto.security.*;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.AuthorityMapper;
 import com.andreidodu.europealibrary.model.security.Authority;
+import com.andreidodu.europealibrary.model.security.Token;
 import com.andreidodu.europealibrary.model.security.User;
+import com.andreidodu.europealibrary.repository.security.TokenRepository;
 import com.andreidodu.europealibrary.repository.security.UserRepository;
 import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
 import com.andreidodu.europealibrary.service.EmailSenderService;
@@ -44,13 +47,14 @@ import java.util.stream.Collectors;
 public class AuthenticationAndRegistrationServiceImpl implements AuthenticationAndRegistrationService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationAndRegistrationServiceImpl.class);
-    private final JwtEncoder jwtEncoder;
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
-    private final AuthorityMapper authorityMapper;
     private final EmailSenderService emailSenderService;
     private final TemplateService templateService;
+    private final TokenRepository tokenRepository;
+    private final AuthorityMapper authorityMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final JwtEncoder jwtEncoder;
 
     @Value("${com.andreidodu.europea-library.password.reset.minutes-to-wait-for-another-attempt}")
     private int timeToWaitForAnotherAttempt;
@@ -85,12 +89,32 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         log.info("Token requested for user: {}", authentication.getAuthorities());
         String token = this.generateToken(authentication);
 
-        return generateAuthResponse(token);
+        String agentId = storeTokenAndGetAgentId(token, userDetails);
+
+        return generateAuthResponse(token, agentId);
     }
 
-    private static AuthResponseDTO generateAuthResponse(String token) {
+    private String storeTokenAndGetAgentId(String token, AuthUserDTO userDetails) {
+        String agentId = this.generateUniqueAgentId();
+
+        Token tokenEntity = new Token();
+        tokenEntity.setToken(token);
+        tokenEntity.setUser(this.userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new ValidationException("User not found")));
+        tokenEntity.setValidFlag(true);
+        tokenEntity.setAgentId(agentId);
+        this.tokenRepository.save(tokenEntity);
+
+        return agentId;
+    }
+
+    private String generateUniqueAgentId() {
+        return UUID.randomUUID().toString();
+    }
+
+    private static AuthResponseDTO generateAuthResponse(String token, String agentId) {
         AuthResponseDTO authResponseDTO = new AuthResponseDTO();
         authResponseDTO.setToken(token);
+        authResponseDTO.setAgentId(agentId);
         return authResponseDTO;
     }
 
@@ -105,7 +129,7 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
-                .expiresAt(now.plus(10, ChronoUnit.HOURS))
+                .expiresAt(now.plus(CookieConst.AUTHORIZATION_COOKIE_MAX_AGE, ChronoUnit.SECONDS))
                 .subject(authentication.getName())
                 .claim("scope", scope)
                 .build();
@@ -272,5 +296,15 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         if (t == null || t.trim().equalsIgnoreCase("")) {
             throw new ValidationException(message);
         }
+    }
+
+    @Override
+    public OperationStatusDTO logout(final String token, final String agentId) {
+        this.tokenRepository.findByTokenAndAgentIdAndValidFlag(token, agentId, true)
+                .forEach(tokenEntity -> {
+                    tokenEntity.setValidFlag(false);
+                    this.tokenRepository.save(tokenEntity);
+                });
+        return new OperationStatusDTO(true, "logout done");
     }
 }
