@@ -30,9 +30,8 @@ index, catalogue, search and provide e-book information?". In this way was born 
 
 A library web application that allows to index, edit, explore, retrieve information about books from file metadata/web (
 by using multi-threading), search, sell/buy through Stripe platform (WIP) and download e-books. The front-end project
-can be
-found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can be
-cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
+can be found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can
+be cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
 
 # Development status
 
@@ -58,6 +57,9 @@ Currently, there are 3 categories of users: ADMINISTRATOR, USER and not authenti
 customize the Home Page, to run the job and reload the application cache. While the user is able to download e-books (as
 I said, this feature is customizable). All the users, authenticated and not authenticated, are able to explore the
 library, search for an e-book and view book information.
+Since version 9 (WIP), Europea Library became an e-book store (feature enableable by the administrator). Not
+it is possible to sell and buy digital books through Stripe payment platform, so that it is possible to pay with
+different banking circuits.
 
 ## Features
 
@@ -79,9 +81,10 @@ library, search for an e-book and view book information.
 - search by title, author, publisher, ISBN and published date;
 - edit e-book information, including change book cover image (only administrator is able to do this);
 - generate e-book URL QR Code;
-- login/change password/register to the system and change password (2 categories of user: ADMINISTRATOR and USER);
-- password reset
-- bulk category/tag/language/publisher name change  (only administrator is able to do this);
+- login/change password/register to the system and change password (2 categories of user: ADMINISTRATOR and USER | XSS
+  protection: JWT token + HttpOnly cookie | the TTL of the user session is 24 hours);
+- password reset (reset link sent by e-mail)
+- bulk category/tag/language/publisher name change (only administrator is able to do this);
 - control panel (administration for admin, profile and security for all users)
     - customize home page
         - enable/disable widgets
@@ -90,6 +93,8 @@ library, search for an e-book and view book information.
     - start/stop job
     - reload application cache
 - sell/buy e-books and view transactions (Work In Progress)
+- included actuator for application monitoring and management
+- included Swagger UI for API documentation
 
 ## Run the project (test environment)
 
@@ -156,12 +161,6 @@ Because the core of the application is the job indexer, I am attaching the job s
 how it works.
 ![job_schema](images/job_steps.png)
 
-## Technologies
-
-Java • Spring Boot • Spring Batch • Spring Security • Spring Email Starter • Apache FreeMarker • Spring JPA • Queryds •
-Hibernate • Feign • Liquibase • PostgreSQL • Swagger (OpenAPI) • Docker • epublib • pdfbox • Google ZXing • Google Books
-API • Stripe • Apache FreeMarker
-
 ## DB schema - Tables
 
 ![db_schema](images/db_schema.png)
@@ -169,6 +168,12 @@ API • Stripe • Apache FreeMarker
 ## DB schema - Views
 
 ![db_schema_views](images/db_schema_views.png)
+
+## Technologies
+
+Java • Spring Boot • Spring Batch • Spring Security • Spring Email Starter • Apache FreeMarker • Spring JPA • Queryds •
+Hibernate • Feign • Liquibase • PostgreSQL • Swagger (OpenAPI) • Docker • epublib • pdfbox • Google ZXing • Google Books
+API • Stripe • Apache FreeMarker
 
 ## More
 
@@ -188,4 +193,4 @@ API • Stripe • Apache FreeMarker
   the job. Some steps were skipped (like FSI/FMI deleter) because I started the job on an empty database.
 - developed and tested on Linux.
 - if you have any suggestions or found a bug please contact
-  me [here](https://andre-i.eu/#contactme) <img src="https://andre-i.eu:8080/api/v1/ipResource/custom.png?host=https://github.com/goto-eof/europea-library-server" onerror="this.parentNode.removeChild(this)" />
+  me [here](https://andre-i.eu/#contactme)<img src="https://andre-i.eu:8080/api/v1/ipResource/custom.png?host=https://github.com/goto-eof/europea-library-server" />
