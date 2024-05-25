@@ -15,4 +15,6 @@ public interface AuthenticationAndRegistrationService {
     OperationStatusDTO sendPasswordResetEmail(String email);
 
     OperationStatusDTO passwordReset(PasswordResetRequestDTO passwordResetRequestDTO);
+
+    OperationStatusDTO logout(String token, String agentId);
 }
