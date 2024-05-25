@@ -53,6 +53,8 @@ springdoc:
 com:
   andreidodu:
     europea-library:
+      session:
+        ttl-seconds: 86400
       stripe:
         secret-key: TBD
         webhook-secret-key: TBD

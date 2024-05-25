@@ -74,6 +74,9 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
     @Value("${com.andreidodu.europea-library.password.reset.token.ttl.minutes}")
     private int passwordResetTokenTtlMinutes;
 
+    @Value("${com.andreidodu.europea-library.session.ttl-seconds}")
+    private int sessionTTLSeconds;
+
 
     @Override
     public AuthResponseDTO login(AuthRequestDTO authRequestDTO) {
@@ -129,7 +132,7 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
-                .expiresAt(now.plus(CookieConst.AUTHORIZATION_COOKIE_MAX_AGE, ChronoUnit.SECONDS))
+                .expiresAt(now.plus(sessionTTLSeconds, ChronoUnit.SECONDS))
                 .subject(authentication.getName())
                 .claim("scope", scope)
                 .build();

@@ -10,9 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +24,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationAndRegistrationResourceImpl implements AuthenticationAndRegistrationResource, com.andreidodu.europealibrary.constants.CookieConst {
 
+    @Value("${com.andreidodu.europea-library.session.ttl-seconds}")
+    private int sessionTTLSeconds;
+
     private final AuthenticationAndRegistrationService authenticationAndRegistrationService;
 
     @Override
@@ -34,15 +37,14 @@ public class AuthenticationAndRegistrationResourceImpl implements Authentication
         return new ResponseEntity<AuthResponseDTO>(authResponseDTO, HttpStatus.OK);
     }
 
-    private static Cookie createDeviceIdentifierCookie(String agentId) {
+    private Cookie createDeviceIdentifierCookie(String agentId) {
         Cookie deviceIdCookie = new Cookie(COOKIE_NAME_DEVICE_ID, agentId);
-        deviceIdCookie.setMaxAge(COOKIE_MAX_EXPIRATION_AGE);
         deviceIdCookie.setPath("/");
         deviceIdCookie.setHttpOnly(true);
         deviceIdCookie.setAttribute("SameSite", "strict");
         // TODO configure the application in order to work also with HTTPS
         // deviceIdCookie.setSecure(true);
-        deviceIdCookie.setMaxAge(CookieConst.AUTHORIZATION_COOKIE_MAX_AGE);
+        deviceIdCookie.setMaxAge(sessionTTLSeconds);
         return deviceIdCookie;
     }
 
