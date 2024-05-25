@@ -16,12 +16,14 @@ public abstract class BookInfoMapper {
 
     @Mapping(ignore = true, target = "categoryList")
     @Mapping(ignore = true, target = "fileMetaInfo")
+    @Mapping(ignore = true, target = "fileSystemItemTopRatedView")
     public abstract BookInfo toModel(BookInfoDTO dto);
 
     @Mapping(ignore = true, target = "id")
     @Mapping(ignore = true, target = "categoryList")
     @Mapping(ignore = true, target = "fileMetaInfo")
     @Mapping(ignore = true, target = "imageUrl")
+    @Mapping(ignore = true, target = "fileSystemItemTopRatedView")
     public abstract void map(@MappingTarget BookInfo target, BookInfoDTO source);
 
 

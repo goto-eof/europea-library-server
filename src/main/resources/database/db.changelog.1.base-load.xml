@@ -394,7 +394,7 @@
     <changeSet id="2024-05-25-001" author="Andrei Dodu">
         <createView encoding="UTF-8"
                     fullDefinition="false"
-                    remarks="A String"
+                    remarks="Top downloaded e-books view"
                     replaceIfExists="true"
                     viewName="v_el_file_system_item_top_downloads">
             select
@@ -405,6 +405,26 @@
             where
             fsi.job_step = 2
             and (fsi.is_directory is null or fsi.is_directory = false)
+        </createView>
+    </changeSet>
+
+    <changeSet id="2024-05-25-002" author="Andrei Dodu">
+        <createView encoding="UTF-8"
+                    fullDefinition="false"
+                    remarks="Top rated e-books view"
+                    replaceIfExists="true"
+                    viewName="v_el_file_system_item_top_rated">
+            select row_number() over (order by wt.average_rating desc NULLS LAST, wt.ratings_count desc NULLS LAST,
+            wt.file_system_item_id asc) as row_number,
+            wt.file_system_item_id, wt.book_info_id, wt.average_rating, wt.ratings_count
+            from (
+            select fsi.id as file_system_item_id, bi.id as book_info_id, bi.average_rating, bi.ratings_count
+            from el_file_system_item fsi, el_file_meta_info fmi, el_book_info bi
+            where fsi.file_meta_info_id = fmi.id
+            and bi.file_meta_info_id = fmi.id
+            and (fsi.is_directory is null or fsi.is_directory = false)
+            and fsi.job_step = 2
+            ) as wt
         </createView>
     </changeSet>
 

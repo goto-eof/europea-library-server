@@ -10,6 +10,7 @@ import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.repository.CategoryRepository;
 import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemTopDownloadsViewRepository;
+import com.andreidodu.europealibrary.repository.FileSystemItemTopRatedViewRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.andreidodu.europealibrary.util.LimitUtil;
 import com.andreidodu.europealibrary.util.ResourceLoaderUtil;
@@ -37,6 +38,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     private EntityManager entityManager;
     private final CategoryRepository categoryRepository;
     private final FileSystemItemTopDownloadsViewRepository fileSystemItemTopDownloadsViewRepository;
+    private final FileSystemItemTopRatedViewRepository fileSystemItemTopRatedViewRepository;
 
     private final static QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -378,15 +380,35 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<FileSystemItem> retrieveChildrenByCursoredRating(CursorRequestDTO cursorRequestDTO) {
+    public PairDTO<List<FileSystemItem>, Long> retrieveChildrenByCursoredRating(CursorCommonRequestDTO cursorRequestDTO) {
+        int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+
+        QFileSystemItemTopRatedView qFileSystemItemTopRatedView = QFileSystemItemTopRatedView.fileSystemItemTopRatedView;
+
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.averageRating.isNotNull());
 
-        OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
-                fileSystemItem.fileMetaInfo.bookInfo.averageRating.desc(), fileSystemItem.fileMetaInfo.bookInfo.ratingsCount.desc()
-        };
+        Long startRowNumber = calculateRowNumber(cursorRequestDTO.getNextCursor());
+        Long endRowNumber = calculateMaxRowNumber(startRowNumber, numberOfResults);
 
-        return this.basicRetrieve(cursorRequestDTO.getNextCursor(), cursorRequestDTO.getLimit(), booleanBuilder, customOrder, OrderEnum.ASC);
+        booleanBuilder.and(qFileSystemItemTopRatedView.id.goe(startRowNumber).and(qFileSystemItemTopRatedView.id.lt(endRowNumber)));
+
+        List<FileSystemItemTopRatedView> fileSystemItemTopRatedViewList = new JPAQuery<List<FileSystemItemTopDownloadsView>>(entityManager)
+                .select(qFileSystemItemTopRatedView)
+                .from(qFileSystemItemTopRatedView)
+                .where(booleanBuilder)
+                .fetch();
+
+        if (fileSystemItemTopRatedViewList.isEmpty() ||
+                fileSystemItemTopRatedViewList.size() < numberOfResults ||
+                startRowNumber > fileSystemItemTopRatedViewList.get(fileSystemItemTopRatedViewList.size() - 1).getId()) {
+            endRowNumber = null;
+        }
+
+        List<FileSystemItem> children = fileSystemItemTopRatedViewList
+                .stream().map(FileSystemItemTopRatedView::getFileSystemItem)
+                .toList();
+
+        return new PairDTO<>(children, endRowNumber);
     }
 
     @Override

@@ -80,6 +80,9 @@ public class BookInfo extends ModelCommon {
     )
     private List<Category> categoryList;
 
+    @OneToOne(mappedBy = "bookInfo", fetch = FetchType.LAZY)
+    private FileSystemItemTopRatedView fileSystemItemTopRatedView;
+
     @Override
     public String toString() {
         return "BookInfo{" +

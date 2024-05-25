@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.resource;
 import com.andreidodu.europealibrary.annotation.security.AllowCalculatedAuthorities;
 import com.andreidodu.europealibrary.dto.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -53,7 +54,7 @@ public interface CursoredFileResource {
     ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(@RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
 
     @PostMapping("/cursored/rating")
-    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByRating(@RequestBody CursorRequestDTO cursorRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByRating(@NotNull @RequestBody CursorCommonRequestDTO cursorRequestDTO);
 
     @PostMapping(path = "/cursored/downloadCount")
     ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(@Valid @RequestBody CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);

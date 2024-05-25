@@ -26,6 +26,7 @@ public abstract class FileSystemItemFullMapper {
     @Mapping(ignore = true, target = "parentId")
     @Mapping(ignore = true, target = "downloadCount")
     @Mapping(ignore = true, target = "fileSystemItemTopDownloadsView")
+    @Mapping(ignore = true, target = "fileSystemItemTopRatedView")
     public abstract FileSystemItem toModel(FileDTO dto);
 
     @Mapping(ignore = true, target = "childrenList")

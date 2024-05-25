@@ -77,4 +77,6 @@ public class FileSystemItem extends ModelCommon implements Identifiable {
     @OneToOne(mappedBy = "fileSystemItem", fetch = FetchType.LAZY)
     private FileSystemItemTopDownloadsView fileSystemItemTopDownloadsView;
 
+    @OneToOne(mappedBy = "fileSystemItem", fetch = FetchType.LAZY)
+    private FileSystemItemTopRatedView fileSystemItemTopRatedView;
 }
