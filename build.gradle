@@ -79,6 +79,8 @@ dependencies {
     testCompileOnly "com.querydsl:querydsl-sql:${queryDslVersion}"
     testAnnotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:general")
 
+    implementation 'org.apache.commons:commons-text:1.12.0'
+
     testImplementation("org.projectlombok:lombok:${lombokVersion}")
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testCompileOnly("org.projectlombok:lombok:${lombokVersion}")

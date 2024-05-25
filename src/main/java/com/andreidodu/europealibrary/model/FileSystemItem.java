@@ -74,4 +74,7 @@ public class FileSystemItem extends ModelCommon implements Identifiable {
     @Column(name = "record_status")
     private Integer recordStatus;
 
+    @OneToOne(mappedBy = "fileSystemItem", fetch = FetchType.LAZY)
+    private FileSystemItemTopDownloadsView fileSystemItemTopDownloadsView;
+
 }
