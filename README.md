@@ -162,9 +162,13 @@ Java • Spring Boot • Spring Batch • Spring Security • Spring Email Start
 Hibernate • Feign • Liquibase • PostgreSQL • Swagger (OpenAPI) • Docker • epublib • pdfbox • Google ZXing • Google Books
 API • Stripe • Apache FreeMarker
 
-## DB schema
+## DB schema - Tables
 
 ![db_schema](images/db_schema.png)
+
+## DB schema - Views
+
+![db_schema_views](images/db_schema_views.png)
 
 ## More
 
