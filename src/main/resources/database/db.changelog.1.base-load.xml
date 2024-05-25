@@ -391,4 +391,21 @@
 
     </changeSet>
 
+    <changeSet id="2024-05-25-001" author="Andrei Dodu">
+        <createView encoding="UTF-8"
+                    fullDefinition="false"
+                    remarks="A String"
+                    replaceIfExists="true"
+                    viewName="v_el_file_system_item_top_downloads">
+            select
+            row_number() over(order by fsi.download_count desc, fsi.id asc) as row_number,
+            fsi.id as file_system_item_id,
+            fsi.download_count
+            from el_file_system_item fsi
+            where
+            fsi.job_step = 2
+            and (fsi.is_directory is null or fsi.is_directory = false)
+        </createView>
+    </changeSet>
+
 </databaseChangeLog>
