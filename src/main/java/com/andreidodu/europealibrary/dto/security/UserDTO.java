@@ -14,4 +14,7 @@ public class UserDTO {
     private String email;
     private List<AuthorityDTO> authorityList;
     private LocalDateTime recoveryRequestTimestamp;
+    private Boolean consensus1Flag;
+    private Boolean consensus2Flag;
+    private Boolean consensus3Flag;
 }

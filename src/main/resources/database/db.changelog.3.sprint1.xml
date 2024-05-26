@@ -6,13 +6,13 @@
 
     <changeSet author="Andrei Dodu" id="2024-05-26-001">
         <addColumn tableName="${tablePrefix}user">
-            <column name="consensus1_flag" type="boolean">
+            <column name="consensus1_flag" type="boolean" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="consensus2_flag" type="boolean">
+            <column name="consensus2_flag" type="boolean" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="consensus3_flag" type="boolean">
+            <column name="consensus3_flag" type="boolean" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
