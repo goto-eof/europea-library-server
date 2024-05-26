@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -29,13 +30,18 @@ public class TokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (token != null && request.getCookies() != null) {
+        if (token != null) {
             log.debug("client sent a token, checking it's validity...");
-            String deviceId = Arrays.stream(request.getCookies())
+
+            String deviceId = Arrays.stream(
+                            Optional.ofNullable(request.getCookies())
+                                    .orElseThrow(() ->
+                                            new AccessDeniedException("Authentication error")
+                                    ))
                     .filter(cookie -> CookieConst.COOKIE_NAME_DEVICE_ID.equalsIgnoreCase(cookie.getName()))
                     .map(Cookie::getValue)
                     .findAny()
-                    .orElseThrow(() -> new AccessDeniedException("Invalid device id"));
+                    .orElseThrow(() -> new AccessDeniedException("Authentication error"));
             log.debug("device-id cookie is valid");
             token = token.substring(7);
             List<Token> tokenList = tokenRepository.findByTokenAndAgentIdAndValidFlag(token, deviceId, true);
