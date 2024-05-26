@@ -16,6 +16,9 @@ public abstract class AuthUserMapper {
     @Mapping(ignore = true, target = "resetToken")
     @Mapping(ignore = true, target = "stripeCustomer")
     @Mapping(ignore = true, target = "tokenList")
+    @Mapping(ignore = true, target = "consensus1Flag")
+    @Mapping(ignore = true, target = "consensus2Flag")
+    @Mapping(ignore = true, target = "consensus3Flag")
     public abstract User toModel(AuthUserDTO dto);
 
     @Mapping(ignore = true, target = "authorities")

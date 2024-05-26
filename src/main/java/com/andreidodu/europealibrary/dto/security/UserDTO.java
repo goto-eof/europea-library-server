@@ -1,5 +1,7 @@
 package com.andreidodu.europealibrary.dto.security;
 
+import com.andreidodu.europealibrary.annotation.validation.ShouldBeAlwaysTrue;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +16,10 @@ public class UserDTO {
     private String email;
     private List<AuthorityDTO> authorityList;
     private LocalDateTime recoveryRequestTimestamp;
+    @ShouldBeAlwaysTrue
+    private Boolean consensus1Flag;
+    @ShouldBeAlwaysTrue
+    private Boolean consensus2Flag;
+    @NotNull
+    private Boolean consensus3Flag;
 }

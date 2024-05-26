@@ -11,5 +11,6 @@
 
     <include file="db.changelog.1.base-load.xml" relativeToChangelogFile="true"/>
     <include file="db.changelog.2.stripe.xml" relativeToChangelogFile="true"/>
+    <include file="db.changelog.3.sprint1.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -148,6 +148,9 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         userDTO.setEmail(user.getEmail());
         userDTO.setUsername(user.getUsername());
         userDTO.setAuthorityList(this.authorityMapper.toDTO(user.getAuthorityList()));
+        userDTO.setConsensus1Flag(user.getConsensus1Flag());
+        userDTO.setConsensus2Flag(user.getConsensus2Flag());
+        userDTO.setConsensus3Flag(user.getConsensus3Flag());
         return userDTO;
     }
 
@@ -278,6 +281,9 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         user.setEmail(StringUtil.cleanAndTrimToNull(registrationRequestDTO.getEmail()));
         user.setPassword(this.passwordEncoder.encode(registrationRequestDTO.getPassword()));
         user.setEnabled(true);
+        user.setConsensus1Flag(registrationRequestDTO.getConsensus1Flag());
+        user.setConsensus2Flag(registrationRequestDTO.getConsensus2Flag());
+        user.setConsensus3Flag(registrationRequestDTO.getConsensus3Flag());
         return user;
     }
 
