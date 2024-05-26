@@ -52,4 +52,13 @@ public class User extends ModelCommon {
     @OneToMany(mappedBy = "user")
     private List<Token> tokenList;
 
+    @Column(name = "consensus1_flag")
+    private Boolean consensus1Flag;
+
+    @Column(name = "consensus2_flag")
+    private Boolean consensus2Flag;
+
+    @Column(name = "consensus3_flag")
+    private Boolean consensus3Flag;
+
 }
