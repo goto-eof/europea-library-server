@@ -33,6 +33,13 @@ by using multi-threading), search, sell/buy through Stripe platform (WIP) and do
 can be found [here](https://github.com/goto-eof/europea-library-client), while the Google Books API mock application can
 be cloned from [here](https://github.com/goto-eof/europea-library-google-books-api-emulator/tree/master).
 
+# Demo
+
+I already bought a domain and deployed the application on my VPS. So that I have
+a working demo on [http://europea-library.eu](http://europea-library.eu). For now the Stripe payment features are set to
+TEST MODE. It means that when you buy an e-book on europea-library.eu it is enough to use as test card like 424242...
+and some random information in order to purchase the book.
+
 # Development status
 
 Take a look also to the [development progress status](https://github.com/users/goto-eof/projects/4).
