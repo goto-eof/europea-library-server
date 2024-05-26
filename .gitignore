@@ -7,6 +7,10 @@ build/
 **/application-dev.properties
 **/application-prod.yml
 **/application-prod.properties
+
+**/application-super-prod.yml
+docker-compose-super-prod.yml
+
 **/private-key.pem
 **/public-key.pem
 ### STS ###
