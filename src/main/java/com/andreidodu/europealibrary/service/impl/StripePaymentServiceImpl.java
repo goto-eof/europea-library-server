@@ -8,6 +8,7 @@ import com.andreidodu.europealibrary.dto.stripe.StripeUserRegistrationRequestDTO
 import com.andreidodu.europealibrary.enums.StripeCustomerProductsOwnedStatus;
 import com.andreidodu.europealibrary.enums.StripePurchaseSessionStatus;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
+import com.andreidodu.europealibrary.exception.FurtherStepNeededException;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.stripe.StripeCustomerMapper;
 import com.andreidodu.europealibrary.model.stripe.*;
@@ -93,7 +94,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         StripeCheckoutSessionResponseDTO stripeCheckoutSessionResponseDTO = new StripeCheckoutSessionResponseDTO();
 
         StripeCustomer stripeCustomer = this.stripeCustomerRepository.findByUser_username(username)
-                .orElseThrow(() -> new ValidationException("StripeCustomer not found"));
+                .orElseThrow(() -> new FurtherStepNeededException("StripeCustomer not found"));
 
         StripePurchaseSession stripePurchaseSession = new StripePurchaseSession();
         stripePurchaseSession.setStripeCustomer(stripeCustomer);
