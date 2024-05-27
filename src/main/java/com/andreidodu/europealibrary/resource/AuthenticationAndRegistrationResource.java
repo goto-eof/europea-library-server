@@ -19,10 +19,12 @@ import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.HttpURLConnection;
 
+@Validated
 @RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication and Registration", description = "Allows to login/register/change password/reset password")
 public interface AuthenticationAndRegistrationResource {
