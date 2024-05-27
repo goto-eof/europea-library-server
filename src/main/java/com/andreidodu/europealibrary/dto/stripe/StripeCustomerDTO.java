@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.dto.stripe;
 
 import com.andreidodu.europealibrary.dto.common.CommonDTO;
 import com.andreidodu.europealibrary.dto.security.UserDTO;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class StripeCustomerDTO extends CommonDTO {
 
     private List<StripeCustomerProductsOwnedDTO> stripeCustomerProductsOwnedList;
 
+    @Valid
     @NotNull
     private StripeCustomerAddressDTO currentStripeCustomerAddress;
 
