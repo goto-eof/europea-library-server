@@ -5,4 +5,6 @@ public interface AuthConst {
     String AUTHORITY_SCOPE_USER = "SCOPE_USER";
     String AUTHORITY_USER = "USER";
     String AUTHORITY_ADMINISTRATOR = "ADMINISTRATOR";
+
+    String AUTHORITY_ACTUATOR = "ACTUATOR";
 }
