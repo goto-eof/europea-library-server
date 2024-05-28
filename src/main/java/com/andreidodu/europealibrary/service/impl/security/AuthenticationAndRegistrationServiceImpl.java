@@ -19,6 +19,8 @@ import com.andreidodu.europealibrary.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,7 +49,11 @@ import java.util.stream.Collectors;
 public class AuthenticationAndRegistrationServiceImpl implements AuthenticationAndRegistrationService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationAndRegistrationServiceImpl.class);
-    private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    @Qualifier(value = "appAuthenticationManager")
+    private AuthenticationManager authenticationManager;
+
     private final EmailSenderService emailSenderService;
     private final TemplateService templateService;
     private final TokenRepository tokenRepository;

@@ -1,4 +1,4 @@
-package com.andreidodu.europealibrary.config.security;
+package com.andreidodu.europealibrary.config.security.requestfilter;
 
 import com.andreidodu.europealibrary.constants.CookieConst;
 import com.andreidodu.europealibrary.model.security.Token;
