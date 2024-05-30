@@ -22,4 +22,5 @@ public class UserDTO {
     private Boolean consensus2Flag;
     @NotNull
     private Boolean consensus3Flag;
+    private Boolean enabled;
 }
