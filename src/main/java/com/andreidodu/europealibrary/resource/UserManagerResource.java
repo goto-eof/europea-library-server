@@ -18,10 +18,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.HttpURLConnection;
 
@@ -73,7 +70,7 @@ public interface UserManagerResource {
 
 
     @AllowOnlyAdministrator
-    @GetMapping
+    @PostMapping
     @Operation(summary = "Provides a list of users by cursorId",
             description = "Returns a limited number of users that are registered to the platform. Only the administrator is enabled to use this feature.",
             security = @SecurityRequirement(
@@ -110,7 +107,7 @@ public interface UserManagerResource {
                     description = "Payload that provides information about filtration criteria",
                     content = @Content(
                             schema = @Schema(implementation = CommonCursoredRequestDTO.class)))
-            @Valid CommonCursoredRequestDTO commonCursoredRequestDTO);
+            @org.springframework.web.bind.annotation.RequestBody @Valid CommonCursoredRequestDTO commonCursoredRequestDTO);
 
 
     @AllowOnlyAdministrator
