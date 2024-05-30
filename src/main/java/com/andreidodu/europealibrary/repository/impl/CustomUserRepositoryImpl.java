@@ -31,24 +31,29 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-        Long startRowNumber = CursoredUtil.calculateRowNumber(commonCursoredRequestDTO.getNextCursor());
-        Long endRowNumber = CursoredUtil.calculateMaxRowNumber(startRowNumber, numberOfResults);
 
-        booleanBuilder.and(user.id.goe(startRowNumber).and(user.id.lt(endRowNumber)));
+        Long nextCursor = commonCursoredRequestDTO.getNextCursor() != null ? commonCursoredRequestDTO.getNextCursor() : new JPAQuery<Long>(entityManager)
+                .select(user.id.min())
+                .from(user)
+                .fetch().getFirst();
 
-        List<User> userList = new JPAQuery<List<FileSystemItemTopDownloadsView>>(entityManager)
+        Long startId = CursoredUtil.calculateRowNumber(nextCursor);
+        booleanBuilder.and(user.id.goe(startId));
+
+        List<User> userList = new JPAQuery<List<User>>(entityManager)
                 .select(user)
                 .from(user)
                 .where(booleanBuilder)
+                .limit(numberOfResults + 1)
                 .fetch();
 
         if (userList.isEmpty() ||
                 userList.size() < numberOfResults ||
-                startRowNumber > userList.get(userList.size() - 1).getId()) {
-            endRowNumber = null;
+                startId > userList.get(userList.size() - 1).getId()) {
+            return new PairDTO<>(userList, null);
         }
 
-        return new PairDTO<>(userList, endRowNumber);
+        return new PairDTO<>(userList.stream().limit(numberOfResults).toList(), userList.get(userList.size() - 1).getId());
     }
 
 }
