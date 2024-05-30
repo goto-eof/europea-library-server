@@ -1,6 +1,5 @@
 package com.andreidodu.europealibrary.repository;
 
-import com.andreidodu.europealibrary.mapper.ApplicationSettingsMapper;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
 import com.andreidodu.europealibrary.repository.common.TransactionalRepository;

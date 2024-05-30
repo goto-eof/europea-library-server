@@ -8,12 +8,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
-@Validated
 @RequestMapping("/api/v1/stripe/customer")
 @Tag(name = "Stripe Customer", description = "")
 public interface StripeCustomerAssemblerResource {

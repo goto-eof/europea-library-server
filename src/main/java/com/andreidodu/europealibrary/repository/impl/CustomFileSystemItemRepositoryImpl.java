@@ -4,16 +4,12 @@ import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.enums.OrderEnum;
-import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.model.*;
-import com.andreidodu.europealibrary.repository.CategoryRepository;
-import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
-import com.andreidodu.europealibrary.repository.FileSystemItemTopDownloadsViewRepository;
-import com.andreidodu.europealibrary.repository.FileSystemItemTopRatedViewRepository;
+import com.andreidodu.europealibrary.repository.*;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
+import com.andreidodu.europealibrary.repository.util.CursoredUtil;
 import com.andreidodu.europealibrary.util.LimitUtil;
-import com.andreidodu.europealibrary.util.ResourceLoaderUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
@@ -24,21 +20,15 @@ import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.OrderedMap;
-import org.apache.commons.text.StringSubstitutor;
-import org.hibernate.query.Query;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class CustomFileSystemItemRepositoryImpl extends CommonRepository implements CustomFileSystemItemRepository {
     @PersistenceContext
     private EntityManager entityManager;
+
     private final CategoryRepository categoryRepository;
-    private final FileSystemItemTopDownloadsViewRepository fileSystemItemTopDownloadsViewRepository;
-    private final FileSystemItemTopRatedViewRepository fileSystemItemTopRatedViewRepository;
 
     private final static QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -387,8 +377,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-        Long startRowNumber = calculateRowNumber(cursorRequestDTO.getNextCursor());
-        Long endRowNumber = calculateMaxRowNumber(startRowNumber, numberOfResults);
+        Long startRowNumber = CursoredUtil.calculateRowNumber(cursorRequestDTO.getNextCursor());
+        Long endRowNumber = CursoredUtil.calculateMaxRowNumber(startRowNumber, numberOfResults);
 
         booleanBuilder.and(qFileSystemItemTopRatedView.id.goe(startRowNumber).and(qFileSystemItemTopRatedView.id.lt(endRowNumber)));
 
@@ -422,8 +412,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         Optional.ofNullable(cursoredRequestByFileTypeDTO.getFileType())
                 .ifPresent(extension -> booleanBuilder.and(fileSystemItemTopDownloadsView.fileSystemItem.extension.eq(extension)));
 
-        Long startRowNumber = calculateRowNumber(cursoredRequestByFileTypeDTO.getNextCursor());
-        Long endRowNumber = calculateMaxRowNumber(startRowNumber, numberOfResults);
+        Long startRowNumber = CursoredUtil.calculateRowNumber(cursoredRequestByFileTypeDTO.getNextCursor());
+        Long endRowNumber = CursoredUtil.calculateMaxRowNumber(startRowNumber, numberOfResults);
 
         booleanBuilder.and(fileSystemItemTopDownloadsView.id.goe(startRowNumber).and(fileSystemItemTopDownloadsView.id.lt(endRowNumber)));
 
@@ -443,15 +433,6 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         return new PairDTO<>(children, endRowNumber);
     }
-
-    private static long calculateRowNumber(Long nextCursor) {
-        return nextCursor == null ? 1 : nextCursor;
-    }
-
-    private static long calculateMaxRowNumber(Long nextCursor, int numberOfResults) {
-        return nextCursor == null ? numberOfResults : nextCursor + numberOfResults;
-    }
-
 
     @Override
     public List<FileSystemItem> retrieveNewCursored(CursorCommonRequestDTO commonRequestDTO) {
