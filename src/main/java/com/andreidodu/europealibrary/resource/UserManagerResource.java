@@ -61,7 +61,7 @@ public interface UserManagerResource {
                                     description = "the row identifier"))
             },
             responses = {
-                    @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Item retrieved successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Item retrieved successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDTO.class))),
                     @ApiResponse(responseCode = "" + +HttpURLConnection.HTTP_UNAUTHORIZED, description = "Not authorized because of wrong JWT"),
                     @ApiResponse(responseCode = "" + +HttpURLConnection.HTTP_BAD_REQUEST, description = "Bad request. Invalid input JSON.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
@@ -97,7 +97,7 @@ public interface UserManagerResource {
                     )
             },
             responses = {
-                    @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Item retrieved successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Item retrieved successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDTO.class))),
                     @ApiResponse(responseCode = "" + +HttpURLConnection.HTTP_UNAUTHORIZED, description = "Not authorized because of wrong JWT"),
                     @ApiResponse(responseCode = "" + +HttpURLConnection.HTTP_BAD_REQUEST, description = "Bad request. Invalid input JSON.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
@@ -145,7 +145,7 @@ public interface UserManagerResource {
                                     description = "the row identifier"))
             },
             responses = {
-                    @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Item retrieved successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                    @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Item retrieved successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserDTO.class))),
                     @ApiResponse(responseCode = "" + +HttpURLConnection.HTTP_UNAUTHORIZED, description = "Not authorized because of wrong JWT"),
                     @ApiResponse(responseCode = "" + +HttpURLConnection.HTTP_BAD_REQUEST, description = "Bad request. Invalid input JSON.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             }
