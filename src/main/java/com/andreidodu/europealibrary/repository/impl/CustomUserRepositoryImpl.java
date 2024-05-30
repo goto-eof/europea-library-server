@@ -14,6 +14,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Value("${com.andreidodu.europea-library.default-admin-username}")
+    private String defaultAdminUsername;
 
     @Override
     public PairDTO<List<User>, Long> retrieveAllCursored(CommonCursoredRequestDTO commonCursoredRequestDTO) {
@@ -39,12 +43,14 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
 
         Long startId = CursoredUtil.calculateRowNumber(nextCursor);
         booleanBuilder.and(user.id.goe(startId));
+        booleanBuilder.and(user.username.notEqualsIgnoreCase(defaultAdminUsername));
 
         List<User> userList = new JPAQuery<List<User>>(entityManager)
                 .select(user)
                 .from(user)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
+                .orderBy(user.id.asc())
                 .fetch();
 
         if (userList.isEmpty() ||
