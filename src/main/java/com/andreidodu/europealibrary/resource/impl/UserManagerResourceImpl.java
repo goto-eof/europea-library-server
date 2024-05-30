@@ -2,6 +2,7 @@ package com.andreidodu.europealibrary.resource.impl;
 
 import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
 import com.andreidodu.europealibrary.dto.CommonGenericCursoredResponseDTO;
+import com.andreidodu.europealibrary.dto.UserEnableDTO;
 import com.andreidodu.europealibrary.dto.security.UserDTO;
 import com.andreidodu.europealibrary.resource.UserManagerResource;
 import com.andreidodu.europealibrary.service.UserManagerService;
@@ -28,12 +29,7 @@ public class UserManagerResourceImpl implements UserManagerResource {
     }
 
     @Override
-    public ResponseEntity<UserDTO> enable(Long id) {
-        return ResponseEntity.ok(this.userManagerService.enable(id, true));
-    }
-
-    @Override
-    public ResponseEntity<UserDTO> disable(Long id) {
-        return ResponseEntity.ok(this.userManagerService.enable(id, false));
+    public ResponseEntity<UserDTO> enable(Long id, UserEnableDTO userEnableDTO) {
+        return ResponseEntity.ok(this.userManagerService.enable(id, userEnableDTO.getEnabled()));
     }
 }

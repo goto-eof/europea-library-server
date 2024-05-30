@@ -2,13 +2,7 @@ package com.andreidodu.europealibrary.resource;
 
 import com.andreidodu.europealibrary.constants.CookieConst;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
-import com.andreidodu.europealibrary.dto.security.AuthRequestDTO;
-import com.andreidodu.europealibrary.dto.security.AuthResponseDTO;
-import com.andreidodu.europealibrary.dto.security.ChangePasswordRequestDTO;
-import com.andreidodu.europealibrary.dto.security.PasswordResetEmailRequestDTO;
-import com.andreidodu.europealibrary.dto.security.PasswordResetRequestDTO;
-import com.andreidodu.europealibrary.dto.security.RegistrationRequestDTO;
-import com.andreidodu.europealibrary.dto.security.UserDTO;
+import com.andreidodu.europealibrary.dto.security.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,12 +13,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.HttpURLConnection;
 
-@Validated
 @RequestMapping("/api/v1/auth")
 @Tag(name = "Authentication and Registration", description = "Allows to login/register/change password/reset password")
 public interface AuthenticationAndRegistrationResource {
