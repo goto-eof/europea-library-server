@@ -25,4 +25,6 @@ public class GoogleRecaptchaResponseDTO {
     @JsonProperty(value = "error-codes")
     @Getter(onMethod_ = {@JsonGetter(value = "error-codes")})
     private List<String> errorCodes;
+
+    private Double score;
 }

@@ -23,7 +23,10 @@ public class GoogleReCaptchaServiceImpl implements GoogleReCaptchaService {
     public void verify(String remoteAddress, String clientCaptchaToken) {
         GoogleRecaptchaResponseDTO googleRecaptchaResponseDTO = this.googleReCaptchaClient.verify(captchaSecret, clientCaptchaToken, remoteAddress);
         if (!googleRecaptchaResponseDTO.isSuccess()) {
-            throw new ValidationException("Invalid captcha: " + googleRecaptchaResponseDTO.toString());
+            throw new ValidationException("success value is false: " + googleRecaptchaResponseDTO.toString());
+        }
+        if (googleRecaptchaResponseDTO.getScore() < 0.5) {
+            throw new ValidationException("Score too low: " + googleRecaptchaResponseDTO.toString());
         }
     }
 
