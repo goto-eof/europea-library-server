@@ -81,6 +81,7 @@ com:
         password: postgres
       google:
         recaptcha:
+          secret: YOUR_SECRET_HERE
           query-url: www.google.com/recaptcha/api/siteverify
         books:
           query-url: https://www.googleapis.com/books/v1/volumes

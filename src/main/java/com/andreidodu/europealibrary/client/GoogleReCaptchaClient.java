@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @FeignClient(value = "google-recaptcha", url = "${com.andreidodu.europea-library.google.recaptcha.query-url}")
 public interface GoogleReCaptchaClient {
+
     @RequestMapping(method = RequestMethod.POST)
     GoogleRecaptchaResponseDTO verify(@RequestBody GoogleRecaptchaDTO googleRecaptchaDTO);
+
 }
