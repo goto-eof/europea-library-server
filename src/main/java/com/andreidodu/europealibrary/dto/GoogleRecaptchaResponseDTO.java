@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
+@ToString
 public class GoogleRecaptchaResponseDTO {
 
     private boolean success;
@@ -23,5 +24,5 @@ public class GoogleRecaptchaResponseDTO {
 
     @JsonProperty(value = "error-codes")
     @Getter(onMethod_ = {@JsonGetter(value = "error-codes")})
-    private List<Map<String, Object>> errorCodes;
+    private List<String> errorCodes;
 }

@@ -1,7 +1,6 @@
 package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.client.GoogleReCaptchaClient;
-import com.andreidodu.europealibrary.dto.GoogleRecaptchaRequestDTO;
 import com.andreidodu.europealibrary.dto.GoogleRecaptchaResponseDTO;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.service.GoogleReCaptchaService;
@@ -18,19 +17,13 @@ public class GoogleReCaptchaServiceImpl implements GoogleReCaptchaService {
     @Value("${com.andreidodu.europea-library.google.recaptcha.secret}")
     private String captchaSecret;
 
-    private GoogleReCaptchaClient googleReCaptchaClient;
+    private final GoogleReCaptchaClient googleReCaptchaClient;
 
     @Override
     public void verify(String remoteAddress, String clientCaptchaToken) {
-        GoogleRecaptchaRequestDTO googleRecaptchaRequestDTO = GoogleRecaptchaRequestDTO
-                .builder()
-                .clientIpAddress(remoteAddress)
-                .secret(captchaSecret)
-                .clientCaptchaToken(clientCaptchaToken)
-                .build();
-        GoogleRecaptchaResponseDTO googleRecaptchaResponseDTO = this.googleReCaptchaClient.verify(googleRecaptchaRequestDTO);
+        GoogleRecaptchaResponseDTO googleRecaptchaResponseDTO = this.googleReCaptchaClient.verify(captchaSecret, clientCaptchaToken, remoteAddress);
         if (!googleRecaptchaResponseDTO.isSuccess()) {
-            throw new ValidationException("Invalid captcha");
+            throw new ValidationException("Invalid captcha: " + googleRecaptchaResponseDTO.toString());
         }
     }
 
