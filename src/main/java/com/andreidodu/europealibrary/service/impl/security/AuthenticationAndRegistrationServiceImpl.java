@@ -169,8 +169,8 @@ public class AuthenticationAndRegistrationServiceImpl implements AuthenticationA
         List<Authority> authorityList = buildAuthorityList(user);
         user.setAuthorityList(authorityList);
 
-        User savedUser = this.userRepository.save(user);
-        return this.login(new AuthRequestDTO(registrationRequestDTO.getUsername(), registrationRequestDTO.getPassword()));
+        this.userRepository.save(user);
+        return this.login(new AuthRequestDTO(registrationRequestDTO.getUsername(), registrationRequestDTO.getPassword(), registrationRequestDTO.getClientCaptchaToken()));
     }
 
     @Override
