@@ -80,6 +80,9 @@ com:
         username: postgres
         password: postgres
       google:
+        recaptcha:
+          secret: YOUR_SECRET_HERE
+          query-url: https://www.google.com/recaptcha/api/siteverify
         books:
           query-url: https://www.googleapis.com/books/v1/volumes
           api_key:

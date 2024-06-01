@@ -1,10 +1,10 @@
 package com.andreidodu.europealibrary.resource.impl;
 
-import com.andreidodu.europealibrary.constants.CookieConst;
 import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.security.*;
 import com.andreidodu.europealibrary.resource.AuthenticationAndRegistrationResource;
 import com.andreidodu.europealibrary.service.AuthenticationAndRegistrationService;
+import com.andreidodu.europealibrary.service.GoogleReCaptchaService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,10 +27,14 @@ public class AuthenticationAndRegistrationResourceImpl implements Authentication
     @Value("${com.andreidodu.europea-library.session.ttl-seconds}")
     private int sessionTTLSeconds;
 
+    private final GoogleReCaptchaService googleReCaptchaService;
+
     private final AuthenticationAndRegistrationService authenticationAndRegistrationService;
 
     @Override
-    public ResponseEntity<AuthResponseDTO> login(HttpServletResponse response, AuthRequestDTO authRequestDTO) {
+    public ResponseEntity<AuthResponseDTO> login(HttpServletRequest request, HttpServletResponse response, AuthRequestDTO authRequestDTO) {
+        this.googleReCaptchaService.verify(request.getRemoteAddr(), authRequestDTO.getClientCaptchaToken());
+
         AuthResponseDTO authResponseDTO = this.authenticationAndRegistrationService.login(authRequestDTO);
         Cookie deviceIdentifierCookie = createDeviceIdentifierCookie(authResponseDTO.getAgentId());
         response.addCookie(deviceIdentifierCookie);
@@ -60,7 +64,9 @@ public class AuthenticationAndRegistrationResourceImpl implements Authentication
     }
 
     @Override
-    public ResponseEntity<AuthResponseDTO> register(HttpServletResponse response, RegistrationRequestDTO registrationRequestDTO) {
+    public ResponseEntity<AuthResponseDTO> register(HttpServletRequest request, HttpServletResponse response, RegistrationRequestDTO registrationRequestDTO) {
+        this.googleReCaptchaService.verify(request.getRemoteAddr(), registrationRequestDTO.getClientCaptchaToken());
+
         AuthResponseDTO authResponseDTO = this.authenticationAndRegistrationService.register(registrationRequestDTO);
         Cookie deviceIdentifierCookie = createDeviceIdentifierCookie(authResponseDTO.getAgentId());
         response.addCookie(deviceIdentifierCookie);

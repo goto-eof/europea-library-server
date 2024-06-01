@@ -25,7 +25,7 @@ public interface AuthenticationAndRegistrationResource {
     @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Logged in successfully", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
     @ApiResponse(responseCode = "" + +HttpURLConnection.HTTP_UNAUTHORIZED, description = "Not authorized because of wrong username or password")
     @ApiResponse(responseCode = "" + +HttpURLConnection.HTTP_BAD_REQUEST, description = "Bad request. Invalid JSON.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-    ResponseEntity<AuthResponseDTO> login(HttpServletResponse response, @Valid @RequestBody AuthRequestDTO authRequestDTO);
+    ResponseEntity<AuthResponseDTO> login(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody AuthRequestDTO authRequestDTO);
 
     @GetMapping("/me")
     @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "User retrieved with success", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
@@ -33,7 +33,7 @@ public interface AuthenticationAndRegistrationResource {
 
     @PostMapping("/register")
     @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Registered and logged in with success", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-    ResponseEntity<AuthResponseDTO> register(HttpServletResponse response, @Valid @RequestBody RegistrationRequestDTO registrationRequestDTO);
+    ResponseEntity<AuthResponseDTO> register(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody RegistrationRequestDTO registrationRequestDTO);
 
     @PostMapping("/password/change")
     @ApiResponse(responseCode = "" + HttpURLConnection.HTTP_OK, description = "Password changed with success", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
