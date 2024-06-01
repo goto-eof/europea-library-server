@@ -3,7 +3,6 @@ package com.andreidodu.europealibrary.repository.impl;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
 import com.andreidodu.europealibrary.dto.PairDTO;
-import com.andreidodu.europealibrary.model.FileSystemItemTopDownloadsView;
 import com.andreidodu.europealibrary.model.security.QUser;
 import com.andreidodu.europealibrary.model.security.User;
 import com.andreidodu.europealibrary.repository.CustomUserRepository;
@@ -53,9 +52,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
                 .orderBy(user.id.asc())
                 .fetch();
 
-        if (userList.isEmpty() ||
-                userList.size() < numberOfResults ||
-                startId > userList.get(userList.size() - 1).getId()) {
+        if (userList.isEmpty() || userList.size() <= numberOfResults) {
             return new PairDTO<>(userList, null);
         }
 
