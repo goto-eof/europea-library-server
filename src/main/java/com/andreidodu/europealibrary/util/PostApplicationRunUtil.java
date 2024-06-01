@@ -65,6 +65,9 @@ public class PostApplicationRunUtil {
         user.setEmail(defaultAdminEmail);
         user.setPassword(bCryptPasswordEncoder.encode(defaultAdminPassword));
         user.setEnabled(true);
+        user.setConsensus1Flag(true);
+        user.setConsensus2Flag(true);
+        user.setConsensus3Flag(false);
         user = userRepository.save(user);
         return user;
     }
