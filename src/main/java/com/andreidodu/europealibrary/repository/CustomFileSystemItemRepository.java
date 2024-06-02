@@ -39,4 +39,6 @@ public interface CustomFileSystemItemRepository {
     PairDTO<List<FileSystemItem>, Long> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
 
     List<FileSystemItem> retrieveNewCursored(CursorCommonRequestDTO cursorRequestDTO);
+
+    PairDTO<List<PairDTO<FileSystemItem, Long>>, Long> retrieveCursoredByTopSold(CommonCursoredRequestDTO commonCursoredRequestDTO);
 }
