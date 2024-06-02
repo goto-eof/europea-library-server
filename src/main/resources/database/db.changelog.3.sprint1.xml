@@ -18,5 +18,34 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="2024-06-02-001" author="Andrei Dodu">
+        <createView encoding="UTF-8"
+                    fullDefinition="false"
+                    remarks="Top sold e-books view"
+                    replaceIfExists="true"
+                    viewName="v_el_file_system_item_top_sold">
+            SELECT row_number() OVER (ORDER BY wt.stripe_product_id_count DESC NULLS LAST) AS row_number,
+            wt.file_system_item_id,
+            wt.file_meta_info_id,
+            wt.stripe_product_id,
+            wt.stripe_product_id_count AS sales_count
+            FROM ( SELECT po.stripe_product_id,
+            fmi.id AS file_meta_info_id,
+            fsi.id AS file_system_item_id,
+            count(po.stripe_product_id) AS stripe_product_id_count
+            FROM el_file_meta_info fmi,
+            el_stripe_customer_product_owned po,
+            el_stripe_product p,
+            el_file_system_item fsi
+            WHERE po.status::text = 'PURCHASED'::text AND po.stripe_product_id = p.id AND p.file_meta_info_id
+            = fmi.id AND fsi.file_meta_info_id = (( SELECT efsi.file_meta_info_id
+            FROM el_file_system_item efsi
+            WHERE efsi.file_meta_info_id = fmi.id
+            ORDER BY efsi.id
+            LIMIT 1))
+            GROUP BY po.stripe_product_id, fmi.id, fsi.id) wt
+        </createView>
+    </changeSet>
+
 
 </databaseChangeLog>

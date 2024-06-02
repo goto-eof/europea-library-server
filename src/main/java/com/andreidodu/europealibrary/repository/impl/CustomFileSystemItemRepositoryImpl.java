@@ -6,6 +6,9 @@ import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.model.*;
+import com.andreidodu.europealibrary.model.security.QUser;
+import com.andreidodu.europealibrary.model.security.User;
+import com.andreidodu.europealibrary.model.stripe.QStripeCustomerProductsOwned;
 import com.andreidodu.europealibrary.repository.*;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.andreidodu.europealibrary.repository.util.CursoredUtil;
@@ -21,6 +24,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 
+import java.io.File;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     private EntityManager entityManager;
 
     private final CategoryRepository categoryRepository;
+    private final FileSystemItemTopSoldViewRepository fileSystemItemTopSoldViewRepository;
 
     private final static QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
@@ -468,6 +473,40 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .limit(numberOfResults + 1)
                 .orderBy(customOrder)
                 .fetch();
+    }
+
+
+    public PairDTO<List<PairDTO<FileSystemItem, Long>>, Long> retrieveCursoredByTopSold(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+        int numberOfResults = LimitUtil.calculateLimit(commonCursoredRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
+        QFileSystemItemTopSoldView topSold = QFileSystemItemTopSoldView.fileSystemItemTopSoldView;
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        Long nextCursor = commonCursoredRequestDTO.getNextCursor() != null ? commonCursoredRequestDTO.getNextCursor() : new JPAQuery<Long>(entityManager)
+                .select(topSold.id.min())
+                .from(topSold)
+                .fetch().getFirst();
+        Long startId = CursoredUtil.calculateRowNumber(nextCursor);
+        booleanBuilder.and(topSold.id.goe(startId));
+
+        List<FileSystemItemTopSoldView> userList = new JPAQuery<List<User>>(entityManager)
+                .select(topSold)
+                .from(topSold)
+                .where(booleanBuilder)
+                .limit(numberOfResults + 1)
+                .orderBy(topSold.id.asc())
+                .fetch();
+
+        List<PairDTO<FileSystemItem, Long>> children = userList.stream()
+                .map(item -> new PairDTO<>(item.getFileSystemItem(), item.getSalesCount()))
+                .limit(numberOfResults)
+                .toList();
+
+
+        if (children.isEmpty() || children.size() <= numberOfResults) {
+            return new PairDTO<>(children, null);
+        }
+
+        return new PairDTO<>(children, userList.get(userList.size() - 1).getId());
     }
 
 }
