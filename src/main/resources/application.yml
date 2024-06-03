@@ -159,7 +159,11 @@ springdoc:
   api-docs:
     enabled: ${com.andreidodu.europea-library.is-production-disabled}
   swagger-ui:
+    path: '/api-documentation'
+    doc-expansion: none
+    disable-swagger-default-url: true
     enabled: ${com.andreidodu.europea-library.is-production-disabled}
+
 
 management:
   endpoints:
