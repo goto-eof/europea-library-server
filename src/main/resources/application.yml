@@ -47,12 +47,12 @@ spring:
       max-request-size: 5MB
 server:
   port: 8081
-springdoc:
-  api-docs:
-    path: "/api-docs"
+
+
 com:
   andreidodu:
     europea-library:
+      is-production-disabled: true
       actuator:
         security:
           username: actuator
@@ -154,6 +154,12 @@ com:
             batch-size: 100
           step-category-obsolete-deleter:
             batch-size: 100
+
+springdoc:
+  api-docs:
+    enabled: ${com.andreidodu.europea-library.is-production-disabled}
+  swagger-ui:
+    enabled: ${com.andreidodu.europea-library.is-production-disabled}
 
 management:
   endpoints:
