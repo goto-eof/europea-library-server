@@ -1,8 +1,12 @@
 package com.andreidodu.europealibrary.service.impl;
 
+import com.andreidodu.europealibrary.constants.AuthConst;
+import com.andreidodu.europealibrary.dto.PaginatedExplorerOptions;
 import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.model.common.Identifiable;
 import jakarta.persistence.criteria.Order;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +56,21 @@ public abstract class CursoredServiceCommon {
                 .filter(item -> !item.getId().equals(nextId))
                 .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    public static PaginatedExplorerOptions buildPaginatedExplorerOptions(Authentication authentication) {
+        return Optional.ofNullable(authentication)
+                .map(auth -> {
+                    PaginatedExplorerOptions paginatedExplorerOptions = new PaginatedExplorerOptions();
+                    boolean isAdministrator = auth.getAuthorities()
+                            .stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .anyMatch(AuthConst.AUTHORITY_ADMINISTRATOR::equalsIgnoreCase);
+                    paginatedExplorerOptions.setAdministratorFlag(isAdministrator);
+                    paginatedExplorerOptions.setUsername(auth.getName());
+                    return paginatedExplorerOptions;
+                })
+                .orElse(new PaginatedExplorerOptions());
     }
 
 }

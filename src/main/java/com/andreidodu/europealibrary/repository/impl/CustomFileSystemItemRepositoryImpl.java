@@ -6,10 +6,11 @@ import com.andreidodu.europealibrary.dto.*;
 import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.model.*;
-import com.andreidodu.europealibrary.model.security.QUser;
 import com.andreidodu.europealibrary.model.security.User;
 import com.andreidodu.europealibrary.model.stripe.QStripeCustomerProductsOwned;
-import com.andreidodu.europealibrary.repository.*;
+import com.andreidodu.europealibrary.repository.CategoryRepository;
+import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
+import com.andreidodu.europealibrary.repository.FileSystemItemTopSoldViewRepository;
 import com.andreidodu.europealibrary.repository.common.CommonRepository;
 import com.andreidodu.europealibrary.repository.util.CursoredUtil;
 import com.andreidodu.europealibrary.util.LimitUtil;
@@ -17,6 +18,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -24,11 +26,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 
-import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CustomFileSystemItemRepositoryImpl extends CommonRepository implements CustomFileSystemItemRepository {
+    public static final QStripeCustomerProductsOwned STRIPE_CUSTOMER_PRODUCTS_OWNED = QStripeCustomerProductsOwned.stripeCustomerProductsOwned;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -39,7 +44,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
 
     @Override
-    public List<FileSystemItem> retrieveChildrenByCursor(CursorRequestDTO cursorRequestDTO) {
+    public List<FileSystemItem> retrieveChildrenByCursor(PaginatedExplorerOptions paginatedExplorerOptions, CursorRequestDTO cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParentId());
 
         Long parentId = cursorRequestDTO.getParentId();
@@ -49,6 +54,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
         booleanBuilder.and(fileSystemItem.parent.id.eq(parentId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         if (cursorId != null) {
@@ -58,6 +64,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileSystemItem)
                 .from(fileSystemItem)
+                .leftJoin(fileSystemItem.fileMetaInfo, QFileMetaInfo.fileMetaInfo)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
                 .orderBy(fileSystemItem.id.asc())
@@ -65,7 +72,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<FileSystemItem> retrieveChildrenByCursoredCategoryId(CursorRequestDTO cursorRequestDTO) {
+    public List<FileSystemItem> retrieveChildrenByCursoredCategoryId(PaginatedExplorerOptions paginatedExplorerOptions, CursorRequestDTO cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParentId());
 
         Long categoryId = cursorRequestDTO.getParentId();
@@ -76,6 +83,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
 
@@ -97,7 +106,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
 
     @Override
-    public List<FileSystemItem> retrieveChildrenByCursoredTagId(CursorRequestDTO cursorRequestDTO) {
+    public List<FileSystemItem> retrieveChildrenByCursoredTagId(PaginatedExplorerOptions paginatedExplorerOptions, CursorRequestDTO cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParentId());
 
         Long tagId = cursorRequestDTO.getParentId();
@@ -109,6 +118,8 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QTag tag = QTag.tag;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+
         booleanBuilder.and(tag.id.eq(tagId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
@@ -128,12 +139,12 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
 
     @Override
-    public List<FileSystemItem> retrieveChildrenByCursoredFileExtension(CursorTypeRequestDTO cursorTypeRequestDTO) {
+    public List<FileSystemItem> retrieveChildrenByCursoredFileExtension(PaginatedExplorerOptions paginatedExplorerOptions, CursorTypeRequestDTO cursorTypeRequestDTO) {
         Objects.requireNonNull(cursorTypeRequestDTO.getExtension());
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.extension.eq(cursorTypeRequestDTO.getExtension()));
-
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
@@ -176,11 +187,12 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<FileSystemItem> retrieveChildrenByCursoredLanguage(GenericCursorRequestDTO<String> cursorRequestDTO) {
+    public List<FileSystemItem> retrieveChildrenByCursoredLanguage(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParent());
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.language.eq(cursorRequestDTO.getParent()));
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
@@ -190,11 +202,12 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<FileSystemItem> retrieveChildrenByCursoredPublisher(GenericCursorRequestDTO<String> cursorRequestDTO) {
+    public List<FileSystemItem> retrieveChildrenByCursoredPublisher(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParent());
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publisher.eq(cursorRequestDTO.getParent()));
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
@@ -274,11 +287,12 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<FileSystemItem> search(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
+    public List<FileSystemItem> search(PaginatedExplorerOptions paginatedExplorerOptions, SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
 
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
         BooleanBuilder booleanBuilder = applySearchFilters(searchFileSystemItemRequestDTO, fileSystemItem);
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
 
         int numberOfResults = LimitUtil.calculateLimit(searchFileSystemItemRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
@@ -361,11 +375,12 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO) {
+    public List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO) {
         Objects.requireNonNull(cursorRequestDTO.getParent());
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publishedDate.eq(cursorRequestDTO.getParent()));
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
                 fileSystemItem.id.asc()
@@ -375,12 +390,13 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public PairDTO<List<FileSystemItem>, Long> retrieveChildrenByCursoredRating(CursorCommonRequestDTO cursorRequestDTO) {
+    public PairDTO<List<FileSystemItem>, Long> retrieveChildrenByCursoredRating(PaginatedExplorerOptions paginatedExplorerOptions, CursorCommonRequestDTO cursorRequestDTO) {
         int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItemTopRatedView qFileSystemItemTopRatedView = QFileSystemItemTopRatedView.fileSystemItemTopRatedView;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
 
         Long startRowNumber = CursoredUtil.calculateRowNumber(cursorRequestDTO.getNextCursor());
         Long endRowNumber = CursoredUtil.calculateMaxRowNumber(startRowNumber, numberOfResults);
@@ -407,13 +423,15 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public PairDTO<List<FileSystemItem>, Long> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
+    public PairDTO<List<FileSystemItem>, Long> retrieveCursoredByDownloadCount(PaginatedExplorerOptions paginatedExplorerOptions, CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
 
         int numberOfResults = LimitUtil.calculateLimit(cursoredRequestByFileTypeDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItemTopDownloadsView fileSystemItemTopDownloadsView = QFileSystemItemTopDownloadsView.fileSystemItemTopDownloadsView;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+
         Optional.ofNullable(cursoredRequestByFileTypeDTO.getFileType())
                 .ifPresent(extension -> booleanBuilder.and(fileSystemItemTopDownloadsView.fileSystemItem.extension.eq(extension)));
 
@@ -439,14 +457,37 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         return new PairDTO<>(children, endRowNumber);
     }
 
-    @Override
-    public List<FileSystemItem> retrieveNewCursored(CursorCommonRequestDTO commonRequestDTO) {
+
+    public List<FileSystemItem> retrieveNewCursored(PaginatedExplorerOptions paginatedExplorerOptions, CursorCommonRequestDTO commonRequestDTO) {
         OrderSpecifier<?>[] order = new OrderSpecifier[]{
                 fileSystemItem.createdDate.desc(),
                 fileSystemItem.id.desc()
         };
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
 
-        return this.basicRetrieve(commonRequestDTO.getNextCursor(), commonRequestDTO.getLimit(), new BooleanBuilder(), order, OrderEnum.DESC);
+        return this.basicRetrieve(commonRequestDTO.getNextCursor(), commonRequestDTO.getLimit(), booleanBuilder, order, OrderEnum.DESC);
+    }
+
+    private static void applyCommonFilter(PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
+        if (!paginatedExplorerOptions.isAdministratorFlag()) {
+            booleanBuilder.and(
+                    fileSystemItem.fileMetaInfoId.isNull()
+                            .or(fileSystemItem.fileMetaInfo.hidden.eq(false))
+                            .or(isProductOwner(paginatedExplorerOptions, booleanBuilder))
+            );
+        } // else is admin and allow to view hidden/unhidden e-books
+    }
+
+    private static Predicate isProductOwner(PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
+        return JPAExpressions
+                .select(fileSystemItem.fileMetaInfo)
+                .from(fileSystemItem)
+                .where(fileSystemItem.fileMetaInfo.id.in(JPAExpressions.selectDistinct(STRIPE_CUSTOMER_PRODUCTS_OWNED.stripeProduct.fileMetaInfo.id)
+                        .from(STRIPE_CUSTOMER_PRODUCTS_OWNED)
+                        .where(STRIPE_CUSTOMER_PRODUCTS_OWNED.stripeCustomer.user.username.eq(paginatedExplorerOptions.getUsername()))
+                ))
+                .exists();
     }
 
     public List<FileSystemItem> basicRetrieve(Long cursorId, Integer limit, BooleanBuilder customWhere, OrderSpecifier<?>[] customOrder, OrderEnum order) {
@@ -476,11 +517,14 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
 
-    public PairDTO<List<PairDTO<FileSystemItem, Long>>, Long> retrieveCursoredByTopSold(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+    @Override
+    public PairDTO<List<PairDTO<FileSystemItem, Long>>, Long> retrieveCursoredByTopSold(PaginatedExplorerOptions paginatedExplorerOptions, CommonCursoredRequestDTO commonCursoredRequestDTO) {
         int numberOfResults = LimitUtil.calculateLimit(commonCursoredRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
         QFileSystemItemTopSoldView topSold = QFileSystemItemTopSoldView.fileSystemItemTopSoldView;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+
         Long nextCursor = commonCursoredRequestDTO.getNextCursor() != null ? commonCursoredRequestDTO.getNextCursor() : new JPAQuery<Long>(entityManager)
                 .select(topSold.id.min())
                 .from(topSold)

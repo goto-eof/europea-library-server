@@ -6,6 +6,7 @@ import com.andreidodu.europealibrary.service.SalesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -15,7 +16,7 @@ public class SalesResourceImpl implements SalesResource {
     private final SalesService salesService;
 
     @Override
-    public ResponseEntity<CommonGenericCursoredResponseDTO<PairDTO<FileSystemItemDTO, Long>>> retrieveCursoredByTopSold(CommonCursoredRequestDTO commonCursoredRequestDTO) {
-        return ResponseEntity.ok(salesService.retrieveCursoredByTopSold(commonCursoredRequestDTO));
+    public ResponseEntity<CommonGenericCursoredResponseDTO<PairDTO<FileSystemItemDTO, Long>>> retrieveCursoredByTopSold(Authentication authentication, CommonCursoredRequestDTO commonCursoredRequestDTO) {
+        return ResponseEntity.ok(salesService.retrieveCursoredByTopSold(authentication, commonCursoredRequestDTO));
     }
 }

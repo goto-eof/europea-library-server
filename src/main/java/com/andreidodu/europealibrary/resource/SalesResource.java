@@ -6,6 +6,7 @@ import com.andreidodu.europealibrary.dto.FileSystemItemDTO;
 import com.andreidodu.europealibrary.dto.PairDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface SalesResource {
 
     @PostMapping(path = "/cursored/topSold")
-    ResponseEntity<CommonGenericCursoredResponseDTO<PairDTO<FileSystemItemDTO, Long>>> retrieveCursoredByTopSold(@Valid @RequestBody CommonCursoredRequestDTO commonCursoredRequestDTO);
+    ResponseEntity<CommonGenericCursoredResponseDTO<PairDTO<FileSystemItemDTO, Long>>> retrieveCursoredByTopSold(Authentication authentication, @Valid @RequestBody CommonCursoredRequestDTO commonCursoredRequestDTO);
 
 }
