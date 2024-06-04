@@ -7,6 +7,7 @@ import com.andreidodu.europealibrary.service.FeaturedFileSystemItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -17,13 +18,13 @@ public class FeaturedFileMetaInfoResourceImpl implements FeaturedFileMetaInfoRes
     private final ApplicationSettingsService applicationSettingsService;
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO) {
-        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursored(cursorCommonRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(Authentication authentication, CursorCommonRequestDTO cursorCommonRequestDTO) {
+        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursored(authentication, cursorCommonRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(CursorCommonRequestDTO cursorCommonRequestDTO) {
-        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursoredHighlight(cursorCommonRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(Authentication authentication, CursorCommonRequestDTO cursorCommonRequestDTO) {
+        return ResponseEntity.ok(featuredFileSystemItemService.retrieveCursoredHighlight(authentication, cursorCommonRequestDTO));
     }
 
     @Override

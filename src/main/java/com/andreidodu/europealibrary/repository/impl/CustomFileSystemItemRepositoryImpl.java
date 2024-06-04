@@ -34,7 +34,6 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CustomFileSystemItemRepositoryImpl extends CommonRepository implements CustomFileSystemItemRepository {
-    public static final QStripeCustomerProductsOwned STRIPE_CUSTOMER_PRODUCTS_OWNED = QStripeCustomerProductsOwned.stripeCustomerProductsOwned;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -472,31 +471,10 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         return this.basicRetrieve(commonRequestDTO.getNextCursor(), commonRequestDTO.getLimit(), booleanBuilder, order, OrderEnum.DESC);
     }
 
-    private static void applyCommonFilter(QFileSystemItem fileSystemItem, PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
-        if (!paginatedExplorerOptions.isAdministratorFlag()) {
-            booleanBuilder.and(
-                    fileSystemItem.fileMetaInfoId.isNull()
-                            .or(fileSystemItem.fileMetaInfo.hidden.eq(false))
-                            .or(isProductOwner(fileSystemItem, paginatedExplorerOptions, booleanBuilder))
-            );
-        } // else is admin and allow to view hidden/unhidden e-books
+    private void applyCommonFilter(QFileSystemItem fileSystemItem, PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
+        super.applyCommonFilter(fileSystemItem.fileMetaInfo, paginatedExplorerOptions, booleanBuilder);
     }
 
-    private static Predicate isProductOwner(QFileSystemItem fileSystemItem, PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
-
-        if (paginatedExplorerOptions.getUsername() == null) {
-            return Expressions.asBoolean(false).isTrue();
-        }
-
-        return JPAExpressions
-                .select(fileSystemItem.fileMetaInfo)
-                .from(fileSystemItem)
-                .where(fileSystemItem.fileMetaInfo.id.in(JPAExpressions.selectDistinct(STRIPE_CUSTOMER_PRODUCTS_OWNED.stripeProduct.fileMetaInfo.id)
-                        .from(STRIPE_CUSTOMER_PRODUCTS_OWNED)
-                        .where(STRIPE_CUSTOMER_PRODUCTS_OWNED.stripeCustomer.user.username.eq(paginatedExplorerOptions.getUsername()))
-                ))
-                .exists();
-    }
 
     public List<FileSystemItem> basicRetrieve(Long cursorId, Integer limit, BooleanBuilder customWhere, OrderSpecifier<?>[] customOrder, OrderEnum order) {
         int numberOfResults = LimitUtil.calculateLimit(limit, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
