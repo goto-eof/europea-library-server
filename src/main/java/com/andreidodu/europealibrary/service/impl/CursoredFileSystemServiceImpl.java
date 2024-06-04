@@ -57,7 +57,6 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     private final TagMapper tagMapper;
 
 
-
     @Override
     public CursoredFileSystemItemDTO readDirectory(Authentication authentication, CursorRequestDTO cursorRequestDTO) {
         return Optional.ofNullable(cursorRequestDTO.getParentId())
@@ -306,9 +305,14 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
         GenericCursoredResponseDTO<String, FileSystemItemDTO> responseDTO = new GenericCursoredResponseDTO<>();
         responseDTO.setParent("By Top Rated");
         PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
-        PairDTO<List<FileSystemItem>, Long> pair = this.fileSystemItemRepository.retrieveChildrenByCursoredRating(paginatedExplorerOptions, cursorRequestDTO);
+        PairDTO<List<PairDTO<FileSystemItem, PairDTO<Double, Long>>>, Long> pair = this.fileSystemItemRepository.retrieveChildrenByCursoredRating(paginatedExplorerOptions, cursorRequestDTO);
         responseDTO.setChildrenList(pair.getVal1().stream()
-                .map(fileSystemItemLessMapper::toDTOWithParentDTORecursively)
+                .map(item -> {
+                    FileSystemItemDTO fsi = fileSystemItemLessMapper.toDTOWithParentDTORecursively(item.getVal1());
+                    fsi.setAverageRating(Optional.ofNullable(item.getVal2().getVal1()).orElse(0.0));
+                    fsi.setRatingsCount(Optional.ofNullable(item.getVal2().getVal2()).orElse(0L));
+                    return fsi;
+                })
                 .collect(Collectors.toList()));
         responseDTO.setNextCursor(pair.getVal2());
         return responseDTO;

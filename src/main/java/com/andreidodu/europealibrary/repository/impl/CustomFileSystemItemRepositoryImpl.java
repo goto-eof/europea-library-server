@@ -54,7 +54,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
         booleanBuilder.and(fileSystemItem.parent.id.eq(parentId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         if (cursorId != null) {
@@ -83,7 +83,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
         booleanBuilder.and(fileSystemItem.isDirectory.isNull().or(fileSystemItem.isDirectory.isFalse()));
@@ -118,7 +118,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QTag tag = QTag.tag;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         booleanBuilder.and(tag.id.eq(tagId));
         booleanBuilder.and(fileSystemItem.jobStep.eq(JobStepEnum.READY.getStepNumber()));
@@ -144,7 +144,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.extension.eq(cursorTypeRequestDTO.getExtension()));
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
@@ -192,7 +192,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.language.eq(cursorRequestDTO.getParent()));
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
@@ -207,7 +207,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publisher.eq(cursorRequestDTO.getParent()));
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
                 fileSystemItem.downloadCount.desc(), fileSystemItem.id.asc()
@@ -292,7 +292,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QFileSystemItem fileSystemItem = QFileSystemItem.fileSystemItem;
 
         BooleanBuilder booleanBuilder = applySearchFilters(searchFileSystemItemRequestDTO, fileSystemItem);
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         int numberOfResults = LimitUtil.calculateLimit(searchFileSystemItemRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
@@ -380,7 +380,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         booleanBuilder.and(fileSystemItem.fileMetaInfo.bookInfo.publishedDate.eq(cursorRequestDTO.getParent()));
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         OrderSpecifier<?>[] customOrder = new OrderSpecifier[]{
                 fileSystemItem.id.asc()
@@ -390,13 +390,13 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public PairDTO<List<FileSystemItem>, Long> retrieveChildrenByCursoredRating(PaginatedExplorerOptions paginatedExplorerOptions, CursorCommonRequestDTO cursorRequestDTO) {
+    public PairDTO<List<PairDTO<FileSystemItem, PairDTO<Double, Long>>>, Long> retrieveChildrenByCursoredRating(PaginatedExplorerOptions paginatedExplorerOptions, CursorCommonRequestDTO cursorRequestDTO) {
         int numberOfResults = LimitUtil.calculateLimit(cursorRequestDTO.getLimit(), ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
 
         QFileSystemItemTopRatedView qFileSystemItemTopRatedView = QFileSystemItemTopRatedView.fileSystemItemTopRatedView;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(qFileSystemItemTopRatedView.fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         Long startRowNumber = CursoredUtil.calculateRowNumber(cursorRequestDTO.getNextCursor());
         Long endRowNumber = CursoredUtil.calculateMaxRowNumber(startRowNumber, numberOfResults);
@@ -415,8 +415,9 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
             endRowNumber = null;
         }
 
-        List<FileSystemItem> children = fileSystemItemTopRatedViewList
-                .stream().map(FileSystemItemTopRatedView::getFileSystemItem)
+        List<PairDTO<FileSystemItem, PairDTO<Double, Long>>> children = fileSystemItemTopRatedViewList
+                .stream()
+                .map(item -> new PairDTO<FileSystemItem, PairDTO<Double, Long>>(item.getFileSystemItem(), new PairDTO<Double, Long>(item.getAverageRating(), item.getRatingsCount())))
                 .toList();
 
         return new PairDTO<>(children, endRowNumber);
@@ -430,7 +431,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QFileSystemItemTopDownloadsView fileSystemItemTopDownloadsView = QFileSystemItemTopDownloadsView.fileSystemItemTopDownloadsView;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItemTopDownloadsView.fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         Optional.ofNullable(cursoredRequestByFileTypeDTO.getFileType())
                 .ifPresent(extension -> booleanBuilder.and(fileSystemItemTopDownloadsView.fileSystemItem.extension.eq(extension)));
@@ -444,6 +445,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 .select(fileSystemItemTopDownloadsView)
                 .from(fileSystemItemTopDownloadsView)
                 .where(booleanBuilder)
+                .orderBy(fileSystemItemTopDownloadsView.id.asc())
                 .fetch();
 
         if (fileSystemItemTopDownloadsViewList.isEmpty() || fileSystemItemTopDownloadsViewList.size() < numberOfResults || startRowNumber > fileSystemItemTopDownloadsViewList.get(fileSystemItemTopDownloadsViewList.size() - 1).getId()) {
@@ -464,22 +466,22 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
                 fileSystemItem.id.desc()
         };
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         return this.basicRetrieve(commonRequestDTO.getNextCursor(), commonRequestDTO.getLimit(), booleanBuilder, order, OrderEnum.DESC);
     }
 
-    private static void applyCommonFilter(PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
+    private static void applyCommonFilter(QFileSystemItem fileSystemItem, PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
         if (!paginatedExplorerOptions.isAdministratorFlag()) {
             booleanBuilder.and(
                     fileSystemItem.fileMetaInfoId.isNull()
                             .or(fileSystemItem.fileMetaInfo.hidden.eq(false))
-                            .or(isProductOwner(paginatedExplorerOptions, booleanBuilder))
+                            .or(isProductOwner(fileSystemItem, paginatedExplorerOptions, booleanBuilder))
             );
         } // else is admin and allow to view hidden/unhidden e-books
     }
 
-    private static Predicate isProductOwner(PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
+    private static Predicate isProductOwner(QFileSystemItem fileSystemItem, PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
         return JPAExpressions
                 .select(fileSystemItem.fileMetaInfo)
                 .from(fileSystemItem)
@@ -523,7 +525,7 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
         QFileSystemItemTopSoldView topSold = QFileSystemItemTopSoldView.fileSystemItemTopSoldView;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        applyCommonFilter(paginatedExplorerOptions, booleanBuilder);
+        applyCommonFilter(topSold.fileSystemItem, paginatedExplorerOptions, booleanBuilder);
 
         Long nextCursor = commonCursoredRequestDTO.getNextCursor() != null ? commonCursoredRequestDTO.getNextCursor() : new JPAQuery<Long>(entityManager)
                 .select(topSold.id.min())
