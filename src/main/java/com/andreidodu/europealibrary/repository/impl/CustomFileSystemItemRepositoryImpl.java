@@ -19,6 +19,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -482,6 +483,11 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     private static Predicate isProductOwner(QFileSystemItem fileSystemItem, PaginatedExplorerOptions paginatedExplorerOptions, BooleanBuilder booleanBuilder) {
+
+        if (paginatedExplorerOptions.getUsername() == null) {
+            return Expressions.asBoolean(false).isTrue();
+        }
+
         return JPAExpressions
                 .select(fileSystemItem.fileMetaInfo)
                 .from(fileSystemItem)
