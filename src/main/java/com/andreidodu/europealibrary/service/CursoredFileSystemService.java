@@ -16,15 +16,15 @@ public interface CursoredFileSystemService {
 
     CursoredTagDTO retrieveByTagId(Authentication authentication, CursorRequestDTO cursorRequestDTO);
 
-    List<FileExtensionDTO> getAllExtensions();
+    List<FileExtensionDTO> getAllExtensions(Authentication authentication);
 
     CursoredFileExtensionDTO retrieveByFileExtension(Authentication authentication, CursorTypeRequestDTO cursorTypeRequestDTO);
 
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_LANGUAGES})
-    List<ItemAndFrequencyDTO> retrieveAllLanguages();
+    List<ItemAndFrequencyDTO> retrieveAllLanguages(Authentication authentication);
 
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHERS})
-    List<ItemAndFrequencyDTO> retrieveAllPublishers();
+    List<ItemAndFrequencyDTO> retrieveAllPublishers(Authentication authentication);
 
     DownloadDTO retrieveResourceForDownload(Authentication authentication, Long fileSystemId);
 
@@ -36,7 +36,7 @@ public interface CursoredFileSystemService {
 
     GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublisher(Authentication authentication, GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    List<ItemAndFrequencyDTO> retrieveAllPublishedDates();
+    List<ItemAndFrequencyDTO> retrieveAllPublishedDates(Authentication authentication);
 
     GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublishedDate(Authentication authentication, GenericCursorRequestDTO<String> cursorRequestDTO);
 

@@ -7,7 +7,6 @@ import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.model.*;
 import com.andreidodu.europealibrary.model.security.User;
-import com.andreidodu.europealibrary.model.stripe.QStripeCustomerProductsOwned;
 import com.andreidodu.europealibrary.repository.CategoryRepository;
 import com.andreidodu.europealibrary.repository.CustomFileSystemItemRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemTopSoldViewRepository;
@@ -18,8 +17,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -154,12 +151,17 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<FileExtensionProjection> retrieveExtensionsInfo() {
+    public List<FileExtensionProjection> retrieveExtensionsInfo(PaginatedExplorerOptions paginatedExplorerOptions) {
         QFileSystemItem fileSystemItem = new QFileSystemItem("outerFSI");
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QFileMetaInfo fileMetaInfo = QFileMetaInfo.fileMetaInfo;
+        applyCommonFilter(fileMetaInfo, paginatedExplorerOptions, booleanBuilder);
         QFileExtensionProjection fileExtensionProjection = createFileExtensionProjection(fileSystemItem);
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(fileExtensionProjection)
                 .from(fileSystemItem)
+                .innerJoin(fileSystemItem.fileMetaInfo, fileMetaInfo)
+                .where(booleanBuilder)
                 .groupBy(fileSystemItem.extension)
                 .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
                 .having(fileSystemItem.extension.trim().length().gt(0))
@@ -174,12 +176,17 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<ItemAndFrequencyProjection> retrieveLanguagesInfo() {
+    public List<ItemAndFrequencyProjection> retrieveLanguagesInfo(PaginatedExplorerOptions paginatedExplorerOptions) {
         QFileSystemItem fileSystemItem = new QFileSystemItem("outerFSI");
         QItemAndFrequencyProjection projection = createItemAndFrequencyProjectionByLanguage(fileSystemItem);
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QFileMetaInfo fileMetaInfo = QFileMetaInfo.fileMetaInfo;
+        applyCommonFilter(fileMetaInfo, paginatedExplorerOptions, booleanBuilder);
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(projection)
                 .from(fileSystemItem)
+                .innerJoin(fileSystemItem.fileMetaInfo, fileMetaInfo)
+                .where(booleanBuilder)
                 .groupBy(fileSystemItem.fileMetaInfo.bookInfo.language)
                 .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
                 .having(fileSystemItem.fileMetaInfo.bookInfo.language.trim().length().gt(0))
@@ -217,12 +224,17 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
     }
 
     @Override
-    public List<ItemAndFrequencyProjection> retrievePublishedDatesInfo() {
+    public List<ItemAndFrequencyProjection> retrievePublishedDatesInfo(PaginatedExplorerOptions paginatedExplorerOptions) {
         QFileSystemItem fileSystemItem = new QFileSystemItem("outerFSI");
         QItemAndFrequencyProjection projection = createItemAndFrequencyProjectionByPublishedDate(fileSystemItem);
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QFileMetaInfo fileMetaInfo = QFileMetaInfo.fileMetaInfo;
+        applyCommonFilter(fileMetaInfo, paginatedExplorerOptions, booleanBuilder);
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(projection)
                 .from(fileSystemItem)
+                .innerJoin(fileSystemItem.fileMetaInfo, fileMetaInfo)
+                .where(booleanBuilder)
                 .groupBy(fileSystemItem.fileMetaInfo.bookInfo.publishedDate)
                 .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
                 .having(fileSystemItem.fileMetaInfo.bookInfo.publishedDate.trim().length().gt(0))
@@ -249,12 +261,17 @@ public class CustomFileSystemItemRepositoryImpl extends CommonRepository impleme
 
 
     @Override
-    public List<ItemAndFrequencyProjection> retrievePublishersInfo() {
+    public List<ItemAndFrequencyProjection> retrievePublishersInfo(PaginatedExplorerOptions paginatedExplorerOptions) {
         QFileSystemItem fileSystemItem = new QFileSystemItem("outerFSI");
         QItemAndFrequencyProjection projection = createItemAndFrequencyByPublisherProjection(fileSystemItem);
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        QFileMetaInfo fileMetaInfo = QFileMetaInfo.fileMetaInfo;
+        applyCommonFilter(fileMetaInfo, paginatedExplorerOptions, booleanBuilder);
         return new JPAQuery<FileSystemItem>(entityManager)
                 .select(projection)
                 .from(fileSystemItem)
+                .innerJoin(fileSystemItem.fileMetaInfo, fileMetaInfo)
+                .where(booleanBuilder)
                 .groupBy(fileSystemItem.fileMetaInfo.bookInfo.publisher)
                 .orderBy(new OrderSpecifier<>(Order.DESC, Expressions.numberPath(Long.class, "cnt")))
                 .having(fileSystemItem.fileMetaInfo.bookInfo.publisher.trim().length().gt(0))

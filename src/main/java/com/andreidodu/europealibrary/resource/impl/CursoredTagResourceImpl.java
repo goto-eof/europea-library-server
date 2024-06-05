@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,8 +18,8 @@ public class CursoredTagResourceImpl implements CursoredTagResource {
     private final TagService tagService;
 
     @Override
-    public ResponseEntity<CursorDTO<TagDTO>> retrieveTagsCursored(@RequestBody CommonCursoredRequestDTO commonCursoredRequestDTO) {
-        return ResponseEntity.ok(this.tagService.retrieveAllTags(commonCursoredRequestDTO));
+    public ResponseEntity<CursorDTO<TagDTO>> retrieveTagsCursored(Authentication authentication, @RequestBody CommonCursoredRequestDTO commonCursoredRequestDTO) {
+        return ResponseEntity.ok(this.tagService.retrieveAllTags(authentication, commonCursoredRequestDTO));
     }
 
     @Override

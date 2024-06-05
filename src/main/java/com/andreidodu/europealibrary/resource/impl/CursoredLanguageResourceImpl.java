@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +23,13 @@ public class CursoredLanguageResourceImpl implements CursoredLanguageResource {
     private final BookInfoService bookInfoService;
 
     @Override
-    public ResponseEntity<List<ItemAndFrequencyDTO>> retrieveLanguages() {
-        return ResponseEntity.ok(this.service.retrieveAllLanguages());
+    public ResponseEntity<List<ItemAndFrequencyDTO>> retrieveLanguages(Authentication authentication) {
+        return ResponseEntity.ok(this.service.retrieveAllLanguages(authentication));
     }
 
     @Override
-    public ResponseEntity<OperationStatusDTO> bulkLanguageRename(@Valid @RequestBody RenameDTO renameDTO) {
-        return ResponseEntity.ok(this.bookInfoService.bulkLanguageRename(renameDTO));
+    public ResponseEntity<OperationStatusDTO> bulkLanguageRename(Authentication authentication, @Valid @RequestBody RenameDTO renameDTO) {
+        return ResponseEntity.ok(this.bookInfoService.bulkLanguageRename(authentication, renameDTO));
     }
 
 }

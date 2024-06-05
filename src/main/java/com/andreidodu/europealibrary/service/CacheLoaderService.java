@@ -1,17 +1,19 @@
 package com.andreidodu.europealibrary.service;
 
+import org.springframework.security.core.Authentication;
+
 public interface CacheLoaderService {
-    void reload();
+    void reload(Authentication authentication);
 
-    void reloadExtensionsInCache();
+    void reloadExtensionsInCache(Authentication authentication);
 
-    void reloadTagsInCache();
+    void reloadTagsInCache(Authentication authentication);
 
-    void reloadCategoriesInCache();
+    void reloadCategoriesInCache(Authentication authentication);
 
-    void reloadLanguagesInCache();
+    void reloadLanguagesInCache(Authentication authentication);
 
-    void reloadPublishersInCache();
+    void reloadPublishersInCache(Authentication authentication);
 
-    void reloadPublishedDatesInCache();
+    void reloadPublishedDatesInCache(Authentication authentication);
 }

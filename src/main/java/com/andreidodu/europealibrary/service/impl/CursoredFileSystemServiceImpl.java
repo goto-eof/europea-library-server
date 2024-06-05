@@ -135,8 +135,9 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_EXTENSIONS})
-    public List<FileExtensionDTO> getAllExtensions() {
-        return this.fileExtensionMapper.toDTO(this.fileSystemItemRepository.retrieveExtensionsInfo());
+    public List<FileExtensionDTO> getAllExtensions(Authentication authentication) {
+        PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
+        return this.fileExtensionMapper.toDTO(this.fileSystemItemRepository.retrieveExtensionsInfo(paginatedExplorerOptions));
     }
 
     @Override
@@ -159,16 +160,18 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_LANGUAGES})
     @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES_SECONDS, propagation = Propagation.REQUIRED)
-    public List<ItemAndFrequencyDTO> retrieveAllLanguages() {
-        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrieveLanguagesInfo());
+    public List<ItemAndFrequencyDTO> retrieveAllLanguages(Authentication authentication) {
+        PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
+        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrieveLanguagesInfo(paginatedExplorerOptions));
     }
 
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHERS})
     @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES_SECONDS, propagation = Propagation.REQUIRED)
-    public List<ItemAndFrequencyDTO> retrieveAllPublishers() {
-        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishersInfo());
+    public List<ItemAndFrequencyDTO> retrieveAllPublishers(Authentication authentication) {
+        PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
+        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishersInfo(paginatedExplorerOptions));
     }
 
     @Override
@@ -279,8 +282,9 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHED_DATES})
     @Transactional(timeout = PersistenceConst.TIMEOUT_DEMANDING_QUERIES_SECONDS, propagation = Propagation.REQUIRED)
-    public List<ItemAndFrequencyDTO> retrieveAllPublishedDates() {
-        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishedDatesInfo());
+    public List<ItemAndFrequencyDTO> retrieveAllPublishedDates(Authentication authentication) {
+        PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
+        return this.itemAndFrequencyMapper.toDTO(this.fileSystemItemRepository.retrievePublishedDatesInfo(paginatedExplorerOptions));
     }
 
     @Override

@@ -35,6 +35,7 @@ public abstract class CommonRepository {
         // is e-book owner, then allow to retrieve the hidden e-book
         booleanBuilder.and(
                 fileMetaInfo.isNull()
+                        .or(fileMetaInfo.hidden.eq(false))
                         .or(isProductOwner(fileMetaInfo, paginatedExplorerOptions, booleanBuilder))
         );
     }
@@ -43,16 +44,13 @@ public abstract class CommonRepository {
         return JPAExpressions
                 .select(fileMetaInfo)
                 .from(fileMetaInfo)
-                .where(fileMetaInfo.isNull()
-                        .or(fileMetaInfo.hidden.eq(false))
-                        .or(
-                                fileMetaInfo.id.in(
-                                        JPAExpressions
-                                                .selectDistinct(stripeCustomerProductsOwned.stripeProduct.fileMetaInfo.id)
-                                                .from(stripeCustomerProductsOwned)
-                                                .where(stripeCustomerProductsOwned.stripeCustomer.user.username.eq(paginatedExplorerOptions.getUsername())
-                                                )
-                                )
+                .where(
+                        fileMetaInfo.id.in(
+                                JPAExpressions
+                                        .selectDistinct(stripeCustomerProductsOwned.stripeProduct.fileMetaInfo.id)
+                                        .from(stripeCustomerProductsOwned)
+                                        .where(stripeCustomerProductsOwned.stripeCustomer.user.username.eq(paginatedExplorerOptions.getUsername())
+                                        )
                         )
                 )
                 .exists();

@@ -6,6 +6,7 @@ import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.RenameDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,9 +17,9 @@ import java.util.List;
 @RequestMapping("/api/v1/publishedDate")
 public interface CursoredPublishedDateResource {
     @GetMapping
-    ResponseEntity<List<ItemAndFrequencyDTO>> retrievePublishedDateCursored();
+    ResponseEntity<List<ItemAndFrequencyDTO>> retrievePublishedDateCursored(Authentication authentication);
 
     @AllowOnlyAdministrator
     @PostMapping("/rename")
-    ResponseEntity<OperationStatusDTO> bulkPublishedDateRename(@Valid @RequestBody RenameDTO renameDTO);
+    ResponseEntity<OperationStatusDTO> bulkPublishedDateRename(Authentication authentication, @Valid @RequestBody RenameDTO renameDTO);
 }

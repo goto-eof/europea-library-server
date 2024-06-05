@@ -74,7 +74,7 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
 
     @Override
     public ResponseEntity<List<FileExtensionDTO>> retrieveFileExtensions(Authentication authentication) {
-        return ResponseEntity.ok(cursoredFileSystemService.getAllExtensions());
+        return ResponseEntity.ok(cursoredFileSystemService.getAllExtensions(authentication));
     }
 
     @Override

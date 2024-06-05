@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.security.core.Authentication;
 
 @SpringBootApplication(exclude = HibernateJpaAutoConfiguration.class)
 @RequiredArgsConstructor
@@ -16,12 +17,12 @@ public class EuropeaLibraryApplication {
 
     public static void main(String[] args) {
         var context = SpringApplication.run(EuropeaLibraryApplication.class, args);
-        postApplicationRun(context);
+        postApplicationRun(null, context);
     }
 
-    private static void postApplicationRun(ConfigurableApplicationContext context) {
+    private static void postApplicationRun(Authentication authentication, ConfigurableApplicationContext context) {
         PostApplicationRunUtil postApplicationRunUtil = context.getBean(PostApplicationRunUtil.class);
-        postApplicationRunUtil.loadCache();
+        postApplicationRunUtil.loadCache(authentication);
         postApplicationRunUtil.addDefaultUsersAndRolesIfNecessary();
         postApplicationRunUtil.createDefaultApplicationSettings();
     }

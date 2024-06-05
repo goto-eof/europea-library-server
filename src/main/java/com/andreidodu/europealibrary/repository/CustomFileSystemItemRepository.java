@@ -18,19 +18,19 @@ public interface CustomFileSystemItemRepository {
 
     List<FileSystemItem> retrieveChildrenByCursoredFileExtension(PaginatedExplorerOptions paginatedExplorerOptions, CursorTypeRequestDTO cursorTypeRequestDTO);
 
-    List<FileExtensionProjection> retrieveExtensionsInfo();
+    List<FileExtensionProjection> retrieveExtensionsInfo(PaginatedExplorerOptions paginatedExplorerOptions);
 
-    List<ItemAndFrequencyProjection> retrievePublishersInfo();
+    List<ItemAndFrequencyProjection> retrievePublishersInfo(PaginatedExplorerOptions paginatedExplorerOptions);
 
     List<FileSystemItem> search(PaginatedExplorerOptions paginatedExplorerOptions, SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
 
-    List<ItemAndFrequencyProjection> retrieveLanguagesInfo();
+    List<ItemAndFrequencyProjection> retrieveLanguagesInfo(PaginatedExplorerOptions paginatedExplorerOptions);
 
     List<FileSystemItem> retrieveChildrenByCursoredLanguage(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO);
 
     List<FileSystemItem> retrieveChildrenByCursoredPublisher(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    List<ItemAndFrequencyProjection> retrievePublishedDatesInfo();
+    List<ItemAndFrequencyProjection> retrievePublishedDatesInfo(PaginatedExplorerOptions paginatedExplorerOptions);
 
     List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO);
 
