@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.dto.OperationStatusDTO;
 import com.andreidodu.europealibrary.dto.RenameDTO;
 import com.andreidodu.europealibrary.dto.common.FileMetaInfoDTO;
 import com.stripe.exception.StripeException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface BookInfoService {
@@ -18,11 +19,11 @@ public interface BookInfoService {
 
 //    FileMetaInfoBookDTO retrieveByFileSystemItemId(Long fileSystemItemId);
 
-    OperationStatusDTO bulkLanguageRename(RenameDTO renameDTO);
+    OperationStatusDTO bulkLanguageRename(Authentication authentication, RenameDTO renameDTO);
 
-    OperationStatusDTO bulkPublisherRename(RenameDTO renameDTO);
+    OperationStatusDTO bulkPublisherRename(Authentication authentication, RenameDTO renameDTO);
 
-    OperationStatusDTO bulkPublishedDateRename(RenameDTO renameDTO);
+    OperationStatusDTO bulkPublishedDateRename(Authentication authentication, RenameDTO renameDTO);
 
     OperationStatusDTO lock(Long fileMetaInfoId);
 

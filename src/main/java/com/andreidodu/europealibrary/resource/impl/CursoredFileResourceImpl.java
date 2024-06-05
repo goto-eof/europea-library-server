@@ -24,62 +24,62 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
 
     @Override
     public ResponseEntity<FileSystemItemDTO> get(Authentication authentication, Long fileSystemItemId) {
-        return ResponseEntity.ok(cursoredFileSystemService.get(authentication != null ? authentication.getName() : null, fileSystemItemId));
+        return ResponseEntity.ok(cursoredFileSystemService.get(authentication, fileSystemItemId));
     }
 
     @Override
     public ResponseEntity<FileSystemItemDTO> getByFileMetaInfoId(Authentication authentication, Long fileMetaInfoId) {
-        return ResponseEntity.ok(cursoredFileSystemService.getByFileMetaInfoId(authentication != null ? authentication.getName() : null, fileMetaInfoId));
+        return ResponseEntity.ok(cursoredFileSystemService.getByFileMetaInfoId(authentication, fileMetaInfoId));
     }
 
     @Override
-    public ResponseEntity<CursoredFileSystemItemDTO> retrieveCursored(@RequestBody CursorRequestDTO cursorRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.readDirectory(cursorRequestDTO));
+    public ResponseEntity<CursoredFileSystemItemDTO> retrieveCursored(Authentication authentication, @RequestBody CursorRequestDTO cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.readDirectory(authentication, cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<CursoredFileSystemItemDTO> retrieveCursoredRoot() {
-        return ResponseEntity.ok(cursoredFileSystemService.readDirectory());
+    public ResponseEntity<CursoredFileSystemItemDTO> retrieveCursoredRoot(Authentication authentication) {
+        return ResponseEntity.ok(cursoredFileSystemService.readDirectory(authentication));
     }
 
     @Override
-    public ResponseEntity<CursoredCategoryDTO> retrieveByCategoryId(@RequestBody CursorRequestDTO cursorRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveByCategoryId(cursorRequestDTO));
+    public ResponseEntity<CursoredCategoryDTO> retrieveByCategoryId(Authentication authentication, @RequestBody CursorRequestDTO cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByCategoryId(authentication, cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<CursoredTagDTO> retrieveByTagId(@RequestBody CursorRequestDTO cursorRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveByTagId(cursorRequestDTO));
+    public ResponseEntity<CursoredTagDTO> retrieveByTagId(Authentication authentication, @RequestBody CursorRequestDTO cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByTagId(authentication, cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByLanguage(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveByLanguage(cursorRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByLanguage(Authentication authentication, @RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByLanguage(authentication, cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByPublishedDate(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublishedDate(cursorRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByPublishedDate(Authentication authentication, @RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublishedDate(authentication, cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByPublisher(@RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublisher(cursorRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveByPublisher(Authentication authentication, @RequestBody GenericCursorRequestDTO<String> cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByPublisher(authentication, cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<CursoredFileExtensionDTO> retrieveCursoredByFileExtension(@RequestBody CursorTypeRequestDTO cursorTypeRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveByFileExtension(cursorTypeRequestDTO));
+    public ResponseEntity<CursoredFileExtensionDTO> retrieveCursoredByFileExtension(Authentication authentication, @RequestBody CursorTypeRequestDTO cursorTypeRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveByFileExtension(authentication, cursorTypeRequestDTO));
     }
 
     @Override
-    public ResponseEntity<List<FileExtensionDTO>> retrieveFileExtensions() {
-        return ResponseEntity.ok(cursoredFileSystemService.getAllExtensions());
+    public ResponseEntity<List<FileExtensionDTO>> retrieveFileExtensions(Authentication authentication) {
+        return ResponseEntity.ok(cursoredFileSystemService.getAllExtensions(authentication));
     }
 
     @Override
     public ResponseEntity<InputStreamResource> download(Authentication authentication, @PathVariable Long fileSystemItemId) {
-        DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(authentication.getName(), fileSystemItemId);
+        DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(authentication, fileSystemItemId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -93,33 +93,33 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     }
 
     @Override
-    public ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(@RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.search(searchFileSystemItemRequestDTO));
+    public ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(Authentication authentication, @RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.search(authentication, searchFileSystemItemRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByRating(CursorCommonRequestDTO cursorRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByRating(cursorRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByRating(Authentication authentication, CursorCommonRequestDTO cursorRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByRating(authentication, cursorRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCount(cursoredRequestByFileTypeDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredByDownloadCount(Authentication authentication, CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCount(authentication, cursoredRequestByFileTypeDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredByDownloadCountHighlight(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCountHighlight(cursoredRequestByFileTypeDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredByDownloadCountHighlight(Authentication authentication, CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveCursoredByDownloadCountHighlight(authentication, cursoredRequestByFileTypeDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredNew(CursorCommonRequestDTO commonRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveNewCursored(commonRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursoredNew(Authentication authentication, CursorCommonRequestDTO commonRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveNewCursored(authentication, commonRequestDTO));
     }
 
     @Override
-    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredNewHighlight(CursorCommonRequestDTO commonRequestDTO) {
-        return ResponseEntity.ok(cursoredFileSystemService.retrieveNewCursoredHighlight(commonRequestDTO));
+    public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredNewHighlight(Authentication authentication, CursorCommonRequestDTO commonRequestDTO) {
+        return ResponseEntity.ok(cursoredFileSystemService.retrieveNewCursoredHighlight(authentication, commonRequestDTO));
     }
 
 }

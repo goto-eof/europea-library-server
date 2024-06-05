@@ -3,6 +3,7 @@ package com.andreidodu.europealibrary.repository.impl;
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CursorCommonRequestDTO;
+import com.andreidodu.europealibrary.dto.PaginatedExplorerOptions;
 import com.andreidodu.europealibrary.dto.PairDTO;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
@@ -28,7 +29,7 @@ public class CustomFeaturedFileSystemItemRepositoryImpl extends CommonRepository
     private EntityManager entityManager;
 
     @Override
-    public PairDTO<List<FileSystemItem>, Long> retrieveCursored(CursorCommonRequestDTO commonRequestDTO) {
+    public PairDTO<List<FileSystemItem>, Long> retrieveCursored(PaginatedExplorerOptions paginatedExplorerOptions, CursorCommonRequestDTO commonRequestDTO) {
 
         Long cursorId = commonRequestDTO.getNextCursor();
         int numberOfResults = LimitUtil.calculateLimit(commonRequestDTO, ApplicationConst.FILE_SYSTEM_EXPLORER_MAX_ITEMS_RETRIEVE);
@@ -36,6 +37,8 @@ public class CustomFeaturedFileSystemItemRepositoryImpl extends CommonRepository
         QFeaturedFileMetaInfo featuredFileMetaInfo = QFeaturedFileMetaInfo.featuredFileMetaInfo;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        super.applyCommonFilter(featuredFileMetaInfo.fileMetaInfo, paginatedExplorerOptions, booleanBuilder);
 
         if (cursorId != null) {
             booleanBuilder.and(featuredFileMetaInfo.id.loe(cursorId));

@@ -3,51 +3,52 @@ package com.andreidodu.europealibrary.service;
 import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.dto.*;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
 public interface CursoredFileSystemService {
-    CursoredFileSystemItemDTO readDirectory(CursorRequestDTO cursorRequestDTO);
+    CursoredFileSystemItemDTO readDirectory(Authentication authentication, CursorRequestDTO cursorRequestDTO);
 
-    CursoredFileSystemItemDTO readDirectory();
+    CursoredFileSystemItemDTO readDirectory(Authentication authentication);
 
-    CursoredCategoryDTO retrieveByCategoryId(CursorRequestDTO cursorRequestDTO);
+    CursoredCategoryDTO retrieveByCategoryId(Authentication authentication, CursorRequestDTO cursorRequestDTO);
 
-    CursoredTagDTO retrieveByTagId(CursorRequestDTO cursorRequestDTO);
+    CursoredTagDTO retrieveByTagId(Authentication authentication, CursorRequestDTO cursorRequestDTO);
 
-    List<FileExtensionDTO> getAllExtensions();
+    List<FileExtensionDTO> getAllExtensions(Authentication authentication);
 
-    CursoredFileExtensionDTO retrieveByFileExtension(CursorTypeRequestDTO cursorTypeRequestDTO);
+    CursoredFileExtensionDTO retrieveByFileExtension(Authentication authentication, CursorTypeRequestDTO cursorTypeRequestDTO);
 
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_LANGUAGES})
-    List<ItemAndFrequencyDTO> retrieveAllLanguages();
+    List<ItemAndFrequencyDTO> retrieveAllLanguages(Authentication authentication);
 
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHERS})
-    List<ItemAndFrequencyDTO> retrieveAllPublishers();
+    List<ItemAndFrequencyDTO> retrieveAllPublishers(Authentication authentication);
 
-    DownloadDTO retrieveResourceForDownload(String username, Long fileSystemId);
+    DownloadDTO retrieveResourceForDownload(Authentication authentication, Long fileSystemId);
 
-    FileSystemItemDTO get(String username, Long fileSystemItemId);
+    FileSystemItemDTO get(Authentication authentication, Long fileSystemItemId);
 
-    SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> search(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
+    SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO> search(Authentication authentication, SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByLanguage(GenericCursorRequestDTO<String> cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByLanguage(Authentication authentication, GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublisher(GenericCursorRequestDTO<String> cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublisher(Authentication authentication, GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    List<ItemAndFrequencyDTO> retrieveAllPublishedDates();
+    List<ItemAndFrequencyDTO> retrieveAllPublishedDates(Authentication authentication);
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveByPublishedDate(Authentication authentication, GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByRating(CursorCommonRequestDTO cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByRating(Authentication authentication, CursorCommonRequestDTO cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursoredByDownloadCount(Authentication authentication, CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveNewCursored(CursorCommonRequestDTO cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveNewCursored(Authentication authentication, CursorCommonRequestDTO cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveNewCursoredHighlight(CursorCommonRequestDTO cursorRequestDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveNewCursoredHighlight(Authentication authentication, CursorCommonRequestDTO cursorRequestDTO);
 
-    GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredByDownloadCountHighlight(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
+    GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredByDownloadCountHighlight(Authentication authentication, CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
 
-    FileSystemItemDTO getByFileMetaInfoId(String username, Long fileMetaInfoId);
+    FileSystemItemDTO getByFileMetaInfoId(Authentication authentication, Long fileMetaInfoId);
 }

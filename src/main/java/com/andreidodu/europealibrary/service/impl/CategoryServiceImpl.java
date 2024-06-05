@@ -17,6 +17,7 @@ import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,10 +36,11 @@ public class CategoryServiceImpl extends CursoredServiceCommon implements Catego
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_CATEGORIES})
-    public CursorDTO<CategoryDTO> retrieveAllCategories(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+    public CursorDTO<CategoryDTO> retrieveAllCategories(Authentication authentication, CommonCursoredRequestDTO commonCursoredRequestDTO) {
         int limit = LimitUtil.calculateLimit(commonCursoredRequestDTO, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE);
         CursorDTO<CategoryDTO> cursoredResult = new CursorDTO<>();
-        List<Category> categoryList = this.categoryRepository.retrieveCategoriesCursored(commonCursoredRequestDTO);
+        PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
+        List<Category> categoryList = this.categoryRepository.retrieveCategoriesCursored(paginatedExplorerOptions, commonCursoredRequestDTO);
         List<CategoryDTO> categoryListDTO = this.categoryMapper.toDTO(limit(categoryList, limit, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE, OrderEnum.ASC));
         calculateNextId(categoryList, limit, ApplicationConst.CATEGORIES_MAX_ITEMS_RETRIEVE, OrderEnum.ASC)
                 .ifPresent(cursoredResult::setNextCursor);

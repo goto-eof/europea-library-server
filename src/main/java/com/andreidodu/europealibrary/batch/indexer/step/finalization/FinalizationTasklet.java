@@ -12,6 +12,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -25,7 +26,7 @@ public class FinalizationTasklet implements Tasklet {
 
     public RepeatStatus execute(StepContribution contribution,
                                 ChunkContext chunkContext) {
-        clearAndReloadCache();
+        clearAndReloadCache(null);
         this.applicationSettingsService.unlockApplication();
 
         restoreFeaturedFileSystemItemId(chunkContext);
@@ -41,9 +42,9 @@ public class FinalizationTasklet implements Tasklet {
         }
     }
 
-    private void clearAndReloadCache() {
+    private void clearAndReloadCache(Authentication authentication) {
         log.debug("loading data in cache");
-        this.cacheLoaderService.reload();
+        this.cacheLoaderService.reload(authentication);
         log.debug("cache loaded");
     }
 

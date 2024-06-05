@@ -14,6 +14,7 @@ import com.andreidodu.europealibrary.service.FeaturedFileSystemItemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,20 +64,22 @@ public class FeaturedFileSystemItemServiceImpl extends CursoredServiceCommon imp
     }
 
     @Override
-    public GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO) {
-        return this.genericRetrieveCursored(cursorCommonRequestDTO, this.fileSystemItemFullMapper::toDTOWithParentDTORecursively);
+    public GenericCursoredResponseDTO<String, FileSystemItemDTO> retrieveCursored(Authentication authentication, CursorCommonRequestDTO cursorCommonRequestDTO) {
+        PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
+        return this.genericRetrieveCursored(paginatedExplorerOptions, cursorCommonRequestDTO, this.fileSystemItemFullMapper::toDTOWithParentDTORecursively);
     }
 
     @Override
-    public GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredHighlight(CursorCommonRequestDTO cursorCommonRequestDTO) {
-        return this.genericRetrieveCursored(cursorCommonRequestDTO, this.fileSystemItemFullMapper::toHighlightDTO);
+    public GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredHighlight(Authentication authentication, CursorCommonRequestDTO cursorCommonRequestDTO) {
+        PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
+        return this.genericRetrieveCursored(paginatedExplorerOptions, cursorCommonRequestDTO, this.fileSystemItemFullMapper::toHighlightDTO);
     }
 
 
-    private <T> GenericCursoredResponseDTO<String, T> genericRetrieveCursored(CursorCommonRequestDTO cursorCommonRequestDTO, Function<FileSystemItem, T> toDTO) {
+    private <T> GenericCursoredResponseDTO<String, T> genericRetrieveCursored(PaginatedExplorerOptions paginatedExplorerOptions, CursorCommonRequestDTO cursorCommonRequestDTO, Function<FileSystemItem, T> toDTO) {
         GenericCursoredResponseDTO<String, T> responseDTO = new GenericCursoredResponseDTO<>();
         responseDTO.setParent("Featured");
-        PairDTO<List<FileSystemItem>, Long> pair = this.featuredFileMetaInfoRepository.retrieveCursored(cursorCommonRequestDTO);
+        PairDTO<List<FileSystemItem>, Long> pair = this.featuredFileMetaInfoRepository.retrieveCursored(paginatedExplorerOptions, cursorCommonRequestDTO);
         responseDTO.setChildrenList(pair.getVal1().stream()
                 .map(toDTO)
                 .collect(Collectors.toList()));

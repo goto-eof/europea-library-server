@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,64 +64,11 @@ public class BookInfoServiceImpl implements BookInfoService {
     @Value("${com.andreidodu.europea-library.server.book-cover-path}")
     private String bookCoverPath;
 
-//    private static void validateUpdateInput(Long id, FileMetaInfoBookDTO dto) {
-//        if (id == null || !id.equals(dto.getId())) {
-//            throw new ApplicationException("IDs does not match");
-//        }
-//    }
-
     private static void validateUpdateInput(Long id, FileMetaInfoDTO dto) {
         if (id == null || !id.equals(dto.getId())) {
             throw new ApplicationException("IDs does not match");
         }
     }
-
-//    @Override
-//    public FileMetaInfoBookDTO retrieveById(Long id) {
-//        FileMetaInfo model = this.checkFileMetaInfoExistence(id);
-//        return this.fileMetaInfoBookMapper.toDTO(model);
-//    }
-
-//    @Override
-//    public FileMetaInfoBookDTO createBookInfo(FileMetaInfoBookDTO dto) {
-//        FileMetaInfo model = this.fileMetaInfoBookMapper.toModel(dto);
-//        model.setTagList(dto.getTagList()
-//                .stream()
-//                .map(tagDTO -> this.tagService.loadOrCreateTagEntity(tagDTO.getName()))
-//                .collect(Collectors.toList()));
-//        List<FileSystemItem> fileSystemItemList = this.fileSystemItemRepository.findAllById(dto.getFileSystemItemIdList());
-//        fileSystemItemList.forEach(fileSystemItem -> fileSystemItem.setFileMetaInfo(model));
-//        model.setFileSystemItemList(fileSystemItemList);
-//        model.getBookInfo().setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
-//        FileMetaInfo newModel = this.repository.save(model);
-//        return this.fileMetaInfoBookMapper.toDTO(newModel);
-//    }
-
-//    @Override
-//    public FileMetaInfoBookDTO updateBookInfo(Long fileMetaInfoId, FileMetaInfoBookDTO dto) {
-//        validateUpdateInput(fileMetaInfoId, dto);
-//        FileMetaInfo model = checkFileMetaInfoExistence(fileMetaInfoId);
-//        this.fileMetaInfoBookMapper.map(model, dto);
-//        model.setTagList(dto.getTagList()
-//                .stream()
-//                .map(TagDTO::getName)
-//                .map(String::toLowerCase)
-//                .map(String::trim)
-//                .distinct()
-//                .map(this.tagService::loadOrCreateTagEntity)
-//                .collect(Collectors.toList()));
-//        model.getBookInfo().setCategoryList(dto.getCategoryList()
-//                .stream()
-//                .map(CategoryDTO::getName)
-//                .map(String::toLowerCase)
-//                .map(String::trim)
-//                .distinct()
-//                .map(this.categoryService::createCategoryEntity)
-//                .collect(Collectors.toList()));
-//        model.getBookInfo().setManualLock(BookInfoConst.MANUAL_LOCK_LOCKED);
-//        FileMetaInfo newModel = this.repository.save(model);
-//        return this.fileMetaInfoBookMapper.toDTO(newModel);
-//    }
 
     @Override
     public OperationStatusDTO delete(Long id) {
@@ -132,17 +80,11 @@ public class BookInfoServiceImpl implements BookInfoService {
                 .orElse(new OperationStatusDTO(false, "not found"));
     }
 
-//    @Override
-//    public FileMetaInfoBookDTO retrieveByFileSystemItemId(Long fileSystemItemId) {
-//        FileSystemItem fileSystemItem = checkFileSystemItemExistence(fileSystemItemId);
-//        return this.fileMetaInfoBookMapper.toDTO(fileSystemItem.getFileMetaInfo());
-//    }
-
     @Override
-    public OperationStatusDTO bulkLanguageRename(RenameDTO renameDTO) {
+    public OperationStatusDTO bulkLanguageRename(Authentication authentication, RenameDTO renameDTO) {
         int count = this.bookInfoRepository.renameLanguage(renameDTO.getOldName(), renameDTO.getNewName());
         if (count > 0) {
-            this.cacheLoaderService.reloadLanguagesInCache();
+            this.cacheLoaderService.reloadLanguagesInCache(authentication);
         }
         return new OperationStatusDTO(count > 0, "language renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
     }
@@ -157,24 +99,22 @@ public class BookInfoServiceImpl implements BookInfoService {
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
     }
 
-
     @Override
-    public OperationStatusDTO bulkPublisherRename(RenameDTO renameDTO) {
+    public OperationStatusDTO bulkPublisherRename(Authentication authentication, RenameDTO renameDTO) {
         int count = this.bookInfoRepository.renamePublisher(renameDTO.getOldName(), renameDTO.getNewName());
         if (count > 0) {
-            this.cacheLoaderService.reloadPublishersInCache();
+            this.cacheLoaderService.reloadPublishersInCache(authentication);
         }
         return new OperationStatusDTO(count > 0, "publisher renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
     }
 
     @Override
-    public OperationStatusDTO bulkPublishedDateRename(RenameDTO renameDTO) {
+    public OperationStatusDTO bulkPublishedDateRename(Authentication authentication, RenameDTO renameDTO) {
         int count = this.bookInfoRepository.renamePublishedDate(renameDTO.getOldName(), renameDTO.getNewName());
         if (count > 0) {
-            this.cacheLoaderService.reloadPublishedDatesInCache();
+            this.cacheLoaderService.reloadPublishedDatesInCache(authentication);
         }
         return new OperationStatusDTO(count > 0, "published date renamed from \"" + renameDTO.getOldName() + "\" to \"" + renameDTO.getNewName() + "\"");
-
     }
 
     @Override
@@ -281,6 +221,5 @@ public class BookInfoServiceImpl implements BookInfoService {
         ImageIO.write(bi, "jpg", baos);
         return baos.toByteArray();
     }
-
 
 }
