@@ -78,14 +78,13 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     }
 
     @Override
-    public ResponseEntity<InputStreamResource> download(Authentication authentication, @PathVariable Long fileSystemItemId) {
-        DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(authentication, fileSystemItemId);
+    @GetMapping(path = "/download/{resourceIdentifier}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<InputStreamResource> download(Authentication authentication, String resourceIdentifier) {
+        DownloadDTO download = this.cursoredFileSystemService.retrieveResourceForDownload(authentication, resourceIdentifier);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         String encodedFilename = URLEncoder.encode(download.getFileName(), StandardCharsets.UTF_8);
         headers.set("Content-Disposition", "attachment; filename=\"" + encodedFilename + "\"");
-
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(download.getFileSize())
@@ -120,6 +119,11 @@ public class CursoredFileResourceImpl implements CursoredFileResource {
     @Override
     public ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredNewHighlight(Authentication authentication, CursorCommonRequestDTO commonRequestDTO) {
         return ResponseEntity.ok(cursoredFileSystemService.retrieveNewCursoredHighlight(authentication, commonRequestDTO));
+    }
+
+    @Override
+    public ResponseEntity<LinkInfoDTO> getLink(Authentication authentication, Long fileSystemItemId) {
+        return ResponseEntity.ok(cursoredFileSystemService.generateDownloadLink(authentication, fileSystemItemId));
     }
 
 }
