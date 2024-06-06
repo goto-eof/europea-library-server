@@ -16,6 +16,7 @@ import com.andreidodu.europealibrary.repository.FileMetaInfoRepository;
 import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
 import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,6 +95,7 @@ public class ApplicationSettingsServiceImpl implements ApplicationSettingsServic
     public FileSystemItemHighlightDTO getFeatured() {
         ApplicationSettings applicationSettings = this.retrieveApplicationSettings();
         FileSystemItem fileSystemItem = Optional.ofNullable(applicationSettings.getFeaturedFileMetaInfo())
+                .filter(fmi -> BooleanUtils.isFalse(fmi.getHidden()))
                 .map(fileMetaInfo -> fileMetaInfo.getFileSystemItemList().stream().findFirst()
                         .filter(fsi -> JobStepEnum.READY.getStepNumber() == fsi.getJobStep())
                         .orElseThrow(() -> new EntityNotFoundException("Entity not found")))

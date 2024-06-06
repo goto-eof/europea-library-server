@@ -10,33 +10,35 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CustomFileSystemItemRepository {
-    List<FileSystemItem> retrieveChildrenByCursor(CursorRequestDTO cursorRequestDTO);
+    List<FileSystemItem> retrieveChildrenByCursor(PaginatedExplorerOptions paginatedExplorerOptions, CursorRequestDTO cursorRequestDTO);
 
-    List<FileSystemItem> retrieveChildrenByCursoredCategoryId(CursorRequestDTO cursorRequestDTO);
+    List<FileSystemItem> retrieveChildrenByCursoredCategoryId(PaginatedExplorerOptions paginatedExplorerOptions, CursorRequestDTO cursorRequestDTO);
 
-    List<FileSystemItem> retrieveChildrenByCursoredTagId(CursorRequestDTO cursorRequestDTO);
+    List<FileSystemItem> retrieveChildrenByCursoredTagId(PaginatedExplorerOptions paginatedExplorerOptions, CursorRequestDTO cursorRequestDTO);
 
-    List<FileSystemItem> retrieveChildrenByCursoredFileExtension(CursorTypeRequestDTO cursorTypeRequestDTO);
+    List<FileSystemItem> retrieveChildrenByCursoredFileExtension(PaginatedExplorerOptions paginatedExplorerOptions, CursorTypeRequestDTO cursorTypeRequestDTO);
 
-    List<FileExtensionProjection> retrieveExtensionsInfo();
+    List<FileExtensionProjection> retrieveExtensionsInfo(PaginatedExplorerOptions paginatedExplorerOptions);
 
-    List<ItemAndFrequencyProjection> retrievePublishersInfo();
+    List<ItemAndFrequencyProjection> retrievePublishersInfo(PaginatedExplorerOptions paginatedExplorerOptions);
 
-    List<FileSystemItem> search(SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
+    List<FileSystemItem> search(PaginatedExplorerOptions paginatedExplorerOptions, SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
 
-    List<ItemAndFrequencyProjection> retrieveLanguagesInfo();
+    List<ItemAndFrequencyProjection> retrieveLanguagesInfo(PaginatedExplorerOptions paginatedExplorerOptions);
 
-    List<FileSystemItem> retrieveChildrenByCursoredLanguage(GenericCursorRequestDTO<String> cursorRequestDTO);
+    List<FileSystemItem> retrieveChildrenByCursoredLanguage(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    List<FileSystemItem> retrieveChildrenByCursoredPublisher(GenericCursorRequestDTO<String> cursorRequestDTO);
+    List<FileSystemItem> retrieveChildrenByCursoredPublisher(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    List<ItemAndFrequencyProjection> retrievePublishedDatesInfo();
+    List<ItemAndFrequencyProjection> retrievePublishedDatesInfo(PaginatedExplorerOptions paginatedExplorerOptions);
 
-    List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(GenericCursorRequestDTO<String> cursorRequestDTO);
+    List<FileSystemItem> retrieveChildrenByCursoredPublishedDate(PaginatedExplorerOptions paginatedExplorerOptions, GenericCursorRequestDTO<String> cursorRequestDTO);
 
-    PairDTO<List<FileSystemItem>, Long> retrieveChildrenByCursoredRating(CursorCommonRequestDTO cursorRequestDTO);
+    PairDTO<List<PairDTO<FileSystemItem, PairDTO<Double, Long>>>, Long> retrieveChildrenByCursoredRating(PaginatedExplorerOptions paginatedExplorerOptions, CursorCommonRequestDTO cursorRequestDTO);
 
-    PairDTO<List<FileSystemItem>, Long> retrieveCursoredByDownloadCount(CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
+    PairDTO<List<FileSystemItem>, Long> retrieveCursoredByDownloadCount(PaginatedExplorerOptions paginatedExplorerOptions, CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
 
-    List<FileSystemItem> retrieveNewCursored(CursorCommonRequestDTO cursorRequestDTO);
+    List<FileSystemItem> retrieveNewCursored(PaginatedExplorerOptions paginatedExplorerOptions, CursorCommonRequestDTO cursorRequestDTO);
+
+    PairDTO<List<PairDTO<FileSystemItem, Long>>, Long> retrieveCursoredByTopSold(PaginatedExplorerOptions paginatedExplorerOptions, CommonCursoredRequestDTO commonCursoredRequestDTO);
 }

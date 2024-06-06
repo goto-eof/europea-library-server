@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="2024-06-06-001" author="Andrei Dodu">
+        <createSequence sequenceName="${tablePrefix}tmp_res_identifier_seq" cycle="false" startValue="1"
+                        incrementBy="50"
+                        cacheSize="50"/>
+    </changeSet>
+
+    <changeSet id="2024-06-06-002" author="Andrei Dodu">
+        <createTable tableName="${tablePrefix}temporary_resource_identifier">
+            <column autoIncrement="${autoIncrement}" name="id" type="BIGINT"
+                    defaultValueSequenceNext="${tablePrefix}tmp_res_identifier_seq">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_temporary_resource_identifier"/>
+            </column>
+            <column name="file_system_item_id" type="BIGINT">
+                <constraints foreignKeyName="fk_file_system_item_id" references="${tablePrefix}file_system_item(id)"
+                             nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints foreignKeyName="fk_user_id" references="${tablePrefix}user(id)"
+                             nullable="true"/>
+            </column>
+            <column name="temporary_resource_identifier" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valid_from_ts" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valid_to_ts" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="insert_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="update_date" type="DATETIME" defaultValueComputed="${defaultTimestamp}"/>
+            <column name="version" type="INT"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

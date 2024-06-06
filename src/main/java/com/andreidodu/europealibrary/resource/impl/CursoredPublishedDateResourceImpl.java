@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,12 +24,12 @@ public class CursoredPublishedDateResourceImpl implements CursoredPublishedDateR
 
 
     @Override
-    public ResponseEntity<List<ItemAndFrequencyDTO>> retrievePublishedDateCursored() {
-        return ResponseEntity.ok(this.cursoredFileSystemService.retrieveAllPublishedDates());
+    public ResponseEntity<List<ItemAndFrequencyDTO>> retrievePublishedDateCursored(Authentication authentication) {
+        return ResponseEntity.ok(this.cursoredFileSystemService.retrieveAllPublishedDates(authentication));
     }
 
     @Override
-    public ResponseEntity<OperationStatusDTO> bulkPublishedDateRename(@Valid @RequestBody RenameDTO renameDTO) {
-        return ResponseEntity.ok(this.bookInfoService.bulkPublishedDateRename(renameDTO));
+    public ResponseEntity<OperationStatusDTO> bulkPublishedDateRename(Authentication authentication, @Valid @RequestBody RenameDTO renameDTO) {
+        return ResponseEntity.ok(this.bookInfoService.bulkPublishedDateRename(authentication, renameDTO));
     }
 }

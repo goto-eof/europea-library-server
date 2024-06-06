@@ -4,15 +4,16 @@ import com.andreidodu.europealibrary.annotation.security.AllowOnlyAdministrator;
 import com.andreidodu.europealibrary.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/featured")
 public interface FeaturedFileMetaInfoResource {
     @PostMapping(path = "/cursored")
-    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(@Valid @RequestBody CursorCommonRequestDTO cursorCommonRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemDTO>> retrieveCursored(Authentication authentication, @Valid @RequestBody CursorCommonRequestDTO cursorCommonRequestDTO);
 
     @PostMapping(path = "/cursored/highlight")
-    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(@Valid @RequestBody CursorCommonRequestDTO cursorCommonRequestDTO);
+    ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredHighlight(Authentication authentication, @Valid @RequestBody CursorCommonRequestDTO cursorCommonRequestDTO);
 
     @AllowOnlyAdministrator
     @GetMapping(path = "/isFeatured/{fileSystemItemId}")

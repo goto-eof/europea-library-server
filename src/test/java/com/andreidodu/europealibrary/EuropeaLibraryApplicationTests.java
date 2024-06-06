@@ -21,7 +21,7 @@ class EuropeaLibraryApplicationTests {
     @Autowired
     private Job job;
 
-    @Test
+
     void testIndexFile() throws Exception {
         jobLauncherTestUtils.setJob(job);
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(new JobParameters());

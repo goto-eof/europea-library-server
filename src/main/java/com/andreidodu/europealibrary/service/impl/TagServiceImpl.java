@@ -16,6 +16,7 @@ import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +35,12 @@ public class TagServiceImpl extends CursoredServiceCommon implements TagService 
 
     @Override
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_TAGS})
-    public CursorDTO<TagDTO> retrieveAllTags(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+    public CursorDTO<TagDTO> retrieveAllTags(Authentication authentication, CommonCursoredRequestDTO commonCursoredRequestDTO) {
         int limit = LimitUtil.calculateLimit(commonCursoredRequestDTO, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE);
 
         CursorDTO<TagDTO> cursoredResult = new CursorDTO<>();
-        List<Tag> tagList = this.tagRepository.retrieveTagsCursored(commonCursoredRequestDTO);
+        PaginatedExplorerOptions paginatedExplorerOptions = buildPaginatedExplorerOptions(authentication);
+        List<Tag> tagList = this.tagRepository.retrieveTagsCursored(paginatedExplorerOptions, commonCursoredRequestDTO);
         List<TagDTO> tagListDTO = this.tagMapper.toDTO(limit(tagList, limit, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE, OrderEnum.ASC));
         calculateNextId(tagList, limit, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE, OrderEnum.ASC)
                 .ifPresent(cursoredResult::setNextCursor);

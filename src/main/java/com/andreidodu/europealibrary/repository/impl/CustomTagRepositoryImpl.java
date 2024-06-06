@@ -2,6 +2,8 @@ package com.andreidodu.europealibrary.repository.impl;
 
 import com.andreidodu.europealibrary.constants.ApplicationConst;
 import com.andreidodu.europealibrary.dto.CommonCursoredRequestDTO;
+import com.andreidodu.europealibrary.dto.PaginatedExplorerOptions;
+import com.andreidodu.europealibrary.model.QFileMetaInfo;
 import com.andreidodu.europealibrary.model.QTag;
 import com.andreidodu.europealibrary.model.Tag;
 import com.andreidodu.europealibrary.repository.CustomTagRepository;
@@ -24,15 +26,17 @@ public class CustomTagRepositoryImpl extends CommonRepository implements CustomT
     private EntityManager entityManager;
 
     @Override
-    public List<Tag> retrieveTagsCursored(CommonCursoredRequestDTO commonCursoredRequestDTO) {
+    public List<Tag> retrieveTagsCursored(PaginatedExplorerOptions paginatedExplorerOptions, CommonCursoredRequestDTO commonCursoredRequestDTO) {
 
         Long cursorId = commonCursoredRequestDTO.getNextCursor();
 
         int numberOfResults = LimitUtil.calculateLimit(commonCursoredRequestDTO, ApplicationConst.TAGS_MAX_ITEMS_RETRIEVE);
 
         QTag tag = QTag.tag;
+        QFileMetaInfo fileMetaInfo = QFileMetaInfo.fileMetaInfo;
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
+        applyCommonFilter(fileMetaInfo, paginatedExplorerOptions, booleanBuilder);
 
         Optional.ofNullable(cursorId)
                 .ifPresent(id -> booleanBuilder.and(tag.id.goe(id)));
@@ -40,6 +44,7 @@ public class CustomTagRepositoryImpl extends CommonRepository implements CustomT
         return new JPAQuery<Tag>(entityManager)
                 .select(tag)
                 .from(tag)
+                .innerJoin(tag.fileMetaInfoList, fileMetaInfo)
                 .where(booleanBuilder)
                 .limit(numberOfResults + 1)
                 .fetch();

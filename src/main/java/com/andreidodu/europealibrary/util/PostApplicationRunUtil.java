@@ -9,6 +9,7 @@ import com.andreidodu.europealibrary.service.ApplicationSettingsService;
 import com.andreidodu.europealibrary.service.CacheLoaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -31,8 +32,8 @@ public class PostApplicationRunUtil {
     @Value("${com.andreidodu.europea-library.default-admin-password}")
     private String defaultAdminPassword;
 
-    public void loadCache() {
-        this.cacheLoaderService.reload();
+    public void loadCache(Authentication authentication) {
+        this.cacheLoaderService.reload(authentication);
     }
 
     public void addDefaultUsersAndRolesIfNecessary() {
