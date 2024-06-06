@@ -17,16 +17,16 @@ import java.time.LocalDateTime;
 public class TemporaryResourceIdentifier extends ModelCommon {
     @Id
     @Column(nullable = false, updatable = false)
-    @GeneratedValue(generator = "el_temporary_resource_identifier_seq", strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name = "el_temporary_resource_identifier_seq", sequenceName = "el_temporary_resource_identifier_seq", allocationSize = 50)
+    @GeneratedValue(generator = "el_tmp_res_identifier_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "el_tmp_res_identifier_seq", sequenceName = "el_tmp_res_identifier_seq", allocationSize = 50)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "file_system_item_id", updatable = false, insertable = false)
+    @JoinColumn(name = "file_system_item_id", nullable = false)
     private FileSystemItem fileSystemItem;
 
     @OneToOne
-    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(name = "temporary_resource_identifier", length = 100, nullable = false, unique = true)

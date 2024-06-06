@@ -2,7 +2,6 @@ package com.andreidodu.europealibrary.service.impl;
 
 import com.andreidodu.europealibrary.batch.indexer.enums.JobStepEnum;
 import com.andreidodu.europealibrary.constants.ApplicationConst;
-import com.andreidodu.europealibrary.constants.AuthConst;
 import com.andreidodu.europealibrary.constants.CacheConst;
 import com.andreidodu.europealibrary.constants.PersistenceConst;
 import com.andreidodu.europealibrary.dto.*;
@@ -11,13 +10,13 @@ import com.andreidodu.europealibrary.enums.OrderEnum;
 import com.andreidodu.europealibrary.enums.StripeCustomerProductsOwnedStatus;
 import com.andreidodu.europealibrary.exception.ApplicationException;
 import com.andreidodu.europealibrary.exception.EntityNotFoundException;
+import com.andreidodu.europealibrary.exception.ValidationException;
 import com.andreidodu.europealibrary.mapper.*;
 import com.andreidodu.europealibrary.model.FileMetaInfo;
 import com.andreidodu.europealibrary.model.FileSystemItem;
-import com.andreidodu.europealibrary.repository.CategoryRepository;
-import com.andreidodu.europealibrary.repository.FileSystemItemRepository;
-import com.andreidodu.europealibrary.repository.StripeCustomerProductsOwnedRepository;
-import com.andreidodu.europealibrary.repository.TagRepository;
+import com.andreidodu.europealibrary.model.TemporaryResourceIdentifier;
+import com.andreidodu.europealibrary.repository.*;
+import com.andreidodu.europealibrary.repository.security.UserRepository;
 import com.andreidodu.europealibrary.service.CursoredFileSystemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +33,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -45,13 +47,18 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class CursoredFileSystemServiceImpl extends CursoredServiceCommon implements CursoredFileSystemService {
+    public static final String DOWNLOAD_ENDPOINT = "/api/v2/file/download";
+    private static final long START_AFTER_SECONDS = 30;
+    private static final long MAX_DOWNLOAD_LINK_TTL_SECONDS = 60;
     private final StripeCustomerProductsOwnedRepository stripeCustomerProductsOwnedRepository;
+    private final TemporaryResourceIdentifierRepository temporaryResourceIdentifierRepository;
     private final FileSystemItemRepository fileSystemItemRepository;
     private final FileSystemItemFullMapper fileSystemItemFullMapper;
     private final FileSystemItemLessMapper fileSystemItemLessMapper;
     private final ItemAndFrequencyMapper itemAndFrequencyMapper;
     private final FileExtensionMapper fileExtensionMapper;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
     private final CategoryMapper categoryMapper;
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
@@ -175,24 +182,28 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
     }
 
     @Override
-    public DownloadDTO retrieveResourceForDownload(Authentication authentication, Long fileSystemId) {
-        return this.fileSystemItemRepository.findById(fileSystemId)
-                .map(fileSystemItem -> {
-                    try {
-                        checkIfUserAllowedToDownloadResource(extractUsername(authentication), fileSystemItem);
-                        fileSystemItem.setDownloadCount(fileSystemItem.getDownloadCount() + 1);
-                        this.fileSystemItemRepository.save(fileSystemItem);
-                        File file = new File(fileSystemItem.getBasePath() + "/" + fileSystemItem.getName());
-                        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-                        DownloadDTO downloadDTO = new DownloadDTO();
-                        downloadDTO.setInputStreamResource(resource);
-                        downloadDTO.setFileSize(file.length());
-                        downloadDTO.setFileName(fileSystemItem.getName());
-                        return downloadDTO;
-                    } catch (IOException e) {
-                        throw new ApplicationException("Unable to retrieve file");
-                    }
-                }).orElseThrow();
+    public DownloadDTO retrieveResourceForDownload(Authentication authentication, String resourceIdentifier) {
+        TemporaryResourceIdentifier temporaryResourceIdentifier = this.temporaryResourceIdentifierRepository.findByIdentifier(resourceIdentifier)
+                .orElseThrow(() -> new ValidationException("Invalid file system item id"));
+        LocalDateTime now = LocalDateTime.now();
+        if (!(now.isAfter(temporaryResourceIdentifier.getValidFromTs()) && now.isBefore(temporaryResourceIdentifier.getValidToTs()))) {
+            throw new ValidationException("Resource identifier expired");
+        }
+        FileSystemItem fileSystemItem = temporaryResourceIdentifier.getFileSystemItem();
+        try {
+            checkIfUserAllowedToDownloadResource(extractUsername(authentication), fileSystemItem);
+            fileSystemItem.setDownloadCount(fileSystemItem.getDownloadCount() + 1);
+            this.fileSystemItemRepository.save(fileSystemItem);
+            File file = new File(fileSystemItem.getBasePath() + "/" + fileSystemItem.getName());
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+            DownloadDTO downloadDTO = new DownloadDTO();
+            downloadDTO.setInputStreamResource(resource);
+            downloadDTO.setFileSize(file.length());
+            downloadDTO.setFileName(fileSystemItem.getName());
+            return downloadDTO;
+        } catch (Exception e) {
+            throw new ApplicationException("Unable to retrieve file: " + e.getMessage());
+        }
     }
 
     private void checkIfUserAllowedToDownloadResource(String username, FileSystemItem fileSystemItem) {
@@ -209,8 +220,10 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
                 .map(this.fileSystemItemFullMapper::toDTOFull)
                 .orElseThrow(() -> new ApplicationException("Item not found"));
         Optional.ofNullable(extractUsername(authentication))
-                .ifPresent(usernameValue -> {
+                .ifPresentOrElse(usernameValue -> {
                     fileSystemItemDTO.getFileMetaInfo().setDownloadable(calculateIsDownloadableByFileMetaInfoId(fileSystemItemDTO.getFileMetaInfo(), usernameValue));
+                }, () -> {
+                    fileSystemItemDTO.getFileMetaInfo().setDownloadable(calculateIsDownloadableByFileMetaInfoId(fileSystemItemDTO.getFileMetaInfo(), null));
                 });
         return fileSystemItemDTO;
     }
@@ -227,12 +240,42 @@ public class CursoredFileSystemServiceImpl extends CursoredServiceCommon impleme
         return fileSystemItemDTO;
     }
 
+    @Override
+    public LinkInfoDTO generateDownloadLink(Authentication authentication, Long fileSystemItemId) {
+
+        final String uuid = UUID.randomUUID().toString();
+
+        TemporaryResourceIdentifier temporaryResourceIdentifier = generateTemporaryResourceIdentifier(authentication, fileSystemItemId, uuid);
+
+        return buildLinkInfo(uuid, temporaryResourceIdentifier);
+    }
+
+    private static LinkInfoDTO buildLinkInfo(String uuid, TemporaryResourceIdentifier temporaryResourceIdentifier) {
+        return LinkInfoDTO.<String>builder().url(DOWNLOAD_ENDPOINT + "/" + uuid).validFromSeconds(
+                temporaryResourceIdentifier.getValidFromTs().toInstant(ZoneOffset.UTC).getEpochSecond() - LocalDateTime.now().toInstant(ZoneOffset.UTC).getEpochSecond()
+        ).validSeconds(
+                temporaryResourceIdentifier.getValidToTs().toInstant(ZoneOffset.UTC).getEpochSecond() - temporaryResourceIdentifier.getValidFromTs().toInstant(ZoneOffset.UTC).getEpochSecond()
+        ).build();
+    }
+
+    private TemporaryResourceIdentifier generateTemporaryResourceIdentifier(Authentication authentication, Long fileSystemItemId, String uuid) {
+        TemporaryResourceIdentifier temporaryResourceIdentifier = new TemporaryResourceIdentifier();
+        temporaryResourceIdentifier.setFileSystemItem(this.fileSystemItemRepository.findById(fileSystemItemId).orElseThrow(() -> new ValidationException("Invalid file system item id")));
+        temporaryResourceIdentifier.setIdentifier(uuid);
+        temporaryResourceIdentifier.setUser(Optional.ofNullable(authentication).map(Principal::getName).map(username -> this.userRepository.findByUsername(username).orElseThrow(() -> new ValidationException("Invalid username"))).orElse(null));
+        LocalDateTime now = LocalDateTime.now();
+        temporaryResourceIdentifier.setValidFromTs(now.plusSeconds(Optional.ofNullable(authentication).filter(Objects::nonNull).filter(auth -> auth.getName() != null).map((data) -> 0L).orElse(START_AFTER_SECONDS)));
+        temporaryResourceIdentifier.setValidToTs(now.plusSeconds(MAX_DOWNLOAD_LINK_TTL_SECONDS));
+        temporaryResourceIdentifier = this.temporaryResourceIdentifierRepository.save(temporaryResourceIdentifier);
+        return temporaryResourceIdentifier;
+    }
+
     private String extractUsername(Authentication authentication) {
         return Optional.ofNullable(authentication).map(Principal::getName).orElse(null);
     }
 
     private boolean calculateIsDownloadableByFileMetaInfoId(FileMetaInfoDTO fileMetaInfo, String username) {
-        return BooleanUtils.isTrue(fileMetaInfo.getOnSale()) ? stripeCustomerProductsOwnedRepository.existsByStripeCustomer_User_usernameAndStripeProduct_FileMetaInfo_idAndStatus(username, fileMetaInfo.getId(), StripeCustomerProductsOwnedStatus.PURCHASED) : true;
+        return !BooleanUtils.isTrue(fileMetaInfo.getOnSale()) || username != null && stripeCustomerProductsOwnedRepository.existsByStripeCustomer_User_usernameAndStripeProduct_FileMetaInfo_idAndStatus(username, fileMetaInfo.getId(), StripeCustomerProductsOwnedStatus.PURCHASED);
     }
 
     @Override

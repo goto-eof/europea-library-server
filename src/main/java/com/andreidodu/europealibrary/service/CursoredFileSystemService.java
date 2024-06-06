@@ -26,7 +26,7 @@ public interface CursoredFileSystemService {
     @Cacheable(cacheNames = {CacheConst.CACHE_NAME_PUBLISHERS})
     List<ItemAndFrequencyDTO> retrieveAllPublishers(Authentication authentication);
 
-    DownloadDTO retrieveResourceForDownload(Authentication authentication, Long fileSystemId);
+    DownloadDTO retrieveResourceForDownload(Authentication authentication, String resourceIdentifier);
 
     FileSystemItemDTO get(Authentication authentication, Long fileSystemItemId);
 
@@ -51,4 +51,6 @@ public interface CursoredFileSystemService {
     GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO> retrieveCursoredByDownloadCountHighlight(Authentication authentication, CursoredRequestByFileTypeDTO cursoredRequestByFileTypeDTO);
 
     FileSystemItemDTO getByFileMetaInfoId(Authentication authentication, Long fileMetaInfoId);
+
+    LinkInfoDTO generateDownloadLink(Authentication authentication, Long fileSystemItemId);
 }

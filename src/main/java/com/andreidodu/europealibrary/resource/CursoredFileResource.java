@@ -5,6 +5,7 @@ import com.andreidodu.europealibrary.dto.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -47,8 +48,8 @@ public interface CursoredFileResource {
     ResponseEntity<List<FileExtensionDTO>> retrieveFileExtensions(Authentication authentication);
 
     @AllowCalculatedAuthorities
-    @GetMapping(path = "/download/{fileSystemItemId}")
-    ResponseEntity<InputStreamResource> download(Authentication authentication, @PathVariable Long fileSystemItemId);
+    @GetMapping(path = "/download/{resourceIdentifier}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, consumes = MediaType.ALL_VALUE)
+    ResponseEntity<InputStreamResource> download(Authentication authentication, @PathVariable String resourceIdentifier);
 
     @PostMapping("/cursored/search")
     ResponseEntity<SearchResultDTO<SearchFileSystemItemRequestDTO, FileSystemItemDTO>> search(Authentication authentication, @RequestBody SearchFileSystemItemRequestDTO searchFileSystemItemRequestDTO);
@@ -67,5 +68,9 @@ public interface CursoredFileResource {
 
     @PostMapping(path = "/cursored/new/highlight")
     ResponseEntity<GenericCursoredResponseDTO<String, FileSystemItemHighlightDTO>> retrieveCursoredNewHighlight(Authentication authentication, @Valid @RequestBody CursorCommonRequestDTO commonRequestDTO);
+
+    @GetMapping(path = "/download/getLink/fileSystemItemId/{fileSystemItemId}")
+    ResponseEntity<LinkInfoDTO> getLink(Authentication authentication, @PathVariable Long fileSystemItemId);
+
 
 }
