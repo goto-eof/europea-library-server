@@ -82,7 +82,8 @@ different banking circuits.
     - file extension
     - language
     - publisher
-    - published date;
+    - published date
+    - top sold
 - view book information;
 - download e-books;
 - search by title, author, publisher, ISBN and published date;
@@ -93,6 +94,7 @@ different banking circuits.
 - password reset (reset link sent by e-mail)
 - bulk category/tag/language/publisher name change (only administrator is able to do this);
 - control panel (administration for admin, profile and security for all users)
+    -  user management page, now the administrator is able to disable user accounts  
     - customize home page
         - enable/disable widgets
     - enable/disable protected downloads feature (only authenticated users or not authenticated are able to download
@@ -102,7 +104,11 @@ different banking circuits.
 - sell/buy e-books and view transactions (Work In Progress)
 - included actuator for application monitoring and management
 - included Swagger UI for API documentation
-
+- protection system against XSS attacks
+- show/hide an e-book preventing access to potential buyers (but they are accessible by the owners and by the administrator)
+- Google reCAPTCHA v.3 integration
+- site cloning slowdown feature
+  
 ## Run the project (test environment)
 
 Before running the software as Spring Boot application it is necessary to follow some steps:
