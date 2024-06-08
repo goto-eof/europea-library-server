@@ -33,17 +33,17 @@ public class StripeCustomer extends ModelCommon {
     @Column(name = "email")
     private String email;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_stripe_customer_address_id", unique = true, nullable = false)
     private StripeCustomerAddress currentStripeCustomerAddress;
 
-    @OneToMany(mappedBy = "stripeCustomer")
+    @OneToMany(mappedBy = "stripeCustomer", fetch = FetchType.LAZY)
     private List<StripeCustomerProductsOwned> stripeCustomerProductsOwnedList;
 
-    @OneToMany(mappedBy = "stripeCustomer")
+    @OneToMany(mappedBy = "stripeCustomer", fetch = FetchType.LAZY)
     private List<StripeCustomerAddress> stripeCustomerAddressList;
 }

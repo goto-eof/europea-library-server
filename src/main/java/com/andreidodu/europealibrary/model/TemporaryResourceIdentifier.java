@@ -25,7 +25,7 @@ public class TemporaryResourceIdentifier extends ModelCommon {
     @JoinColumn(name = "file_system_item_id", nullable = false)
     private FileSystemItem fileSystemItem;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

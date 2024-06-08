@@ -49,7 +49,7 @@ public class FileMetaInfo extends ModelCommon {
     @OneToMany(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY)
     private List<FileSystemItem> fileSystemItemList;
 
-    @OneToOne(mappedBy = "fileMetaInfo")
+    @OneToOne(mappedBy = "fileMetaInfo", fetch = FetchType.LAZY)
     private StripeProduct stripeProduct;
 
     @OneToOne(mappedBy = "featuredFileMetaInfo", fetch = FetchType.LAZY)

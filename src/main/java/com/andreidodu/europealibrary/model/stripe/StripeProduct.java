@@ -31,15 +31,15 @@ public class StripeProduct extends ModelCommon {
     @Column(name = "stripe_product_id")
     private String stripeProductId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id", unique = true, nullable = false)
     private FileMetaInfo fileMetaInfo;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_stripe_price_id", referencedColumnName = "id", unique = true, nullable = false)
     private StripePrice currentStripePrice;
 
-    @OneToMany(mappedBy = "stripeProduct")
+    @OneToMany(mappedBy = "stripeProduct", fetch = FetchType.LAZY)
     private List<StripePrice> stripePriceHistoryList;
 
 }

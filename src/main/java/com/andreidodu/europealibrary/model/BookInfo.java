@@ -67,7 +67,7 @@ public class BookInfo extends ModelCommon {
     @Column(name = "is_corrupted")
     private Boolean isCorrupted;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_meta_info_id", referencedColumnName = "id")
     private FileMetaInfo fileMetaInfo;
 
