@@ -39,7 +39,7 @@ public class StripeCustomerAddress extends ModelCommon {
     @Column(name = "state")
     private String state;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_customer_id", unique = true, nullable = false)
     private StripeCustomer stripeCustomer;
 

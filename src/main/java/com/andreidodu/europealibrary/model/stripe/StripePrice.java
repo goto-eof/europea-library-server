@@ -33,11 +33,11 @@ public class StripePrice extends ModelCommon {
     @Column(name = "archived")
     private Boolean archived;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_product_id", nullable = false)
     private StripeProduct stripeProduct;
 
-    @OneToMany(mappedBy = "stripePrice")
+    @OneToMany(mappedBy = "stripePrice", fetch = FetchType.LAZY)
     private List<StripePurchaseSession> stripePurchaseSessionHistoryList;
 
 }
