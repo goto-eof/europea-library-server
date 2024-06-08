@@ -24,19 +24,19 @@ public class StripePurchaseSession extends ModelCommon {
     @Column(name = "status")
     private StripePurchaseSessionStatus stripePurchaseSessionStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_customer_id")
     private StripeCustomer stripeCustomer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_product_id", nullable = true, unique = false)
     private StripeProduct stripeProduct;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_price_id", referencedColumnName = "id", nullable = false)
     private StripePrice stripePrice;
 
-    @OneToOne(mappedBy = "stripePurchaseSession")
+    @OneToOne(mappedBy = "stripePurchaseSession", fetch = FetchType.LAZY)
     private StripeCustomerProductsOwned stripeCustomerProductsOwned;
 
     @Column(name = "stripe_payment_intent_id")

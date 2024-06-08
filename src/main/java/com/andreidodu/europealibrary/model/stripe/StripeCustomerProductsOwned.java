@@ -22,19 +22,19 @@ public class StripeCustomerProductsOwned extends ModelCommon implements Identifi
 
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_customer_id", nullable = false)
     private StripeCustomer stripeCustomer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_product_id", nullable = false)
     private StripeProduct stripeProduct;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_price_id", nullable = false)
     private StripePrice stripePrice;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stripe_purchase_session_id", unique = true, nullable = false)
     private StripePurchaseSession stripePurchaseSession;
 
