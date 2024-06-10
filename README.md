@@ -75,7 +75,7 @@ different banking circuits.
     - directory
     - top-rated
     - featured
-    - number of downloads
+    - top downloaded
     - just added
     - category
     - tags
