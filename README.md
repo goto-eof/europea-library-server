@@ -190,9 +190,6 @@ API • Stripe • Apache FreeMarker
 
 ## More
 
-- Currently, I do not add *alter* changesets to liquibase (the base schema is still in definition status), so that
-  sometimes
-  it is necessary to drop all tables and restart the application.
 - During my tests (in debug mode) I noticed that the job, in order to index and extract metadata from 8.850 files in a
   single-thread context,
   takes about 1 hour on a notebook (based on Ubuntu) with Intel i5 (2 core, 2.40GHz) equipped with an SSD. Because I
