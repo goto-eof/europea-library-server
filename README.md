@@ -165,7 +165,7 @@ stripe listen --forward-to localhost:8081/api/v1/stripe/webhook
 
 # API documentation
 
-The API documentation can be accessed here: http://europea-library.eu:8081/swagger-ui/index.html
+The API documentation can be accessed here: http://localhost:8081/swagger-ui/index.html
 
 ## Job steps
 
