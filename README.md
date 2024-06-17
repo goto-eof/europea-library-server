@@ -70,19 +70,7 @@ different banking circuits.
 ## Features
 
 - index and catalog large digital books collection quickly;
-- explore e-books by
-    - directory
-    - top-rated
-    - featured
-    - top downloaded
-    - just added
-    - category
-    - tags
-    - file extension
-    - language
-    - publisher
-    - published date
-    - top sold
+- explore e-books by directory, top-rated, featured, top downloaded, just added, category, tags, file extension, language, publisher, published date, top sold;
 - view book information;
 - download e-books;
 - search by title, author, publisher, ISBN and published date;
